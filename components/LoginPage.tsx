@@ -1,9 +1,26 @@
 // FIX: Implemented the LoginPage component to handle user authentication.
-import React from 'react';
+import React, { useState } from 'react';
 
-const LoginPage: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
+type UserRole = 'admin' | 'user';
+interface LoginPageProps {
+    onLogin: (role: UserRole) => void;
+}
+
+const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
+    const [email, setEmail] = useState('demo@dripfy.com');
+    const [password, setPassword] = useState('password');
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (email === 'admin@dripfy.de' && password === 'password123') {
+            onLogin('admin');
+        } else {
+            onLogin('user');
+        }
+    };
+
     return (
-        <div className="min-h-screen bg-neutral-900 flex items-center justify-center">
+        <div className="min-h-screen bg-neutral-900 flex items-center justify-center animate-fade-in">
             <div className="w-full max-w-md p-8 space-y-8 bg-neutral-800 rounded-xl border border-neutral-700 shadow-2xl">
                 <div>
                     <h1 className="text-4xl font-bold text-center text-[#32ff84] brand-glow">dripfy<span className="text-neutral-400">.</span></h1>
@@ -11,13 +28,31 @@ const LoginPage: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
                         Long-Life Startup Management Information System
                     </p>
                 </div>
-                <form className="mt-8 space-y-6" onSubmit={(e) => { e.preventDefault(); onLogin(); }}>
+                <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
                     <div className="rounded-md shadow-sm -space-y-px">
                         <div>
-                            <input id="email-address" name="email" type="email" required className="appearance-none rounded-none relative block w-full px-3 py-2 border border-neutral-600 bg-neutral-900 text-white placeholder-neutral-500 focus:outline-none focus:ring-[#32ff84] focus:border-[#32ff84] focus:z-10 sm:text-sm rounded-t-md" placeholder="Email address" defaultValue="demo@dripfy.com" />
+                            <input 
+                                id="email-address" 
+                                name="email" 
+                                type="email" 
+                                required 
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-neutral-600 bg-neutral-900 text-white placeholder-neutral-500 focus:outline-none focus:ring-[#32ff84] focus:border-[#32ff84] focus:z-10 sm:text-sm rounded-t-md" 
+                                placeholder="Email address (admin@dripfy.de)" 
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
                         </div>
                         <div>
-                            <input id="password" name="password" type="password" required className="appearance-none rounded-none relative block w-full px-3 py-2 border border-neutral-600 bg-neutral-900 text-white placeholder-neutral-500 focus:outline-none focus:ring-[#32ff84] focus:border-[#32ff84] focus:z-10 sm:text-sm rounded-b-md" placeholder="Password" defaultValue="password" />
+                            <input 
+                                id="password" 
+                                name="password" 
+                                type="password" 
+                                required 
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-neutral-600 bg-neutral-900 text-white placeholder-neutral-500 focus:outline-none focus:ring-[#32ff84] focus:border-[#32ff84] focus:z-10 sm:text-sm rounded-b-md" 
+                                placeholder="Password (password123 for admin)" 
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
                         </div>
                     </div>
                     <button type="submit" className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-black bg-[#32ff84] hover:bg-green-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">

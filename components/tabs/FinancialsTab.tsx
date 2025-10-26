@@ -1,86 +1,72 @@
-// FIX: Implemented the FinancialsTab component to display financial data.
 import React from 'react';
-import { Payment } from '../../types';
-import { TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
+import { FinancialRecord } from '../../types';
+import { PlusCircle, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
 
-const tagColorStyles: { [key: string]: { bg: string; text: string } } = {
-  purple: { bg: 'bg-purple-500/20', text: 'text-purple-300' },
-  red: { bg: 'bg-red-500/20', text: 'text-red-300' },
-  green: { bg: 'bg-green-500/20', text: 'text-green-300' },
-  orange: { bg: 'bg-orange-500/20', text: 'text-orange-300' },
-  blue: { bg: 'bg-blue-500/20', text: 'text-blue-300' },
-  yellow: { bg: 'bg-yellow-500/20', text: 'text-yellow-300' },
-  gray: { bg: 'bg-gray-500/20', text: 'text-gray-300' },
-  pink: { bg: 'bg-pink-500/20', text: 'text-pink-300' },
-  teal: { bg: 'bg-teal-500/20', text: 'text-teal-300' },
+interface FinancialsTabProps {
+    data: FinancialRecord[];
+    userRole: 'admin' | 'user' | null;
+    onOpenModal: (item: FinancialRecord | Partial<FinancialRecord>, type: 'financials', isNew?: boolean) => void;
+}
+
+const getStatusColor = (status: string) => {
+    switch(status) {
+        case 'Paid': return 'bg-green-500/20 text-green-300';
+        case 'Pending': return 'bg-yellow-500/20 text-yellow-300';
+        case 'Overdue': return 'bg-red-500/20 text-red-300';
+        default: return 'bg-neutral-700';
+    }
 };
 
-const FinancialsTab: React.FC<{ data: any }> = ({ data }) => {
-    if (!data) return null;
-    const { overview, payments, breakdown, categories } = data;
-
+const FinancialsTab: React.FC<FinancialsTabProps> = ({ data, userRole, onOpenModal }) => {
+    const handleAddNew = () => {
+        onOpenModal({ description: '', amount: 0, status: 'Pending', dueDate: new Date().toISOString().split('T')[0], type: 'Outgoing' }, 'financials', true);
+    }
+    
     return (
-        <div className="animate-fade-in space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-neutral-800 p-5 rounded-xl border border-neutral-700">
-                    <div className="flex items-center text-neutral-400 gap-2"><DollarSign size={16} /> Total Amount</div>
-                    <p className="text-2xl font-bold text-white mt-2">€{overview.total.toLocaleString()}</p>
-                </div>
-                <div className="bg-neutral-800 p-5 rounded-xl border border-neutral-700">
-                    <div className="flex items-center text-green-400 gap-2"><TrendingUp size={16} /> Paid</div>
-                    <p className="text-2xl font-bold text-white mt-2">€{overview.paid.toLocaleString()}</p>
-                </div>
-                <div className="bg-neutral-800 p-5 rounded-xl border border-neutral-700">
-                    <div className="flex items-center text-orange-400 gap-2"><TrendingDown size={16} /> Total Pending</div>
-                    <p className="text-2xl font-bold text-white mt-2">€{overview.totalPending.toLocaleString()}</p>
-                </div>
+        <div className="animate-fade-in">
+             <div className="flex justify-end mb-4">
+                {userRole === 'admin' && (
+                    <button onClick={handleAddNew} className="flex items-center gap-2 px-4 py-2 bg-[#32ff84] text-black text-sm font-semibold rounded-lg hover:bg-green-400 transition-colors">
+                        <PlusCircle size={18}/> New Financial Record
+                    </button>
+                )}
             </div>
-
-            <div className="bg-neutral-800 p-5 rounded-xl border border-neutral-700">
-                <h3 className="text-xl font-bold text-white mb-4">Pending Payments</h3>
-                <div className="space-y-3">
-                    {payments.map((payment: Payment) => (
-                        <div key={payment.id} className="flex justify-between items-center bg-neutral-900/50 p-3 rounded-lg">
-                            <div>
-                                <p className="font-semibold text-white">{payment.title}</p>
-                                <div className="flex flex-wrap gap-2 mt-1">
-                                    {payment.tags.map(tag => (
-                                        <span key={tag.text} className={`px-2 py-0.5 text-xs rounded-full ${tagColorStyles[tag.color]?.bg || ''} ${tagColorStyles[tag.color]?.text || ''}`}>
-                                            {tag.text}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                            <p className="font-bold text-lg text-white">€{payment.amount.toLocaleString()}</p>
-                        </div>
-                    ))}
-                </div>
+            <div className="overflow-x-auto bg-neutral-800/50 rounded-lg border border-neutral-700">
+                <table className="min-w-full divide-y divide-neutral-700">
+                    <thead className="bg-neutral-800">
+                        <tr>
+                            <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-white sm:pl-6">Description</th>
+                            <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-white">Amount</th>
+                            <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-white">Status</th>
+                            <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-white">Due Date</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-neutral-800 bg-neutral-900/50">
+                        {data.map((record) => (
+                            <tr key={record.id} onClick={() => onOpenModal(record, 'financials')} className="hover:bg-neutral-800/70 group cursor-pointer">
+                                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                                    <div className="flex items-center">
+                                        {record.type === 'Incoming' 
+                                            ? <ArrowUpCircle size={20} className="text-green-400 mr-3" />
+                                            : <ArrowDownCircle size={20} className="text-red-400 mr-3" />
+                                        }
+                                        <div className="font-medium text-white">{record.description}</div>
+                                    </div>
+                                </td>
+                                <td className={`whitespace-nowrap px-3 py-4 text-sm font-semibold ${record.amount > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                    €{Math.abs(record.amount).toLocaleString('de-DE')}
+                                </td>
+                                <td className="whitespace-nowrap px-3 py-4 text-sm">
+                                    <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${getStatusColor(record.status)}`}>
+                                        {record.status}
+                                    </span>
+                                </td>
+                                <td className="whitespace-nowrap px-3 py-4 text-sm text-neutral-400">{record.dueDate}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
-            
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                 <div className="bg-neutral-800 p-5 rounded-xl border border-neutral-700">
-                     <h3 className="text-xl font-bold text-white mb-4">Daily Breakdown</h3>
-                     <ul className="space-y-2">
-                        {Object.entries(breakdown).map(([day, amount]) => (
-                            <li key={day} className="flex justify-between text-neutral-300">
-                                <span>{day}</span>
-                                <span className="font-mono">€{Number(amount).toLocaleString()}</span>
-                            </li>
-                        ))}
-                     </ul>
-                 </div>
-                 <div className="bg-neutral-800 p-5 rounded-xl border border-neutral-700">
-                     <h3 className="text-xl font-bold text-white mb-4">Categories</h3>
-                      <ul className="space-y-2">
-                        {Object.entries(categories).map(([category, amount]) => (
-                            <li key={category} className="flex justify-between text-neutral-300">
-                                <span>{category}</span>
-                                <span className="font-mono">€{Number(amount).toLocaleString()}</span>
-                            </li>
-                        ))}
-                     </ul>
-                 </div>
-             </div>
         </div>
     );
 };

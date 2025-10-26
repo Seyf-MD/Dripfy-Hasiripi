@@ -2,7 +2,7 @@
 import React from 'react';
 import { Calendar, Euro, ShieldAlert, Users, ListChecks, Shield } from 'lucide-react';
 
-const tabs = [
+const allTabs = [
     { name: 'Weekly Schedule', icon: <Calendar size={18} /> },
     { name: 'Financials', icon: <Euro size={18} /> },
     { name: 'Challenges', icon: <ShieldAlert size={18} /> },
@@ -14,14 +14,17 @@ const tabs = [
 interface TabNavigationProps {
     activeTab: string;
     setActiveTab: (tab: string) => void;
+    userRole: 'admin' | 'user' | null;
 }
 
-const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab }) => {
+const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab, userRole }) => {
+    const visibleTabs = userRole === 'admin' ? allTabs : allTabs.filter(tab => tab.name !== 'Admin Panel');
+    
     return (
         <div className="mt-6 animate-slide-in-up" style={{ animationDelay: '600ms' }}>
             <div className="border-b border-neutral-700">
                 <nav className="-mb-px flex space-x-6 overflow-x-auto" aria-label="Tabs">
-                    {tabs.map((tab) => (
+                    {visibleTabs.map((tab) => (
                         <button
                             key={tab.name}
                             onClick={() => setActiveTab(tab.name)}

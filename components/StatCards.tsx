@@ -8,11 +8,13 @@ interface StatCardProps {
   subValue?: string;
   children?: React.ReactNode;
   delay: number;
+  onClick?: () => void;
 }
 
-const StatCard: React.FC<StatCardProps> = ({ icon, title, value, subValue, children, delay }) => (
+const StatCard: React.FC<StatCardProps> = ({ icon, title, value, subValue, children, delay, onClick }) => (
   <div 
-    className="bg-neutral-800 p-5 rounded-xl border border-neutral-700 flex flex-col justify-between h-full transition-all duration-300 hover:border-[#32ff84]/50 hover:shadow-2xl hover:shadow-black/20 hover:-translate-y-1 animate-slide-in-up"
+    onClick={onClick}
+    className={`bg-neutral-800 p-5 rounded-xl border border-neutral-700 flex flex-col justify-between h-full transition-all duration-300 hover:border-[#32ff84]/50 hover:shadow-2xl hover:shadow-black/20 hover:-translate-y-1 animate-slide-in-up ${onClick ? 'cursor-pointer' : ''}`}
     style={{ animationDelay: `${delay}ms` }}
   >
     <div>
@@ -27,7 +29,11 @@ const StatCard: React.FC<StatCardProps> = ({ icon, title, value, subValue, child
   </div>
 );
 
-const StatCards: React.FC = () => {
+interface StatCardsProps {
+  setActiveTab: (tab: string) => void;
+}
+
+const StatCards: React.FC<StatCardsProps> = ({ setActiveTab }) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
       <StatCard
@@ -36,6 +42,7 @@ const StatCards: React.FC = () => {
         title="Total Meetings"
         value="53"
         subValue="+5 this limited week"
+        onClick={() => setActiveTab('Weekly Schedule')}
       />
       <StatCard
         delay={300}
@@ -43,6 +50,7 @@ const StatCards: React.FC = () => {
         title="Pending Payments"
         value="€64.100"
         subValue="Start this week"
+        onClick={() => setActiveTab('Financials')}
       />
       <StatCard
         delay={400}
@@ -50,12 +58,14 @@ const StatCards: React.FC = () => {
         title="Active Escrows"
         value="35"
         subValue="In compensation"
+        onClick={() => setActiveTab('Contacts')}
       />
       <StatCard
         delay={500}
         icon={<BarChart2 size={20} />}
         title="Test Condition"
         value="72%"
+        onClick={() => setActiveTab('Tasks')}
       >
         <div className="w-full bg-neutral-700 rounded-full h-2">
           <div className="bg-[#32ff84] h-2 rounded-full" style={{ width: '72%' }}></div>

@@ -1,42 +1,47 @@
-// FIX: Implemented the ContactsTab component to display contact information.
 import React from 'react';
 import { Contact } from '../../types';
-import { User, Building } from 'lucide-react';
+import { Building, User, PlusCircle } from 'lucide-react';
 
-const tagColorStyles: { [key: string]: { bg: string; text: string } } = {
-  purple: { bg: 'bg-purple-500/20', text: 'text-purple-300' },
-  red: { bg: 'bg-red-500/20', text: 'text-red-300' },
-  green: { bg: 'bg-green-500/20', text: 'text-green-300' },
-  orange: { bg: 'bg-orange-500/20', text: 'text-orange-300' },
-  blue: { bg: 'bg-blue-500/20', text: 'text-blue-300' },
-  yellow: { bg: 'bg-yellow-500/20', text: 'text-yellow-300' },
-};
+interface ContactsTabProps {
+    data: Contact[];
+    userRole: 'admin' | 'user' | null;
+    onOpenModal: (item: Contact | Partial<Contact>, type: 'contacts', isNew?: boolean) => void;
+}
 
-const ContactCard: React.FC<{ item: Contact }> = ({ item }) => (
-    <div className="bg-neutral-800 p-4 rounded-lg border border-neutral-700 mb-3 transition-all duration-300 hover:border-[#32ff84]/50 hover:shadow-lg hover:shadow-black/20">
-        <h4 className="font-semibold text-white">{item.name}</h4>
-        <p className="text-sm text-neutral-400 mt-1">{item.role}</p>
-        <div className="flex flex-wrap gap-2 mt-3">
-            {item.tags.map(tag => (
-                <span key={tag.text} className={`px-2 py-1 text-xs rounded-full ${tagColorStyles[tag.color]?.bg || 'bg-gray-500/20'} ${tagColorStyles[tag.color]?.text || 'text-gray-300'}`}>
-                    {tag.text}
-                </span>
-            ))}
-        </div>
-    </div>
-);
-
-const ContactsTab: React.FC<{ data: { individuals: Contact[]; organizations: Contact[] } }> = ({ data }) => {
-    if (!data) return null;
+const ContactsTab: React.FC<ContactsTabProps> = ({ data, userRole, onOpenModal }) => {
+    const handleAddNew = () => {
+        onOpenModal({ name: '', role: '', type: 'Individual', email: ''}, 'contacts', true);
+    }
+    
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
-            <div>
-                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2"><User /> Individuals</h3>
-                {data.individuals.map(item => <ContactCard key={item.id} item={item} />)}
+        <div className="animate-fade-in">
+            <div className="flex justify-end mb-4">
+                {userRole === 'admin' && (
+                    <button onClick={handleAddNew} className="flex items-center gap-2 px-4 py-2 bg-[#32ff84] text-black text-sm font-semibold rounded-lg hover:bg-green-400 transition-colors">
+                        <PlusCircle size={18}/> New Contact
+                    </button>
+                )}
             </div>
-            <div>
-                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2"><Building /> Organizations</h3>
-                {data.organizations.map(item => <ContactCard key={item.id} item={item} />)}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {data.map((contact) => (
+                    <div key={contact.id} onClick={() => onOpenModal(contact, 'contacts')} className="bg-neutral-800 p-5 rounded-xl border border-neutral-700 flex flex-col justify-between transition-all duration-300 hover:border-[#32ff84]/50 hover:-translate-y-1 relative group cursor-pointer">
+                        <div>
+                            <div className="flex items-start justify-between">
+                                <div>
+                                    <h3 className="text-lg font-bold text-white">{contact.name}</h3>
+                                    <p className="text-sm text-neutral-400">{contact.role}</p>
+                                </div>
+                                <span className="p-2 bg-neutral-700 rounded-lg">
+                                    {contact.type === 'Company' ? <Building size={20} className="text-orange-400" /> : <User size={20} className="text-blue-400" />}
+                                </span>
+                            </div>
+                            <div className="mt-4 space-y-2 text-sm">
+                                <p className="text-neutral-300 break-all">{contact.email}</p>
+                                {contact.phone && <p className="text-neutral-500">{contact.phone}</p>}
+                            </div>
+                        </div>
+                    </div>
+                ))}
             </div>
         </div>
     );

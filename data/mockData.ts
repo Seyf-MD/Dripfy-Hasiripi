@@ -1,90 +1,124 @@
-import { ScheduleItem, Payment, Challenge, Advantage, Contact, Task } from '../types';
+import { DashboardData } from '../types';
 
-export const scheduleData: { germany: ScheduleItem[]; istanbul: ScheduleItem[] } = {
-  germany: [
-    { id: 1, title: 'Entegrasyon toplantısı sonrası Driss (LR BME-Head)', assignees: ['Dr.Umut Zinc', 'Dr. Jhon Doe Team'], tags: [{ text: 'visit', color: 'purple' }, { text: 'high', color: 'red' }] },
-    { id: 2, title: 'İsviçre Bankası ile toplantı ve Sharman Ailesi Ortaklığı', assignees: ['Dr. Riyadh Team'], tags: [{ text: 'call', color: 'green' }, { text: 'high', color: 'red' }] },
-    { id: 3, title: 'Vegan pure serisi sunumu (Franchise Day)', assignees: ['Dr. Sinan Team'], tags: [{ text: 'done', color: 'orange' }, { text: 'high', color: 'red' }] },
-    { id: 4, title: 'Lipozomal Vitamin C Formülü', assignees: ['Dr. Uwell'], tags: [{ text: 'notify', color: 'blue' }, { text: 'medium', color: 'yellow' }] },
+export const mockData: DashboardData = {
+  schedule: [
+    { id: 's1', day: 'Monday', time: '10:00', title: 'German Medical ile Press Release Toplantısı', participants: ['Marcus', 'PR Team'], type: 'Meeting' },
+    { id: 's2', day: 'Tuesday', time: '14:00', title: 'David Lyodds Club ile Wellness Entegrasyon Görüşmesi', participants: ['Gabriel'], type: 'Call' },
+    { id: 's3', day: 'Wednesday', time: '11:30', title: 'Dr. Adeel Khan ile Plazmaferez Cihazı Görüşmesi', participants: ['Dr. Adeel Khan'], type: 'Meeting' },
+    { id: 's4', day: 'Thursday', time: '16:00', title: 'Frankfurt Healthexpo Katılımcı Listesi Talebi', participants: ['Event Team'], type: 'Event' },
+    { id: 's5', day: 'Friday', time: '15:00', title: 'Kliwla Family Office ile Dripfy Flagship Görüşmesi', participants: ['Dt. Moritz Breitenbach', 'Osman Altinisik'], type: 'Meeting' },
   ],
-  istanbul: [
-    { id: 1, title: 'Pazarlama ile ilgili peptide updates', assignees: ['Dr. Cem'], tags: [{ text: 'meeting', color: 'blue' }, { text: 'high', color: 'red' }] },
-    { id: 2, title: 'Gelecekteki M.I.S. Council listesi ve sunum update', assignees: ['Dr. Ali İstanbul'], tags: [{ text: 'meeting', color: 'blue' }, { text: 'high', color: 'red' }] },
-    { id: 3, title: 'Dr. Nail Han ile planlanan video-BR2 çekimi', assignees: ['Dr. Gökhan Kurt'], tags: [{ text: 'meeting', color: 'blue' }, { text: 'medium', color: 'yellow' }] },
-    { id: 4, title: 'Dudak Dolgusu Etkinliği 2023 için yapılan pratik gün', assignees: ['Ahmet Kurt, ICD'], tags: [{ text: 'meeting', color: 'blue' }, { text: 'medium', color: 'yellow' }] },
+  financials: [
+    { id: 'f1', description: 'Ibo Ödemesi', amount: -500, status: 'Pending', dueDate: '2024-10-07', type: 'Outgoing' },
+    { id: 'f2', description: 'PTS İsviçre', amount: -1500, status: 'Pending', dueDate: '2024-10-07', type: 'Outgoing' },
+    { id: 'f3', description: 'Dubai Press Release', amount: -500, status: 'Pending', dueDate: '2024-10-08', type: 'Outgoing' },
+    { id: 'f4', description: 'Uçak Bileti', amount: -500, status: 'Pending', dueDate: '2024-10-08', type: 'Outgoing' },
+    { id: 'f5', description: 'Hamburg Giderleri', amount: -400, status: 'Pending', dueDate: '2024-10-09', type: 'Outgoing' },
+    { id: 'f6', description: 'Myoact Cihazı', amount: -350, status: 'Pending', dueDate: '2024-10-09', type: 'Outgoing' },
+    { id: 'f7', description: 'ChatGpt Pro Aboneliği', amount: -250, status: 'Pending', dueDate: '2024-10-09', type: 'Outgoing' },
   ],
-};
-
-// FIX: Replaced `any` with specific types for `overview`, `breakdown`, and `categories` to ensure type safety.
-export const financialData: {
-  overview: { totalPending: number; paid: number; total: number };
-  payments: Payment[];
-  breakdown: { [key: string]: number };
-  categories: { [key: string]: number };
-} = {
-    overview: {
-        totalPending: 64100,
-        paid: 20000,
-        total: 84100,
-    },
-    payments: [
-        { id: 1, title: 'Ibo', amount: 500, status: 'pending', tags: [{ text: 'Passive', color: 'blue' }] },
-        { id: 2, title: 'PTS İsviçre', amount: 1500, status: 'pending', tags: [{ text: 'Contribution', color: 'purple' }] },
-        { id: 3, title: 'Dubai press release', amount: 500, status: 'pending', tags: [{ text: 'Marketing', color: 'pink' }] },
-        { id: 4, title: 'Bilet uçak', amount: 500, status: 'pending', tags: [{ text: 'Travel', color: 'orange' }] },
-        { id: 5, title: 'Hamburg', amount: 400, status: 'pending', tags: [{ text: 'Travel', color: 'orange' }] },
-        { id: 6, title: 'Myoact', amount: 350, status: 'pending', tags: [{ text: 'Logistics', color: 'green' }] },
-        { id: 7, title: 'ChatGpt Pro', amount: 250, status: 'pending', tags: [{ text: 'Software', color: 'teal' }] },
-    ],
-    breakdown: {
-        'Pazartesi': 2000,
-        'Salı': 2000,
-        'Çarşamba': 2100,
-    },
-    categories: {
-        'Contribution': 1500,
-        'Travel': 900,
-        'Passive': 500,
-        'Marketing': 500,
-        'Logistics': 350,
-        'Software': 250,
-    }
-};
-
-export const challengesAndAdvantages: { challenges: Challenge[]; advantages: Advantage[] } = {
   challenges: [
-    { id: 1, title: 'Zaman Kısıtlılığı', description: 'Hamburg ve İstanbul ziyaretleri sebebiyle zaman kısıtlılığı.', tags: [{ text: 'high impact', color: 'red' }, { text: 'Operational', color: 'gray' }] },
-    { id: 2, title: 'Teknoloji Ekipmanları', description: 'iPad ve iPhone alınması gerekli.', tags: [{ text: 'action impact', color: 'yellow' }, { text: 'Technology', color: 'gray' }] },
-    { id: 3, title: 'Tesisat Düzenlemesi', description: 'LR camın dış yüzüne milchglass kaplanması gibi usta başı işlerin zaman alması.', tags: [{ text: 'action impact', color: 'yellow' }, { text: 'Maintenance', color: 'gray' }] },
-    { id: 4, title: 'Yazılım Abonelikleri', description: 'ChatGPT Pro aboneliği.', tags: [{ text: 'low impact', color: 'green' }, { text: 'Software', color: 'gray' }] },
+    { id: 'c1', title: 'Zaman Kısıtlılığı', description: 'Hamburg ve İstanbul ziyaretleri sebebiyle yoğun program.', severity: 'High' },
+    { id: 'c2', title: 'Ekipman İhtiyacı', description: 'Yeni iPad ve iPhone alınması gerekiyor.', severity: 'Medium' },
+    { id: 'c3', title: 'Operasyonel Zamanlama', description: 'LR camın dış yüzüne milchglass kaplanması gibi usta başı işlerin zaman alması.', severity: 'Low' },
+    { id: 'c4', title: 'Abonelik Yönetimi', description: 'Chatgpt Pro aboneliğinin yenilenmesi ve takibi.', severity: 'Low' },
   ],
   advantages: [
-    { id: 1, title: 'MVP Başarısı', description: 'Dripfy NAD serumunun, ilk Proof of Concept yerimiz olan Longevity Rooms içerisinde faaliyete başladığı için Live on Action deneyimler ile hız kazanmış oluyoruz.', tags: [{ text: 'high impact', color: 'red' }, { text: 'Product', color: 'gray' }] },
-    { id: 2, title: 'Proof of Concept', description: 'istikrarlı bir şekilde büyüyen LR x Dripfy işbirliğine katılan Team memberlar uyum içerisinde özverili içten ve profesyonel yaklaşımda bulunuyorlar.', tags: [{ text: 'high impact', color: 'red' }, { text: 'Validation', color: 'gray' }] },
-    { id: 3, title: 'Takım Uyumu', description: 'süregelen networking imkanlari hiz kazanmamiza yardimci oluyor.', tags: [{ text: 'high impact', color: 'red' }, { text: 'Team', color: 'gray' }] },
+    { id: 'a1', title: 'Live on Action Deneyimi & Hızlı Büyüme', description: 'Dripfy NAD serumu MVP\'sinin Longevity Rooms\'ta başarılı PoC süreci ile hız kazanılması.' },
+    { id: 'a2', title: 'Güçlü Takım ve İşbirliği', description: 'LR x Dripfy işbirliğindeki ekibin uyumu, özverili ve profesyonel yaklaşımı.' },
+    { id: 'a3', title: 'Süregelen Networking Fırsatları', description: 'Mevcut networklerin hız kazanmaya yardımcı olması.' },
   ],
+  contacts: [
+    { id: 'ct1', name: 'Ali Tınazlı', role: 'Lifespin GTM Partner', type: 'Individual', email: 'ali.tinazli@lifespin.health' },
+    { id: 'ct2', name: 'Dr. Bülent Ugurlu', role: 'Medical Board', type: 'Individual', email: 'b.ugurlu@medical.dripfy' },
+    { id: 'ct3', name: 'Dr. Ali Assar', role: 'Medical Board', type: 'Individual', email: 'a.assar@medical.dripfy' },
+    { id: 'ct4', name: 'Dr. Mansoor Mohammed', role: 'CEO, Precision Health Clinic', type: 'Individual', email: 'mansoor.m@thephclinic.com' },
+    { id: 'ct5', name: 'Noah Laith', role: 'RBT Referansı', type: 'Individual', email: 'noah.laith@rbt.com' },
+    { id: 'ct6', name: 'Timo Kress', role: 'İlk Peptid Hastası', type: 'Individual', email: 't.kress@patient.info' },
+    { id: 'ct7', name: 'Prof. Fatih Toy', role: 'Nanolive Partner', type: 'Individual', email: 'fatih.toy@nanolive.ai' },
+    { id: 'ct8', name: 'Dr. Federico', role: 'Lifespan Dubai', type: 'Individual', email: 'dr.federico@lifespansportsmed.com' },
+    { id: 'ct9', name: 'Dr. Yadigar Genç', role: 'Köln Kanser Aşısı Partner', type: 'Individual', email: 'y.genc@iozk.de' },
+    { id: 'ct10', name: 'Osman Altinisik', role: 'Kliwla Family Office', type: 'Individual', email: 'osman.a@kliwla.com' },
+    { id: 'ct11', name: 'Marian', role: 'Helfie.Al / NAD Tedavisi', type: 'Individual', email: 'marian@helfie.ai' },
+    { id: 'ct12', name: 'Cenk', role: 'Worknwerk Partner', type: 'Individual', email: 'cenk@worknwerk.com' },
+    { id: 'ct13', name: 'Dr. Patrick Sewell', role: 'Medical Advisory Board', type: 'Individual', email: 'patrick.s@onlyhealth.co' },
+    { id: 'ct14', name: 'Dr. Adeel Khan', role: 'Plazmaferez Görüşmesi', type: 'Individual', email: 'dr.adeel@triplhelix.com' },
+    { id: 'ct15', name: 'Yar.Doc. Ahmet Emin Sönmez', role: 'Exosome Protokolü', type: 'Individual', email: 'ahmet.sonmez@mederaclinic.com' },
+    { id: 'ct16', name: 'Prof. Tunc Hoca', role: 'Marstem / GMP Lab', type: 'Individual', email: 'tunc.hoca@marstem.com' },
+    { id: 'ct17', name: 'Livion Clinic', role: 'İlk Toplu Satış Partneri', type: 'Company', email: 'contact@livion.de' },
+    { id: 'ct18', name: 'Lifespin', role: 'GTM Partner', type: 'Company', email: 'info@lifespin.health' },
+    { id: 'ct19', name: 'Precision Health Clinic', role: 'Genetik Test Partneri', type: 'Company', email: 'info@thephclinic.com' },
+    { id: 'ct20', name: 'Nanolive', role: 'Hücre Görüntüleme Partneri', type: 'Company', email: 'contact@nanolive.ai' },
+    { id: 'ct21', name: 'Deeplongevtiy', role: 'Singapore Partner', type: 'Company', email: 'contact@deeplongevity.com' },
+    { id: 'ct22', name: 'Kliwla Family Office', role: 'Dripfy Flagship Partner', type: 'Company', email: 'info@kliwla-office.com' },
+    { id: 'ct23', name: 'Worknwerk', role: 'Istanbul Partner', type: 'Company', email: 'info@worknwerk.com' },
+    { id: 'ct24', name: 'Onlyhealth.co', role: 'Türkiye Lansman Partneri', type: 'Company', email: 'contact@onlyhealth.co' },
+    { id: 'ct25', name: 'Hair Chefs', role: 'Saç Ekim Kliniği Partneri', type: 'Company', email: 'info@hairchiefs.com' }
+  ],
+  tasks: [
+    { id: 't1', title: 'Livion Clinic Ziyareti & İlk Toplu Satış (50 adet NAD+)', priority: 'High', status: 'To Do', dueDate: '2024-10-07', assignee: 'Sales Team' },
+    { id: 't2', title: 'Myoact Cihazı Onboarding', priority: 'High', status: 'To Do', dueDate: '2024-10-07', assignee: 'Tech Team' },
+    { id: 't3', title: 'Lifespin GTM Sunumu & API Entegrasyonu Başlangıcı', priority: 'High', status: 'In Progress', dueDate: '2024-10-08', assignee: 'Ali Tınazlı' },
+    { id: 't4', title: 'Heilpraktiker ile Sözleşme ve Dripfy Akademi Görevlendirmesi', priority: 'Medium', status: 'To Do', dueDate: '2024-10-08', assignee: 'HR' },
+    { id: 't5', title: 'Partner/Representative Vertrag Taslak Değişimi', priority: 'Medium', status: 'In Progress', dueDate: '2024-10-09', assignee: 'Legal' },
+    { id: 't6', title: 'Medical Board Yapı ve Sözleşme Taslakları Hazırlığı', priority: 'High', status: 'To Do', dueDate: '2024-10-09', assignee: 'Management' },
+    { id: 't7', title: 'Precision Health Clinic ile Genetik Test Mutabakatı', priority: 'High', status: 'To Do', dueDate: '2024-10-10', assignee: 'Dr. Mansoor Mohammed' },
+    { id: 't8', title: 'P4-Medizin Leitkonzept Hazırlanması ve ISO9001 Denetimi', priority: 'Medium', status: 'To Do', dueDate: '2024-10-10', assignee: 'QM Team' },
+    { id: 't9', title: 'İsviçre PTS ile GMP Expert Belgesi Sonrası Planlama', priority: 'Medium', status: 'To Do', dueDate: '2024-10-11', assignee: 'Operations' },
+    { id: 't10', title: 'Nelly ile Anamnese ve Dijital Onam Kararı', priority: 'Low', status: 'To Do', dueDate: '2024-10-11', assignee: 'Legal' },
+    { id: 't11', title: 'RBT Referansı (Noah Laith) ile Networking', priority: 'Medium', status: 'To Do', dueDate: '2024-10-07', assignee: 'Marketing' },
+    { id: 't12', title: 'Margo Bakü ile Longevity Clinic Dripfy Corner Görüşmesi', priority: 'Medium', status: 'To Do', dueDate: '2024-10-08', assignee: 'Sales Team' },
+    { id: 't13', title: 'German Medical ile Press Release Toplantısı', priority: 'High', status: 'In Progress', dueDate: '2024-10-08', assignee: 'Marcus' },
+    { id: 't14', title: 'David Lyodds Club ile Wellness Entegrasyon Görüşmesi', priority: 'Medium', status: 'To Do', dueDate: '2024-10-09', assignee: 'Gabriel' },
+    { id: 't15', title: 'EGYM - Wellpass ile Remote Health Wellness Entegrasyonu', priority: 'Medium', status: 'To Do', dueDate: '2024-10-10', assignee: 'Okan' },
+    { id: 't16', title: 'Edgaras (RBT CEO) ile Kombine Peptid Estetik Görüşmesi', priority: 'High', status: 'To Do', dueDate: '2024-10-11', assignee: 'Management' },
+    { id: 't17', title: 'Stanford Healthcare Innovation Labs Sertifika Başvurusu', priority: 'High', status: 'Done', dueDate: '2024-10-04', assignee: 'Admin' },
+    { id: 't18', title: 'Nanolive & Mitkondri AI ile Canlı Hücre Görüntüleme Demosu', priority: 'High', status: 'To Do', dueDate: '2024-10-09', assignee: 'Prof. Fatih Toy' },
+    { id: 't19', title: 'Lifespan Dubai ile Holo-Tomography Product Demo', priority: 'Medium', status: 'To Do', dueDate: '2024-10-10', assignee: 'Dr. Federico' },
+    { id: 't20', title: 'Deeplongevtiy API Faturası Ödemesi ve DeepMind Rapor Talebi', priority: 'High', status: 'In Progress', dueDate: '2024-10-07', assignee: 'Finance' },
+    { id: 't21', title: 'Köln Dr Yadigar Genç ile Medical Board Görüşmesi', priority: 'Medium', status: 'To Do', dueDate: '2024-10-11', assignee: 'Management' },
+    { id: 't22', title: 'Kliwla Family Office ile Dripfy Flagship Açılışı Görüşmesi', priority: 'High', status: 'To Do', dueDate: '2024-10-10', assignee: 'Osman Altinisik' },
+    { id: 't23', title: 'MitoVit ile VOmax Cihazı Demosu', priority: 'Low', status: 'To Do', dueDate: '2024-10-09', assignee: 'Tech Team' },
+    { id: 't24', title: 'Metagon\'a Instagram & Story Post Metinleri Teslimi', priority: 'Medium', status: 'Done', dueDate: '2024-10-05', assignee: 'Marketing' },
+    { id: 't25', title: 'Implfy\'dan RFID Roll Container Kilit Sistemi Yenilenmesi', priority: 'Low', status: 'To Do', dueDate: '2024-10-11', assignee: 'Operations' },
+    { id: 't26', title: 'Brosch Digital ile Hasta Paneli Backend Sunumu', priority: 'Medium', status: 'To Do', dueDate: '2024-10-08', assignee: 'Tech Team' },
+    { id: 't27', title: 'Komplikasyon Yönetim Grubu Kurulması', priority: 'Medium', status: 'To Do', dueDate: '2024-10-07', assignee: 'Management' },
+    { id: 't28', title: 'LR için Kredi Kartı Entegrasyonu', priority: 'High', status: 'In Progress', dueDate: '2024-10-09', assignee: 'Finance' },
+    { id: 't29', title: 'Offenbach Futbolcusunun Myoact Analizi PT', priority: 'Low', status: 'To Do', dueDate: '2024-10-10', assignee: 'PT' },
+    { id: 't30', title: 'Sportive Peptid Protokolü Yazılması Eğitimi', priority: 'Medium', status: 'To Do', dueDate: '2024-10-11', assignee: 'Dr. Elif' },
+    { id: 't31', title: 'Zadarma Yüklenmesi ve Dripfy Concierge Desk Başlangıcı', priority: 'High', status: 'In Progress', dueDate: '2024-10-07', assignee: 'Tech Team' },
+    { id: 't32', title: 'Superchat ile Demo Toplantısı ve Entegrasyon', priority: 'Medium', status: 'To Do', dueDate: '2024-10-08', assignee: 'Sales Team' },
+    { id: 't33', title: 'Dr.Frost ve Mitolight Ziyareti/Demo Satın Alma Kararı', priority: 'Medium', status: 'To Do', dueDate: '2024-10-09', assignee: 'Sales Team' },
+    { id: 't34', title: 'Frankfurt Healthexpo Katılımcı Listesi Talebi', priority: 'Low', status: 'To Do', dueDate: '2024-10-10', assignee: 'Marketing' },
+    { id: 't35', title: 'LR HygieneKonzept için Sözleşme', priority: 'Medium', status: 'To Do', dueDate: '2024-10-11', assignee: 'Legal' },
+    { id: 't36', title: 'Helfie.Al Entegrasyonu için Metagon Ceo ile İstişare', priority: 'High', status: 'To Do', dueDate: '2024-10-08', assignee: 'Marian' },
+    { id: 't37', title: 'Worknwerk (Cenk) ile Peptid Pack Toplantısı (Istanbul)', priority: 'High', status: 'To Do', dueDate: '2024-10-14', assignee: 'Cenk' },
+    { id: 't38', title: 'Onlyhealth.co (MUSE Stemcell) Türkiye Lansmanına Katılım (Istanbul)', priority: 'High', status: 'To Do', dueDate: '2024-10-15', assignee: 'Dr. Patrick Sewell' },
+    { id: 't39', title: 'Dr. Adeel Khan ile EBO2 Cihazı Görüşmesi (Istanbul)', priority: 'Medium', status: 'To Do', dueDate: '2024-10-15', assignee: 'Dr. Adeel Khan' },
+    { id: 't40', title: 'Hair Chefs CEO\'su ile Dripf Hair Peptid Pack Toplantısı (Istanbul)', priority: 'Medium', status: 'To Do', dueDate: '2024-10-16', assignee: 'Hair Chefs CEO' },
+    { id: 't41', title: 'Yar.Doc. Ahmet Emin Sönmez ile Exosome Protokolü Gözden Geçirme (Istanbul)', priority: 'High', status: 'To Do', dueDate: '2024-10-16', assignee: 'Ahmet Emin Sönmez' },
+    { id: 't42', title: 'Marstem (Prof. Tunc Hoca) ile Exosome Üretimi Görüşmesi (Istanbul)', priority: 'High', status: 'To Do', dueDate: '2024-10-17', assignee: 'Prof. Tunc Hoca' },
+  ],
+  users: [
+      { id: 'u1', name: 'Demo User', email: 'demo@dripfy.com', role: 'user', lastLogin: '2024-07-26 10:00' },
+      { id: 'u2', name: 'Admin User', email: 'admin@dripfy.de', role: 'admin', lastLogin: '2024-07-26 11:30' },
+  ],
+  auditLog: [
+    { id: 'l1', user: 'Admin User', action: 'Updated', targetType: 'Task', targetId: 't17', timestamp: '2024-07-26 11:32', details: 'Status changed to Done' },
+    { id: 'l2', user: 'Admin User', action: 'Created', targetType: 'Contact', targetId: 'ct25', timestamp: '2024-07-26 11:35', details: 'Added new company: Hair Chefs' },
+  ],
+  userPermissions: [
+      {
+          userId: 'u1',
+          userName: 'Demo User',
+          permissions: {
+              schedule: { view: true, edit: false },
+              financials: { view: true, edit: false },
+              challenges: { view: true, edit: false },
+              advantages: { view: true, edit: false },
+              contacts: { view: true, edit: false },
+              tasks: { view: true, edit: true },
+          }
+      }
+  ]
 };
-
-export const contactsData: { individuals: Contact[]; organizations: Contact[] } = {
-  individuals: [
-    { id: 1, name: 'Dr. Ali Tınazlı', role: 'Medical Consultant', tags: [{ text: 'active', color: 'green' }, { text: 'key', color: 'red' }, { text: 'advisor', color: 'blue' }] },
-    { id: 2, name: 'Dr. Bülent Uğurlu', role: 'Medical Board Partner', tags: [{ text: 'negotiating', color: 'yellow' }, { text: 'high', color: 'red' }, { text: 'board', color: 'blue' }] },
-    { id: 3, name: 'Dr. Ali Assar', role: 'Board Tutor', tags: [{ text: 'negotiating', color: 'yellow' }, { text: 'high', color: 'red' }, { text: 'board', color: 'blue' }] },
-    { id: 4, name: 'Dr. Mansoor Mohammed', role: 'Precision Health Clinic', tags: [{ text: 'active', color: 'green' }, { text: 'key', color: 'red' }, { text: 'partner', color: 'blue' }] },
-  ],
-  organizations: [
-    { id: 1, name: 'Livion Clinic', role: 'Partner Clinic', tags: [{ text: 'active', color: 'green' }, { text: 'key', color: 'red' }, { text: 'B2B', color: 'purple' }] },
-    { id: 2, name: 'Myoact', role: 'Device Partner', tags: [{ text: 'active', color: 'green' }, { text: 'key', color: 'red' }, { text: 'tech', color: 'purple' }] },
-    { id: 3, name: 'Lifespin Health', role: 'API Partner', tags: [{ text: 'active', color: 'green' }, { text: 'key', color: 'red' }, { text: 'tech', color: 'purple' }] },
-    { id: 4, name: 'Nanolive', role: 'Tech Partner', tags: [{ text: 'pending', color: 'yellow' }, { text: 'medium', color: 'orange' }, { text: 'B2B', color: 'purple' }] },
-    { id: 5, name: 'Deep Longevity', role: 'Singapore', tags: [{ text: 'active', color: 'green' }, { text: 'key', color: 'red' }, { text: 'tech', color: 'purple' }] },
-  ],
-};
-
-export const tasksData: Task[] = [
-    { id: 1, title: 'M&E + Sales to Livion Clinic', description: 'Completed sales presentation. Sheet M/E-2 to Livion Clinic', status: 'in-progress', priority: 'high', assignee: 'Lucas Doe', tags: [{ text: 'in-progress', color: 'blue' }, { text: 'meeting', color: 'purple' }] },
-    { id: 2, title: 'Myoact Device Onboarding', description: 'Problem/onboarding solved. Dr. Judy header fixed.', status: 'in-progress', priority: 'high', assignee: 'Lucas Doe', tags: [{ text: 'in-progress', color: 'blue' }, { text: 'integration', color: 'green' }] },
-    { id: 3, title: 'Lifespin API Integration', description: 'Start API Integration based on presentation of Google Power plan', status: 'pending', priority: 'high', assignee: 'Dev Team', tags: [{ text: 'pending', color: 'yellow' }, { text: 'integration', color: 'green' }] },
-    { id: 4, title: 'Medical Board Contracts', description: 'Structure and send out drafts for medical board members', status: 'pending', priority: 'high', assignee: 'Legal Team', tags: [{ text: 'pending', color: 'yellow' }, { text: 'contract', color: 'orange' }] },
-    { id: 5, title: 'ISO9001 Audit Documentation', description: 'All revisions accepted, preparation until 2th process edition for ISO9001 audit document', status: 'completed', priority: 'medium', assignee: 'Admin', tags: [{ text: 'completed', color: 'gray' }, { text: 'administrative', color: 'pink' }] },
-];

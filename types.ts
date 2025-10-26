@@ -1,51 +1,95 @@
-// FIX: Define and export interfaces for data models to ensure type safety across the application.
-export interface Tag {
-  text: string;
-  color: string;
+// types.ts
+
+export interface ScheduleEvent {
+  id: string;
+  day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
+  time: string;
+  title: string;
+  participants: string[];
+  type: 'Meeting' | 'Call' | 'Event';
 }
 
-export interface ScheduleItem {
-  id: number;
-  title: string;
-  assignees: string[];
-  tags: Tag[];
-}
-
-export interface Payment {
-  id: number;
-  title: string;
+export interface FinancialRecord {
+  id: string;
+  description: string;
   amount: number;
-  status: string;
-  tags: Tag[];
+  status: 'Paid' | 'Pending' | 'Overdue';
+  dueDate: string;
+  type: 'Incoming' | 'Outgoing';
 }
 
 export interface Challenge {
-  id: number;
+  id: string;
   title: string;
   description: string;
-  tags: Tag[];
+  severity: 'High' | 'Medium' | 'Low';
 }
 
 export interface Advantage {
-  id: number;
+  id: string;
   title: string;
   description: string;
-  tags: Tag[];
 }
 
 export interface Contact {
-  id: number;
+  id: string;
   name: string;
   role: string;
-  tags: Tag[];
+  type: 'Company' | 'Individual';
+  email: string;
+  phone?: string;
 }
 
 export interface Task {
-  id: number;
+  id: string;
   title: string;
-  description: string;
-  status: string;
-  priority: string;
+  priority: 'High' | 'Medium' | 'Low';
+  status: 'To Do' | 'In Progress' | 'Done';
+  dueDate: string;
   assignee: string;
-  tags: Tag[];
+}
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: 'admin' | 'user';
+  lastLogin: string;
+}
+
+export interface AuditLogEntry {
+    id: string;
+    user: string;
+    action: 'Created' | 'Updated' | 'Deleted';
+    targetType: string;
+    targetId: string;
+    timestamp: string;
+    details: string;
+}
+
+export interface UserPermission {
+    userId: string;
+    userName: string;
+    permissions: {
+        [key: string]: {
+            view: boolean;
+            edit: boolean;
+        }
+    }
+}
+
+export type UserRole = 'admin' | 'user';
+
+export type DataItem = ScheduleEvent | FinancialRecord | Challenge | Advantage | Contact | Task | User;
+
+export interface DashboardData {
+  schedule: ScheduleEvent[];
+  financials: FinancialRecord[];
+  challenges: Challenge[];
+  advantages: Advantage[];
+  contacts: Contact[];
+  tasks: Task[];
+  users: User[];
+  auditLog: AuditLogEntry[];
+  userPermissions: UserPermission[];
 }

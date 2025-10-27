@@ -1,109 +1,106 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useState } from 'react';
+import { mockData } from './data/mockData';
+import { DashboardData, DataItem, SignupRequest, UserRole, Task } from './types';
 import LoginPage from './components/LoginPage';
 import Header from './components/Header';
 import StatCards from './components/StatCards';
 import TabNavigation from './components/TabNavigation';
-import Chatbot from './components/Chatbot';
-import Footer from './components/Footer';
-
-import CalendarTab from './components/tabs/WeeklyScheduleTab';
+import WeeklyScheduleTab from './components/tabs/WeeklyScheduleTab';
 import FinancialsTab from './components/tabs/FinancialsTab';
 import ChallengesTab from './components/tabs/ChallengesTab';
 import ContactsTab from './components/tabs/ContactsTab';
 import TasksTab from './components/tabs/TasksTab';
 import AdminPanelTab from './components/tabs/AdminPanelTab';
+import Chatbot from './components/Chatbot';
+import Footer from './components/Footer';
 import DetailModal from './components/DetailModal';
+import SettingsModal from './components/SettingsModal';
 
-import { mockData } from './data/mockData';
-import { UserRole, DataItem, DashboardData, Task, SignupRequest } from './types';
-import { useLanguage } from './i18n/LanguageContext';
+type SettingsTab = 'profile' | 'settings' | 'privacy';
 
 const App: React.FC = () => {
-    const [userRole, setUserRole] = useState<UserRole | null>(null);
-    const [activeTab, setActiveTab] = useState('Tasks');
     const [data, setData] = useState<DashboardData>(mockData);
-    const [modalItem, setModalItem] = useState<{item: DataItem | Partial<DataItem>, type: keyof DashboardData, isNew?: boolean} | null>(null);
-    const { direction, t } = useLanguage();
-
-    const currentUser = data.users.find(u => u.role === userRole);
+    const [userRole, setUserRole] = useState<UserRole | null>(null);
+    const [activeTab, setActiveTab] = useState('Calendar');
+    const [modalState, setModalState] = useState<{
+        item: DataItem | Partial<DataItem>;
+        type: keyof DashboardData;
+        isNew?: boolean;
+    } | null>(null);
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [settingsInitialTab, setSettingsInitialTab] = useState<SettingsTab>('profile');
 
     const handleLogin = (role: UserRole) => {
         setUserRole(role);
     };
 
+    const handleLogout = () => {
+        setUserRole(null);
+    };
+    
+    const handleOpenSettingsModal = (tab: SettingsTab) => {
+        setSettingsInitialTab(tab);
+        setIsSettingsOpen(true);
+    };
+
     const handleOpenModal = (item: DataItem | Partial<DataItem>, type: keyof DashboardData, isNew = false) => {
-        setModalItem({ item, type, isNew });
+        setModalState({ item, type, isNew });
     };
 
     const handleCloseModal = () => {
-        setModalItem(null);
+        setModalState(null);
     };
 
-    const addLogEntry = (action: 'Created' | 'Updated' | 'Deleted' | 'Approved' | 'Denied', type: string, item: DataItem | SignupRequest, details?: string) => {
-        const title = 'title' in item ? item.title : ('name' in item ? item.name : ('description' in item ? item.description : 'item'));
-        const defaultDetails = `${t(`auditLogActions.${action}`)} ${t(`dataTypes.${type.slice(0, -1)}`)}: "${title}"`;
-        const newLog = {
-            id: `l${Date.now()}`,
-            user: currentUser?.name || 'System',
-            action,
-            targetType: type.slice(0,-1),
-            targetId: item.id,
-            timestamp: new Date().toISOString(),
-            details: details || defaultDetails
-        };
-        setData(prev => ({...prev, auditLog: [newLog, ...prev.auditLog]}))
-    }
+    const handleSaveItem = (item: DataItem) => {
+        if (!modalState) return;
+        const { type, isNew } = modalState;
 
-    const handleSave = (itemToSave: DataItem) => {
-        if (!modalItem) return;
-        const { type, isNew } = modalItem;
-        
-        if (isNew) {
-            const newItem = { ...itemToSave, id: `${type.slice(0,1)}${Date.now()}`};
-            const items = data[type] as DataItem[];
-            setData(prev => ({ ...prev, [type]: [...items, newItem] }));
-            addLogEntry('Created', type, newItem);
-        } else {
-            const items = data[type] as DataItem[];
-            setData(prev => ({
-                ...prev,
-                [type]: items.map(item => item.id === itemToSave.id ? itemToSave : item)
-            }));
-            addLogEntry('Updated', type, itemToSave);
-        }
+        setData(prevData => {
+            const currentTypedArray = prevData[type] as DataItem[];
+            let newTypedArray: DataItem[];
+
+            if (isNew) {
+                // Add new item with a generated ID
+                const newItem = { ...item, id: `${type.slice(0, 1)}${Date.now()}` };
+                newTypedArray = [...currentTypedArray, newItem];
+            } else {
+                // Update existing item
+                newTypedArray = currentTypedArray.map(i => (i.id === item.id ? item : i));
+            }
+
+            return {
+                ...prevData,
+                [type]: newTypedArray,
+            };
+        });
 
         handleCloseModal();
     };
-
-    const handleDelete = (itemToDelete: DataItem) => {
-        if (!modalItem) return;
-        if (window.confirm(t('confirmDelete'))) {
-            const { type } = modalItem;
-            const items = data[type] as DataItem[];
-            setData(prev => ({
-                ...prev,
-                [type]: items.filter(item => item.id !== itemToDelete.id)
-            }));
-            addLogEntry('Deleted', type, itemToDelete);
-            handleCloseModal();
-        }
-    };
     
-    const handleUpdateTaskField = (taskId: string, field: keyof Task, value: any) => {
-        let updatedTask: Task | undefined;
-        const newTasks = data.tasks.map(task => {
-            if (task.id === taskId) {
-                updatedTask = { ...task, [field]: value };
-                return updatedTask;
-            }
-            return task;
-        });
+    const handleDeleteItem = (item: DataItem) => {
+        if (!modalState) return;
+        const { type } = modalState;
 
-        if (updatedTask) {
-            const details = t('auditLogMessages.updateTask', { title: updatedTask.title, field: String(field), value });
-            addLogEntry('Updated', 'tasks', updatedTask, details);
-            setData(prev => ({ ...prev, tasks: newTasks }));
-        }
+        setData(prevData => {
+            const currentTypedArray = prevData[type] as DataItem[];
+            const newTypedArray = currentTypedArray.filter(i => i.id !== item.id);
+            return {
+                ...prevData,
+                [type]: newTypedArray,
+            };
+        });
+        
+        handleCloseModal();
+    };
+
+    const handleUpdateTask = (taskId: string, field: keyof Task, value: any) => {
+        setData(prevData => {
+            const newTasks = prevData.tasks.map(task => 
+                task.id === taskId ? { ...task, [field]: value } : task
+            );
+            return { ...prevData, tasks: newTasks };
+        });
     };
     
     const handleSignupRequest = (signupData: Omit<SignupRequest, 'id' | 'status' | 'timestamp'>) => {
@@ -111,13 +108,12 @@ const App: React.FC = () => {
             ...signupData,
             id: `sr${Date.now()}`,
             status: 'pending',
-            timestamp: new Date().toISOString(),
+            timestamp: new Date().toISOString()
         };
-        setData(prev => ({ ...prev, signupRequests: [...prev.signupRequests, newRequest] }));
-        addLogEntry('Created', 'signupRequests', newRequest, t('auditLogMessages.newSignup', { name: newRequest.name }));
-        alert(t('signup.requestReceived'));
+        setData(prev => ({...prev, signupRequests: [...prev.signupRequests, newRequest]}));
+        // Optionally show a confirmation message to the user
     };
-
+    
     const handleApproveSignup = (requestId: string) => {
         const request = data.signupRequests.find(r => r.id === requestId);
         if (!request) return;
@@ -126,50 +122,56 @@ const App: React.FC = () => {
             id: `u${Date.now()}`,
             name: request.name,
             email: request.email,
-            role: 'user' as UserRole,
-            lastLogin: new Date().toISOString(),
+            role: 'user' as const,
+            lastLogin: new Date().toISOString()
         };
 
         const newUserPermission = {
             userId: newUser.id,
             userName: newUser.name,
             permissions: {
-                schedule: { view: true, edit: false },
-                financials: { view: true, edit: false },
-                challenges: { view: true, edit: false },
-                advantages: { view: true, edit: false },
-                contacts: { view: true, edit: false },
-                tasks: { view: true, edit: true },
+              schedule: { view: true, edit: false },
+              financials: { view: true, edit: false },
+              challenges: { view: true, edit: false },
+              advantages: { view: true, edit: false },
+              contacts: { view: true, edit: false },
+              tasks: { view: true, edit: false },
             }
         };
-        
+
         setData(prev => ({
             ...prev,
             users: [...prev.users, newUser],
             userPermissions: [...prev.userPermissions, newUserPermission],
             signupRequests: prev.signupRequests.filter(r => r.id !== requestId),
+            auditLog: [...prev.auditLog, {
+                id: `l${Date.now()}`,
+                user: 'Admin User',
+                action: 'Approved',
+                targetType: 'SignupRequest',
+                targetId: requestId,
+                timestamp: new Date().toISOString(),
+                details: `Approved signup for ${request.name}`
+            }]
         }));
-        
-        addLogEntry('Approved', 'signupRequests', request, t('auditLogMessages.approvedSignup', { name: request.name }));
     };
-
+    
     const handleDenySignup = (requestId: string) => {
-        const request = data.signupRequests.find(r => r.id === requestId);
-        if (!request) return;
-
+         const request = data.signupRequests.find(r => r.id === requestId);
+         if (!request) return;
         setData(prev => ({
             ...prev,
             signupRequests: prev.signupRequests.filter(r => r.id !== requestId),
+            auditLog: [...prev.auditLog, {
+                id: `l${Date.now()}`,
+                user: 'Admin User',
+                action: 'Denied',
+                targetType: 'SignupRequest',
+                targetId: requestId,
+                timestamp: new Date().toISOString(),
+                details: `Denied signup for ${request.name}`
+            }]
         }));
-        addLogEntry('Denied', 'signupRequests', request, t('auditLogMessages.deniedSignup', { name: request.name }));
-    };
-
-
-    const getDataContextForAI = () => {
-        return {
-            activeView: activeTab,
-            dashboardData: data
-        };
     };
 
     if (!userRole) {
@@ -177,66 +179,55 @@ const App: React.FC = () => {
     }
 
     const renderActiveTab = () => {
-        const commonProps = { userRole, onOpenModal: handleOpenModal };
         switch (activeTab) {
             case 'Calendar':
-                return <CalendarTab data={data.schedule} {...commonProps} />;
+                return <WeeklyScheduleTab data={data.schedule} userRole={userRole} onOpenModal={(item, type, isNew) => handleOpenModal(item, type, isNew)} />;
             case 'Financials':
-                return <FinancialsTab data={data.financials} {...commonProps} />;
+                return <FinancialsTab data={data.financials} userRole={userRole} onOpenModal={(item, type, isNew) => handleOpenModal(item, type, isNew)} />;
             case 'Challenges':
-                return <ChallengesTab challenges={data.challenges} advantages={data.advantages} {...commonProps} />;
+                return <ChallengesTab challenges={data.challenges} advantages={data.advantages} userRole={userRole} onOpenModal={(item, type, isNew) => handleOpenModal(item, type, isNew)} />;
             case 'Contacts':
-                return <ContactsTab data={data.contacts} {...commonProps} />;
+                return <ContactsTab data={data.contacts} userRole={userRole} onOpenModal={(item, type, isNew) => handleOpenModal(item, type, isNew)} />;
             case 'Tasks':
-                return <TasksTab 
-                    data={data.tasks} 
-                    {...commonProps} 
-                    onUpdateTask={handleUpdateTaskField}
-                    permissions={data.userPermissions}
-                />;
+                return <TasksTab data={data.tasks} userRole={userRole} onOpenModal={(item, type, isNew) => handleOpenModal(item, type, isNew)} onUpdateTask={handleUpdateTask} permissions={data.userPermissions} />;
             case 'Admin Panel':
-                return userRole === 'admin' ? (
-                     <AdminPanelTab
-                        users={data.users}
-                        permissions={data.userPermissions}
-                        auditLog={data.auditLog}
-                        signupRequests={data.signupRequests}
-                        onOpenModal={(item: any, type: 'users') => handleOpenModal(item, type)}
-                        onApproveSignup={handleApproveSignup}
-                        onDenySignup={handleDenySignup}
-                    />
-                 ) : null;
+                return userRole === 'admin' ? <AdminPanelTab users={data.users} permissions={data.userPermissions} auditLog={data.auditLog} signupRequests={data.signupRequests} onOpenModal={(item, type) => handleOpenModal(item, type)} onApproveSignup={handleApproveSignup} onDenySignup={handleDenySignup} /> : null;
             default:
                 return null;
         }
     };
+    
+    const dataContext = { activeView: activeTab, ...data };
 
     return (
-        <div dir={direction} className="bg-neutral-900 text-white min-h-screen font-sans p-4 sm:p-6 lg:p-8">
-            <div className="max-w-7xl mx-auto">
-                <Header />
-                <main className="mt-8">
-                    <StatCards setActiveTab={setActiveTab} />
-                    <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} userRole={userRole} />
-                    <div className="mt-6">
-                        {renderActiveTab()}
-                    </div>
-                </main>
+        <div className="bg-neutral-900 text-white min-h-screen font-sans">
+            <Header userRole={userRole} onLogout={handleLogout} onOpenSettings={handleOpenSettingsModal} />
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <StatCards setActiveTab={setActiveTab} />
+                <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} userRole={userRole} />
+                <div className="mt-8">
+                    {renderActiveTab()}
+                </div>
+            </main>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <Footer />
-                <Chatbot dataContext={getDataContextForAI()} />
             </div>
-            {modalItem && (
-                 <DetailModal
-                    key={modalItem.item.id || 'new'}
-                    modalState={modalItem}
-                    isOpen={!!modalItem}
-                    onClose={handleCloseModal}
-                    onSave={handleSave}
-                    onDelete={handleDelete}
-                    userRole={userRole}
-                    permissions={data.userPermissions}
-                />
-            )}
+            <Chatbot dataContext={dataContext} />
+            <DetailModal
+                isOpen={!!modalState}
+                modalState={modalState}
+                onClose={handleCloseModal}
+                onSave={handleSaveItem}
+                onDelete={handleDeleteItem}
+                userRole={userRole}
+                permissions={data.userPermissions}
+            />
+            <SettingsModal 
+                isOpen={isSettingsOpen} 
+                onClose={() => setIsSettingsOpen(false)}
+                activeTab={settingsInitialTab}
+                setActiveTab={setSettingsInitialTab}
+            />
         </div>
     );
 };

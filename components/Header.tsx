@@ -1,26 +1,40 @@
 import React from 'react';
-import { UserPlus } from 'lucide-react';
-import { useLanguage } from '../i18n/LanguageContext';
 import LanguageSwitcher from './LanguageSwitcher';
+import ProfileDropdown from './ProfileDropdown';
+import { UserRole } from '../types';
 
-const Header: React.FC = () => {
-  const { t } = useLanguage();
+type SettingsTab = 'profile' | 'settings' | 'privacy';
 
-  return (
-    <header className="flex justify-between items-center animate-slide-in-up" style={{ animationDelay: '100ms' }}>
-      <div>
-        <h1 className="text-3xl font-bold text-[#32ff84] brand-glow">dripfy<span className="text-neutral-400">.</span></h1>
-        <p className="text-neutral-500 mt-1">{t('header.subtitle')}</p>
-      </div>
-      <div className="flex items-center gap-4">
-        <LanguageSwitcher />
-        <button className="flex items-center gap-2 px-4 py-2 bg-neutral-800 border border-neutral-700 rounded-lg shadow-sm text-sm font-medium text-neutral-200 hover:bg-neutral-700 hover:border-[#32ff84] transition-all duration-300 transform hover:-translate-y-0.5">
-          <UserPlus size={16} />
-          {t('header.inviteButton')}
-        </button>
-      </div>
-    </header>
-  );
+interface HeaderProps {
+    userRole: UserRole | null;
+    onLogout: () => void;
+    onOpenSettings: (tab: SettingsTab) => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ userRole, onLogout, onOpenSettings }) => {
+    const userName = userRole === 'admin' ? 'Admin User' : 'Demo User';
+    const userEmail = userRole === 'admin' ? 'admin@dripfy.de' : 'demo@dripfy.com';
+
+    return (
+        <header className="bg-neutral-900/80 backdrop-blur-sm sticky top-0 z-40 border-b border-neutral-800">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex items-center justify-between h-16">
+                    <div className="flex items-center">
+                         <h1 className="text-2xl font-bold text-[#32ff84] brand-glow">dripfy<span className="text-neutral-400">.</span></h1>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <LanguageSwitcher />
+                        <ProfileDropdown 
+                            userName={userName}
+                            userEmail={userEmail}
+                            onLogout={onLogout}
+                            onOpenSettings={onOpenSettings}
+                        />
+                    </div>
+                </div>
+            </div>
+        </header>
+    );
 };
 
 export default Header;

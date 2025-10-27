@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useLanguage } from '../i18n/LanguageContext';
 import LanguageSwitcher from './LanguageSwitcher';
 import { SignupRequest } from '../types';
@@ -8,14 +8,6 @@ interface LoginPageProps {
     onLogin: (role: UserRole) => void;
     onSignupRequest: (signupData: Omit<SignupRequest, 'id' | 'status' | 'timestamp'>) => void;
 }
-
-const welcomeMessages = {
-    en: "Welcome",
-    tr: "Hoş geldiniz",
-    de: "Willkommen",
-    ru: "Добро пожаловать",
-    ar: "أهلاً وسهلاً"
-};
 
 const companyPositions = [
     'CEO', 'CTO', 'CFO', 'COO', 'Head of Department', 'Team Lead', 'Project Manager', 'Senior Specialist', 'Junior Specialist', 'Intern'
@@ -35,23 +27,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onSignupRequest }) => {
     const [signupPhone, setSignupPhone] = useState('');
     const [signupPosition, setSignupPosition] = useState(companyPositions[0]);
     const [signupPassword, setSignupPassword] = useState('');
-
-    // Animation state
-    const [welcomeIndex, setWelcomeIndex] = useState(0);
-    const [fade, setFade] = useState(true);
-
-    const languages = Object.keys(welcomeMessages) as (keyof typeof welcomeMessages)[];
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setFade(false);
-            setTimeout(() => {
-                setWelcomeIndex((prevIndex) => (prevIndex + 1) % languages.length);
-                setFade(true);
-            }, 500); // fade out duration
-        }, 3000); // 3 seconds per message
-        return () => clearInterval(interval);
-    }, []);
 
     const handleLoginSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -89,8 +64,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onSignupRequest }) => {
             <div className="w-full max-w-md p-8 space-y-6 bg-neutral-800 rounded-xl border border-neutral-700 shadow-2xl">
                 <div className="text-center">
                     <div className="h-12 flex items-center justify-center">
-                         <h2 className={`text-3xl font-bold text-neutral-300 transition-opacity duration-500 ${fade ? 'opacity-100' : 'opacity-0'}`}>
-                            {welcomeMessages[languages[welcomeIndex]]}
+                         <h2 className="text-3xl font-bold text-neutral-300">
+                            {t('login.welcome')}
                         </h2>
                     </div>
                     <div>

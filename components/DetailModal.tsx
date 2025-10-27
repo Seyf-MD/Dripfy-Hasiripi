@@ -24,6 +24,12 @@ const FormField: React.FC<{ label: string; children: React.ReactNode }> = ({ lab
     </div>
 );
 
+const getSingularName = (pluralName: string) => {
+    if (pluralName === 'schedule') return 'schedule';
+    if (pluralName.endsWith('s')) return pluralName.slice(0, -1);
+    return pluralName;
+};
+
 const DetailModal: React.FC<DetailModalProps> = ({ modalState, isOpen, onClose, onSave, onDelete, userRole, permissions }) => {
     const [formData, setFormData] = useState<DataItem | Partial<DataItem> | null>(null);
     const { t, language } = useLanguage();
@@ -230,7 +236,7 @@ const DetailModal: React.FC<DetailModalProps> = ({ modalState, isOpen, onClose, 
         }
     }
 
-    const titleType = t(`dataTypes.${type.slice(0, -1)}`);
+    const titleType = t(`dataTypes.${getSingularName(type)}`);
     
     return (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>

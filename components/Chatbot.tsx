@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, X, Send, Bot, User, Loader, Sparkles, RefreshCcw } from 'lucide-react';
 import { streamDashboardInsights } from '../services/geminiService';
+import { useLanguage } from '../i18n/LanguageContext';
 
 interface Message {
   role: 'user' | 'model';
@@ -10,18 +11,6 @@ interface Message {
 interface ChatbotProps {
     dataContext: any;
 }
-
-const initialMessage: Message = { 
-  role: 'model', 
-  content: "Hi! I'm Dripfy AI. Ask me anything about the data on your current screen." 
-};
-
-const examplePrompts = [
-    "Summarize the pending payments.",
-    "Which tasks are high priority?",
-    "Who are the key individual contacts?",
-    "What are the main challenges?",
-]
 
 // Simple markdown renderer
 const MarkdownRenderer = ({ content }: { content: string }) => {
@@ -40,6 +29,20 @@ const MarkdownRenderer = ({ content }: { content: string }) => {
 
 
 const Chatbot: React.FC<ChatbotProps> = ({ dataContext }) => {
+  const { t } = useLanguage();
+  
+  const initialMessage: Message = { 
+    role: 'model', 
+    content: t('chatbot.initialMessage')
+  };
+
+  const examplePrompts = [
+    t('chatbot.prompt1'),
+    t('chatbot.prompt2'),
+    t('chatbot.prompt3'),
+    t('chatbot.prompt4'),
+  ]
+  
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([initialMessage]);
   const [input, setInput] = useState('');
@@ -49,6 +52,10 @@ const Chatbot: React.FC<ChatbotProps> = ({ dataContext }) => {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+  
+  useEffect(() => {
+     setMessages([initialMessage]);
+  }, [t])
 
   useEffect(() => {
     if (isOpen) {
@@ -78,7 +85,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ dataContext }) => {
          console.error("Error streaming response:", error);
          setMessages(prev => {
             const newMessages = [...prev];
-            newMessages[newMessages.length - 1].content = "Sorry, an error occurred while streaming the response.";
+            newMessages[newMessages.length - 1].content = t('chatbot.error');
             return newMessages;
          });
     } finally {
@@ -101,7 +108,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ dataContext }) => {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="fixed bottom-6 right-6 bg-[#32ff84] text-black p-4 rounded-full shadow-lg shadow-green-500/20 hover:scale-105 transition-transform"
-        aria-label="Toggle Chatbot"
+        aria-label={t('chatbot.toggle')}
       >
         {isOpen ? <X size={24} /> : <MessageSquare size={24} />}
       </button>
@@ -114,11 +121,11 @@ const Chatbot: React.FC<ChatbotProps> = ({ dataContext }) => {
                     <Bot size={24} />
                 </div>
                 <div>
-                    <h3 className="font-bold text-white">Dripfy AI Assistant</h3>
-                    <p className="text-xs text-neutral-400">Analyze the current screen data</p>
+                    <h3 className="font-bold text-white">{t('chatbot.header')}</h3>
+                    <p className="text-xs text-neutral-400">{t('chatbot.subtitle')}</p>
                 </div>
             </div>
-            <button onClick={handleClearChat} className="text-neutral-400 hover:text-white transition-colors" aria-label="Clear chat">
+            <button onClick={handleClearChat} className="text-neutral-400 hover:text-white transition-colors" aria-label={t('chatbot.clear')}>
                 <RefreshCcw size={16} />
             </button>
           </header>
@@ -149,7 +156,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ dataContext }) => {
                   <div className="flex flex-col gap-2 items-start mt-4 p-4 bg-neutral-800/50 rounded-lg border border-neutral-700">
                       <div className="flex items-center gap-2 text-sm font-semibold text-neutral-300">
                           <Sparkles size={16} className="text-[#32ff84]"/>
-                          <span>Example Prompts</span>
+                          <span>{t('chatbot.examplePrompts')}</span>
                       </div>
                       {examplePrompts.map(prompt => (
                         <button key={prompt} onClick={() => handleSend(prompt)} className="w-full text-left text-sm text-green-300 bg-green-500/10 hover:bg-green-500/20 p-2 rounded-md transition-colors">
@@ -169,7 +176,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ dataContext }) => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Ask about the data..."
+                placeholder={t('chatbot.placeholder')}
                 className="w-full pl-4 pr-12 py-2 bg-neutral-800 border border-neutral-600 rounded-full focus:ring-2 focus:ring-[#32ff84] focus:outline-none text-white placeholder:text-neutral-500"
                 disabled={isLoading}
               />
@@ -177,7 +184,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ dataContext }) => {
                 onClick={() => handleSend()}
                 className="absolute right-1 top-1/2 -translate-y-1/2 bg-[#32ff84] text-black p-2 rounded-full hover:bg-green-400 disabled:bg-neutral-600 transition-colors"
                 disabled={isLoading}
-                aria-label="Send message"
+                aria-label={t('chatbot.send')}
               >
                 <Send size={16} />
               </button>

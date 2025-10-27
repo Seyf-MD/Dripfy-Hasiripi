@@ -1,6 +1,7 @@
 import React from 'react';
 import { Contact } from '../../types';
 import { Building, User, PlusCircle } from 'lucide-react';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 interface ContactsTabProps {
     data: Contact[];
@@ -9,6 +10,8 @@ interface ContactsTabProps {
 }
 
 const ContactsTab: React.FC<ContactsTabProps> = ({ data, userRole, onOpenModal }) => {
+    const { t } = useLanguage();
+    
     const handleAddNew = () => {
         onOpenModal({ name: '', role: '', type: 'Individual', email: ''}, 'contacts', true);
     }
@@ -18,7 +21,7 @@ const ContactsTab: React.FC<ContactsTabProps> = ({ data, userRole, onOpenModal }
             <div className="flex justify-end mb-4">
                 {userRole === 'admin' && (
                     <button onClick={handleAddNew} className="flex items-center gap-2 px-4 py-2 bg-[#32ff84] text-black text-sm font-semibold rounded-lg hover:bg-green-400 transition-colors">
-                        <PlusCircle size={18}/> New Contact
+                        <PlusCircle size={18}/> {t('contacts.newContact')}
                     </button>
                 )}
             </div>

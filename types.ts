@@ -60,7 +60,7 @@ export interface User {
 export interface AuditLogEntry {
     id: string;
     user: string;
-    action: 'Created' | 'Updated' | 'Deleted';
+    action: 'Created' | 'Updated' | 'Deleted' | 'Approved' | 'Denied';
     targetType: string;
     targetId: string;
     timestamp: string;
@@ -78,6 +78,16 @@ export interface UserPermission {
     }
 }
 
+export interface SignupRequest {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    position: string;
+    status: 'pending';
+    timestamp: string;
+}
+
 export type UserRole = 'admin' | 'user';
 
 export type DataItem = ScheduleEvent | FinancialRecord | Challenge | Advantage | Contact | Task | User;
@@ -92,4 +102,5 @@ export interface DashboardData {
   users: User[];
   auditLog: AuditLogEntry[];
   userPermissions: UserPermission[];
+  signupRequests: SignupRequest[];
 }

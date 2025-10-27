@@ -1,6 +1,7 @@
 import React from 'react';
 import { Challenge, Advantage } from '../../types';
 import { ThumbsUp, AlertTriangle, PlusCircle } from 'lucide-react';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 interface ChallengesTabProps {
     challenges: Challenge[];
@@ -19,14 +20,16 @@ const getSeverityColor = (severity: string) => {
 }
 
 const ChallengesTab: React.FC<ChallengesTabProps> = ({ challenges, advantages, userRole, onOpenModal }) => {
+    const { t } = useLanguage();
+    
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-fade-in">
             <div>
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-2xl font-bold flex items-center gap-3 text-yellow-300"><AlertTriangle /> Challenges</h2>
+                    <h2 className="text-2xl font-bold flex items-center gap-3 text-yellow-300"><AlertTriangle /> {t('challenges.title')}</h2>
                      {userRole === 'admin' && (
                         <button onClick={() => onOpenModal({ title: '', description: '', severity: 'Medium'}, 'challenges', true)} className="flex items-center gap-2 px-3 py-1.5 bg-yellow-500/10 text-yellow-300 text-sm font-semibold rounded-lg hover:bg-yellow-500/20 transition-colors">
-                            <PlusCircle size={16}/> Add
+                            <PlusCircle size={16}/> {t('challenges.add')}
                         </button>
                     )}
                 </div>
@@ -41,10 +44,10 @@ const ChallengesTab: React.FC<ChallengesTabProps> = ({ challenges, advantages, u
             </div>
             <div>
                  <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-2xl font-bold flex items-center gap-3 text-green-300"><ThumbsUp /> Advantages</h2>
+                    <h2 className="text-2xl font-bold flex items-center gap-3 text-green-300"><ThumbsUp /> {t('advantages.title')}</h2>
                     {userRole === 'admin' && (
                         <button onClick={() => onOpenModal({ title: '', description: ''}, 'advantages', true)} className="flex items-center gap-2 px-3 py-1.5 bg-green-500/10 text-green-300 text-sm font-semibold rounded-lg hover:bg-green-500/20 transition-colors">
-                           <PlusCircle size={16}/> Add
+                           <PlusCircle size={16}/> {t('advantages.add')}
                         </button>
                     )}
                 </div>

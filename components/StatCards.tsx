@@ -1,5 +1,6 @@
 import React from 'react';
 import { Briefcase, Euro, Users, BarChart2 } from 'lucide-react';
+import { useLanguage } from '../i18n/LanguageContext';
 
 interface StatCardProps {
   icon: React.ReactNode;
@@ -34,36 +35,37 @@ interface StatCardsProps {
 }
 
 const StatCards: React.FC<StatCardsProps> = ({ setActiveTab }) => {
+  const { t } = useLanguage();
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
       <StatCard
         delay={200}
         icon={<Briefcase size={20} />}
-        title="Total Meetings"
+        title={t('statCards.totalMeetings')}
         value="53"
-        subValue="+5 this limited week"
-        onClick={() => setActiveTab('Weekly Schedule')}
+        subValue={t('statCards.meetingsThisWeek')}
+        onClick={() => setActiveTab('Calendar')}
       />
       <StatCard
         delay={300}
         icon={<Euro size={20} />}
-        title="Pending Payments"
+        title={t('statCards.pendingPayments')}
         value="€64.100"
-        subValue="Start this week"
+        subValue={t('statCards.startThisWeek')}
         onClick={() => setActiveTab('Financials')}
       />
       <StatCard
         delay={400}
         icon={<Users size={20} />}
-        title="Active Escrows"
+        title={t('statCards.activeEscrows')}
         value="35"
-        subValue="In compensation"
+        subValue={t('statCards.inCompensation')}
         onClick={() => setActiveTab('Contacts')}
       />
       <StatCard
         delay={500}
         icon={<BarChart2 size={20} />}
-        title="Test Condition"
+        title={t('statCards.testCondition')}
         value="72%"
         onClick={() => setActiveTab('Tasks')}
       >

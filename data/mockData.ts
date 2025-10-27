@@ -112,13 +112,16 @@ export const mockData: DashboardData = {
           userId: 'u1',
           userName: 'Demo User',
           permissions: {
-              schedule: { view: true, edit: false },
-              financials: { view: true, edit: false },
-              challenges: { view: true, edit: false },
-              advantages: { view: true, edit: false },
-              contacts: { view: true, edit: false },
+              schedule: { view: true, edit: true },
+              financials: { view: true, edit: true },
+              challenges: { view: true, edit: true },
+              advantages: { view: true, edit: true },
+              contacts: { view: true, edit: true },
               tasks: { view: true, edit: true },
           }
       }
+  ],
+  signupRequests: [
+      { id: 'sr1', name: 'Laura Schmidt', email: 'laura.s@example.com', phone: '+49123456789', position: 'Team Lead', status: 'pending', timestamp: '2024-07-27 09:15:00' }
   ]
 };

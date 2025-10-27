@@ -1,15 +1,6 @@
-// FIX: Implemented the TabNavigation component to provide navigation between dashboard sections.
 import React from 'react';
 import { Calendar, Euro, ShieldAlert, Users, ListChecks, Shield } from 'lucide-react';
-
-const allTabs = [
-    { name: 'Weekly Schedule', icon: <Calendar size={18} /> },
-    { name: 'Financials', icon: <Euro size={18} /> },
-    { name: 'Challenges', icon: <ShieldAlert size={18} /> },
-    { name: 'Contacts', icon: <Users size={18} /> },
-    { name: 'Tasks', icon: <ListChecks size={18} /> },
-    { name: 'Admin Panel', icon: <Shield size={18} /> },
-];
+import { useLanguage } from '../i18n/LanguageContext';
 
 interface TabNavigationProps {
     activeTab: string;
@@ -18,6 +9,17 @@ interface TabNavigationProps {
 }
 
 const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab, userRole }) => {
+    const { t } = useLanguage();
+    
+    const allTabs = [
+        { name: 'Calendar', icon: <Calendar size={18} />, label: t('tabs.calendar') },
+        { name: 'Financials', icon: <Euro size={18} />, label: t('tabs.financials') },
+        { name: 'Challenges', icon: <ShieldAlert size={18} />, label: t('tabs.challenges') },
+        { name: 'Contacts', icon: <Users size={18} />, label: t('tabs.contacts') },
+        { name: 'Tasks', icon: <ListChecks size={18} />, label: t('tabs.tasks') },
+        { name: 'Admin Panel', icon: <Shield size={18} />, label: t('tabs.adminPanel') },
+    ];
+
     const visibleTabs = userRole === 'admin' ? allTabs : allTabs.filter(tab => tab.name !== 'Admin Panel');
     
     return (
@@ -37,7 +39,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab, 
                             `}
                         >
                             {tab.icon}
-                            {tab.name}
+                            {tab.label}
                         </button>
                     ))}
                 </nav>

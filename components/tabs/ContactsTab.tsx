@@ -19,7 +19,7 @@ const ContactsTab: React.FC<ContactsTabProps> = ({ data, canEdit, onOpenModal, o
     const [searchTerm, setSearchTerm] = React.useState('');
     const [sortConfig, setSortConfig] = React.useState<{ key: SortKey; direction: SortDirection }>({ key: 'firstName', direction: 'asc' });
     
-    const inputClasses = "w-full bg-neutral-200 dark:bg-neutral-700 border-transparent focus:bg-neutral-300 dark:focus:bg-neutral-600 rounded p-1 text-sm focus:ring-2 focus:ring-[#32ff84] focus:outline-none text-black dark:text-white";
+    const inputClasses = "w-full bg-slate-100 dark:bg-neutral-700 border-transparent focus:bg-slate-200 dark:focus:bg-neutral-600 rounded p-1 text-sm focus:ring-2 focus:ring-[#32ff84] focus:outline-none text-black dark:text-white";
 
     const sortedAndFilteredData = React.useMemo(() => {
         let filtered = data.filter(contact => {
@@ -91,14 +91,14 @@ const ContactsTab: React.FC<ContactsTabProps> = ({ data, canEdit, onOpenModal, o
                         placeholder={t('contacts.searchPlaceholder')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full max-w-xs px-4 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-[#32ff84] focus:outline-none"
+                        className="w-full max-w-xs px-4 py-2 bg-white dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-[#32ff84] focus:outline-none"
                     />
                 </div>
                 <div className="w-full sm:w-auto flex items-center gap-4">
                      <select
                         onChange={handleSortChange}
                         defaultValue={`${sortConfig.key}-${sortConfig.direction}`}
-                        className="w-full sm:w-auto px-4 py-2 bg-white dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-[#32ff84] focus:outline-none"
+                        className="w-full sm:w-auto px-4 py-2 bg-white dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-[#32ff84] focus:outline-none"
                     >
                         {sortOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                     </select>
@@ -111,14 +111,14 @@ const ContactsTab: React.FC<ContactsTabProps> = ({ data, canEdit, onOpenModal, o
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {sortedAndFilteredData.map((contact) => (
-                    <div key={contact.id} onClick={() => editingItem ? null : onOpenModal(contact, 'contacts')} className="bg-white dark:bg-neutral-800 p-5 rounded-xl border border-neutral-200 dark:border-neutral-700 flex flex-col justify-between transition-all duration-300 hover:border-[#32ff84]/50 hover:-translate-y-1 relative group cursor-pointer">
+                    <div key={contact.id} onClick={() => editingItem ? null : onOpenModal(contact, 'contacts')} className="bg-white dark:bg-neutral-800 p-5 rounded-xl border border-slate-200 dark:border-neutral-700 flex flex-col justify-between transition-all duration-300 hover:border-[#32ff84]/50 hover:-translate-y-1 relative group cursor-pointer">
                         <div>
                             <div className="flex items-start justify-between">
                                 <div className="flex-1 mr-4">
                                     <h3 onClick={(e) => handleCellClick(e, contact.id, 'firstName')} className="font-bold text-black dark:text-white truncate">{contact.firstName} {contact.lastName}</h3>
                                     <p onClick={(e) => handleCellClick(e, contact.id, 'role')} className="text-sm text-neutral-500 dark:text-neutral-400 truncate">{contact.role}</p>
                                 </div>
-                                <div className="p-2 bg-neutral-100 dark:bg-neutral-700 rounded-lg flex-shrink-0">
+                                <div className="p-2 bg-slate-100 dark:bg-neutral-700 rounded-lg flex-shrink-0">
                                     {contact.type === 'Company' ? <Building size={20} className="text-neutral-500" /> : <User size={20} className="text-neutral-500" />}
                                 </div>
                             </div>

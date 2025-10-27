@@ -17,21 +17,22 @@ import SettingsModal from './components/SettingsModal';
 import PasswordChangeModal from './components/PasswordChangeModal';
 
 import { mockData } from './data/mockData';
-import { DashboardData, UserRole, DataItem, SignupRequest, ScheduleEvent, FinancialRecord, Challenge, Advantage, Contact, Task, User, UserPermission, AdminSubTab, Theme, NotificationSettings } from './types';
+import { DashboardData, UserRole, DataItem, SignupRequest, ScheduleEvent, FinancialRecord, Challenge, Advantage, Contact, Task, User, UserPermission, AdminSubTab, NotificationSettings } from './types';
 import { useLanguage } from './i18n/LanguageContext';
+import { useTheme } from './context/ThemeContext';
 
 type ModalType = 'schedule' | 'financials' | 'challenges' | 'advantages' | 'contacts' | 'tasks' | 'users';
 type SettingsPanelTab = 'profile' | 'settings' | 'privacy';
 
 function App() {
   const { t } = useLanguage();
+  const { theme } = useTheme();
   const [userRole, setUserRole] = React.useState<UserRole | null>(null);
   const [dashboardData, setDashboardData] = React.useState<DashboardData>(mockData);
   const [activeTab, setActiveTab] = React.useState<string>('Calendar');
   const [adminPanelSubTab, setAdminPanelSubTab] = React.useState<AdminSubTab>('permissions');
   
   // App-wide settings
-  const [theme, setTheme] = React.useState<Theme>('dark');
   const [notificationSettings, setNotificationSettings] = React.useState<NotificationSettings>({
     email: false,
     push: true,
@@ -45,15 +46,6 @@ function App() {
   const [passwordChangeModalOpen, setPasswordChangeModalOpen] = React.useState(false);
   
   const [financialsDateFilter, setFinancialsDateFilter] = React.useState<'week' | 'month' | null>(null);
-
-  React.useEffect(() => {
-    const root = window.document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-  }, [theme]);
 
   const currentUser = React.useMemo(() => dashboardData.users.find(u => u.role === userRole), [userRole, dashboardData.users]);
   const currentUserPermissions = React.useMemo(() => dashboardData.userPermissions.find(p => p.userId === currentUser?.id)?.permissions, [currentUser, dashboardData.userPermissions]);
@@ -95,9 +87,8 @@ function App() {
     setSettingsModalOpen(true);
   }
   
-  const handleSaveSettings = (settings: { theme: Theme; notifications: NotificationSettings; }) => {
-      setTheme(settings.theme);
-      setNotificationSettings(settings.notifications);
+  const handleSaveSettings = (newNotifications: NotificationSettings) => {
+      setNotificationSettings(newNotifications);
   };
 
   const handleUpdateItem = (updatedItem: DataItem, type: ModalType) => {
@@ -324,13 +315,11 @@ function App() {
   }
 
   return (
-    <div className="bg-neutral-50 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 min-h-screen font-sans">
+    <div className="bg-slate-50 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 min-h-screen font-sans">
       <Header 
         userRole={userRole} 
         onLogout={handleLogout} 
         onOpenSettings={handleOpenSettings}
-        theme={theme}
-        setTheme={setTheme}
       />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -376,7 +365,6 @@ function App() {
         onClose={() => setSettingsModalOpen(false)}
         activeTab={settingsActiveTab}
         setActiveTab={setSettingsActiveTab}
-        theme={theme}
         notificationSettings={notificationSettings}
         onSaveSettings={handleSaveSettings}
         onChangePasswordClick={() => {

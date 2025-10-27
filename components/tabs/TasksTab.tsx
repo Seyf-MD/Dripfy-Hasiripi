@@ -28,7 +28,7 @@ const TaskCard: React.FC<{ task: Task; onOpenModal: () => void; onDragStart: (e:
             draggable={canEdit}
             onDragStart={(e) => onDragStart(e, task.id)}
             onClick={onOpenModal}
-            className={`bg-white dark:bg-neutral-800 p-4 rounded-lg border border-neutral-200 dark:border-neutral-700 ${canEdit ? 'cursor-grab' : 'cursor-default'} hover:bg-neutral-100 dark:hover:bg-neutral-700/50 transition-colors shadow-sm`}
+            className={`bg-white dark:bg-neutral-800 p-4 rounded-lg border border-slate-200 dark:border-neutral-700 ${canEdit ? 'cursor-grab' : 'cursor-default'} hover:bg-slate-50 dark:hover:bg-neutral-700/50 transition-colors shadow-sm`}
         >
             <div className="flex justify-between items-start">
                 <p className="text-sm font-semibold text-black dark:text-white break-words">{task.title}</p>
@@ -39,7 +39,7 @@ const TaskCard: React.FC<{ task: Task; onOpenModal: () => void; onDragStart: (e:
                     <p>{task.assignee}</p>
                     <p className="mt-0.5">{new Date(task.dueDate).toLocaleDateString()}</p>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-neutral-200 dark:bg-neutral-700 flex items-center justify-center text-xs font-bold text-neutral-600 dark:text-neutral-300">
+                <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-neutral-700 flex items-center justify-center text-xs font-bold text-neutral-600 dark:text-neutral-300">
                     {task.assignee.substring(0,2).toUpperCase()}
                 </div>
             </div>
@@ -88,7 +88,7 @@ const TaskColumn: React.FC<{
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            className={`flex-1 min-w-[300px] bg-neutral-100 dark:bg-neutral-900/50 rounded-lg p-3 transition-colors ${isDragOver ? 'bg-neutral-200 dark:bg-neutral-700/50' : ''}`}
+            className={`flex-1 min-w-[300px] bg-slate-100 dark:bg-neutral-900/50 rounded-lg p-3 transition-colors ${isDragOver ? 'bg-slate-200 dark:bg-neutral-700/50' : ''}`}
         >
             <div className={`flex items-center justify-between mb-4 px-2 py-1 rounded ${statusInfo[status].color.replace('text-', 'bg-')}/10`}>
                 <div className={`flex items-center gap-2 font-semibold text-sm ${statusInfo[status].color}`}>

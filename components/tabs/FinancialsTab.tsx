@@ -108,7 +108,7 @@ const FinancialsTab: React.FC<FinancialsTabProps> = ({ data, canEdit, onOpenModa
         setEditingCell(null);
     };
 
-    const inputClasses = "w-full bg-neutral-200 dark:bg-neutral-700 border-transparent focus:bg-neutral-300 dark:focus:bg-neutral-600 rounded p-1.5 text-sm focus:ring-2 focus:ring-[#32ff84] focus:outline-none text-black dark:text-white";
+    const inputClasses = "w-full bg-slate-100 dark:bg-neutral-700 border-transparent focus:bg-slate-200 dark:focus:bg-neutral-600 rounded p-1.5 text-sm focus:ring-2 focus:ring-[#32ff84] focus:outline-none text-black dark:text-white";
 
     return (
         <div className="animate-fade-in">
@@ -119,9 +119,9 @@ const FinancialsTab: React.FC<FinancialsTabProps> = ({ data, canEdit, onOpenModa
                     </button>
                 )}
             </div>
-            <div className="overflow-x-auto bg-white dark:bg-neutral-800/50 rounded-lg border border-neutral-200 dark:border-neutral-700">
-                <table className="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700">
-                    <thead className="bg-neutral-50 dark:bg-neutral-800">
+            <div className="overflow-x-auto bg-white dark:bg-neutral-800/50 rounded-lg border border-slate-200 dark:border-neutral-700">
+                <table className="min-w-full divide-y divide-slate-200 dark:divide-neutral-700">
+                    <thead className="bg-slate-50 dark:bg-neutral-800">
                         <tr>
                             {headers.map(header => (
                                 <th key={header.key} scope="col" className="py-3.5 px-3 text-left text-sm font-semibold text-neutral-800 dark:text-white first:pl-4 first:sm:pl-6">
@@ -132,9 +132,9 @@ const FinancialsTab: React.FC<FinancialsTabProps> = ({ data, canEdit, onOpenModa
                             ))}
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800 bg-white dark:bg-neutral-900/50">
+                    <tbody className="divide-y divide-slate-200 dark:divide-neutral-800 bg-white dark:bg-neutral-900/50">
                         {filteredAndSortedData.map((record) => (
-                            <tr key={record.id} className="hover:bg-neutral-100/70 dark:hover:bg-neutral-800/70 group">
+                            <tr key={record.id} className="hover:bg-slate-50 dark:hover:bg-neutral-800/70 group">
                                 <td onClick={() => onOpenModal(record, 'financials')} className="w-1/3 py-4 pl-4 pr-3 text-sm font-medium text-black dark:text-white sm:pl-6 cursor-pointer">{record.description}</td>
                                 
                                 <td onClick={() => handleCellClick(record.id, 'amount')} className="whitespace-nowrap px-3 py-2 text-sm text-neutral-500 dark:text-neutral-400 cursor-pointer">

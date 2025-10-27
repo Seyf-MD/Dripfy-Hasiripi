@@ -15,7 +15,7 @@ interface StatCardProps {
 const StatCard: React.FC<StatCardProps> = ({ icon, title, value, subValue, children, delay, onClick }) => (
   <div 
     onClick={onClick}
-    className={`bg-white dark:bg-neutral-800 p-5 rounded-xl border border-neutral-200 dark:border-neutral-700 flex flex-col justify-between h-full transition-all duration-300 hover:border-[#32ff84]/50 hover:shadow-2xl hover:shadow-black/20 hover:-translate-y-1 animate-slide-in-up ${onClick ? 'cursor-pointer' : ''}`}
+    className={`bg-white dark:bg-neutral-800 p-5 rounded-xl border border-slate-200 dark:border-neutral-700 flex flex-col justify-between h-full transition-all duration-300 hover:border-[#32ff84]/50 hover:shadow-2xl hover:shadow-black/20 hover:-translate-y-1 animate-slide-in-up ${onClick ? 'cursor-pointer' : ''}`}
     style={{ animationDelay: `${delay}ms` }}
   >
     <div>
@@ -70,7 +70,7 @@ const StatCards: React.FC<StatCardsProps> = ({ setActiveTab, onPendingPaymentsCl
         value="72%"
         onClick={() => setActiveTab('Tasks')}
       >
-        <div className="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2">
+        <div className="w-full bg-slate-200 dark:bg-neutral-700 rounded-full h-2">
           <div className="bg-[#32ff84] h-2 rounded-full" style={{ width: '72%' }}></div>
         </div>
       </StatCard>

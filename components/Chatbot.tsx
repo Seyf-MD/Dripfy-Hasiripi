@@ -156,8 +156,8 @@ const Chatbot: React.FC<ChatbotProps> = ({ dataContext }) => {
       </button>
 
       {isOpen && (
-        <div className="fixed bottom-20 right-6 w-full max-w-sm h-[70vh] max-h-[600px] bg-white dark:bg-neutral-900 rounded-xl shadow-2xl flex flex-col border border-neutral-200 dark:border-neutral-700 overflow-hidden animate-fade-in-up">
-          <header className="p-4 bg-neutral-100 dark:bg-neutral-800/50 border-b border-neutral-200 dark:border-neutral-700 flex items-center justify-between gap-3">
+        <div className="fixed bottom-20 right-6 w-full max-w-sm h-[70vh] max-h-[600px] bg-white dark:bg-neutral-900 rounded-xl shadow-2xl flex flex-col border border-slate-200 dark:border-neutral-700 overflow-hidden animate-fade-in-up">
+          <header className="p-4 bg-slate-50 dark:bg-neutral-800/50 border-b border-slate-200 dark:border-neutral-700 flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#32ff84] to-green-400 flex items-center justify-center text-black">
                     <Bot size={24} />
@@ -177,25 +177,25 @@ const Chatbot: React.FC<ChatbotProps> = ({ dataContext }) => {
               {messages.map((msg, index) => (
                 <div key={index} className={`flex items-start gap-3 ${msg.role === 'user' ? 'justify-end' : ''}`}>
                   {msg.role === 'model' && (
-                    <div className="w-8 h-8 rounded-full bg-neutral-200 dark:bg-neutral-700 flex items-center justify-center flex-shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-neutral-700 flex items-center justify-center flex-shrink-0">
                       <Bot size={18} className="text-neutral-600 dark:text-neutral-300"/>
                     </div>
                   )}
-                  <div className={`max-w-[80%] p-3 rounded-xl text-sm leading-6 ${msg.role === 'user' ? 'bg-neutral-700 text-white rounded-br-none' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700 rounded-bl-none'}`}>
+                  <div className={`max-w-[80%] p-3 rounded-xl text-sm leading-6 ${msg.role === 'user' ? 'bg-slate-200 dark:bg-neutral-700 text-black dark:text-white rounded-br-none' : 'bg-slate-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-slate-200 dark:border-neutral-700 rounded-bl-none'}`}>
                     {msg.role === 'model' && index === messages.length - 1 && isLoading && msg.content === '' 
                         ? <Loader className="animate-spin text-neutral-500 dark:text-neutral-400" size={20}/>
                         : <MarkdownRenderer content={msg.content} />
                     }
                   </div>
                    {msg.role === 'user' && (
-                    <div className="w-8 h-8 rounded-full bg-neutral-200 dark:bg-neutral-700 flex items-center justify-center flex-shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-neutral-700 flex items-center justify-center flex-shrink-0">
                       <User size={18} className="text-neutral-600 dark:text-neutral-300"/>
                     </div>
                   )}
                 </div>
               ))}
               {messages.length === 1 && !isLoading && (
-                  <div className="flex flex-col gap-2 items-start mt-4 p-4 bg-neutral-100 dark:bg-neutral-800/50 rounded-lg border border-neutral-200 dark:border-neutral-700">
+                  <div className="flex flex-col gap-2 items-start mt-4 p-4 bg-slate-100 dark:bg-neutral-800/50 rounded-lg border border-slate-200 dark:border-neutral-700">
                       <div className="flex items-center gap-2 text-sm font-semibold text-neutral-700 dark:text-neutral-300">
                           <Sparkles size={16} className="text-[#32ff84]"/>
                           <span>{t('chatbot.examplePrompts')}</span>
@@ -211,7 +211,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ dataContext }) => {
             </div>
           </div>
           
-          <div className="p-4 border-t border-neutral-200 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-800/50">
+          <div className="p-4 border-t border-slate-200 dark:border-neutral-700 bg-white dark:bg-neutral-800/50">
             <div className="relative">
               <input
                 type="text"
@@ -219,7 +219,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ dataContext }) => {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder={t('chatbot.placeholder')}
-                className="w-full pl-4 pr-12 py-2 bg-neutral-200 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-600 rounded-full focus:ring-2 focus:ring-[#32ff84] focus:outline-none text-black dark:text-white placeholder:text-neutral-500"
+                className="w-full pl-4 pr-12 py-2 bg-slate-100 dark:bg-neutral-800 border border-slate-300 dark:border-neutral-600 rounded-full focus:ring-2 focus:ring-[#32ff84] focus:outline-none text-black dark:text-white placeholder:text-neutral-500"
                 disabled={isLoading}
               />
               <button

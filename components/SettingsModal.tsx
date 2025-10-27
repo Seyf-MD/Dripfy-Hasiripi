@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { X, UserCircle, Settings as SettingsIcon, Shield, Key } from 'lucide-react';
 import { useLanguage, Language } from '../i18n/LanguageContext';
-import { UserRole, Theme, NotificationSettings } from '../types';
+import { UserRole, NotificationSettings } from '../types';
+import { useTheme } from '../context/ThemeContext';
 
 type SettingsTab = 'profile' | 'settings' | 'privacy';
 
@@ -11,9 +12,8 @@ interface SettingsModalProps {
     onClose: () => void;
     activeTab: SettingsTab;
     setActiveTab: (tab: SettingsTab) => void;
-    theme: Theme;
     notificationSettings: NotificationSettings;
-    onSaveSettings: (settings: { theme: Theme, notifications: NotificationSettings }) => void;
+    onSaveSettings: (notifications: NotificationSettings) => void;
     onChangePasswordClick: () => void;
     onViewAuditLog: () => void;
     onExportData: () => void;
@@ -25,7 +25,7 @@ const Toggle: React.FC<{ label: string; enabled: boolean; onToggle: () => void }
         <span className="font-medium text-neutral-600 dark:text-neutral-300">{label}</span>
         <button
             onClick={onToggle}
-            className={`w-12 h-6 rounded-full p-1 transition-colors ${enabled ? 'bg-[#32ff84]' : 'bg-neutral-300 dark:bg-neutral-700'}`}
+            className={`w-12 h-6 rounded-full p-1 transition-colors ${enabled ? 'bg-[#32ff84]' : 'bg-slate-200 dark:bg-neutral-700'}`}
         >
             <span className={`block w-4 h-4 rounded-full bg-white transform transition-transform ${enabled ? 'translate-x-6' : 'translate-x-0'}`} />
         </button>
@@ -40,18 +40,21 @@ const FormField: React.FC<{ label: string; children: React.ReactNode }> = ({ lab
 );
 
 
-const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, userRole, onClose, activeTab, setActiveTab, theme, notificationSettings, onSaveSettings, onChangePasswordClick, onViewAuditLog, onExportData, onDeleteAccount }) => {
+const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, userRole, onClose, activeTab, setActiveTab, notificationSettings, onSaveSettings, onChangePasswordClick, onViewAuditLog, onExportData, onDeleteAccount }) => {
     const { t, language, setLanguage } = useLanguage();
+    const { theme, setTheme } = useTheme();
     
-    const [localSettings, setLocalSettings] = React.useState({ theme, notifications: notificationSettings });
+    const [localNotifications, setLocalNotifications] = React.useState(notificationSettings);
+    const [localTheme, setLocalTheme] = React.useState(theme);
     const [localLanguage, setLocalLanguage] = React.useState(language);
     
     React.useEffect(() => {
         if (isOpen) {
-            setLocalSettings({ theme, notifications: notificationSettings });
+            setLocalNotifications(notificationSettings);
+            setLocalTheme(theme);
             setLocalLanguage(language);
         }
-    }, [isOpen, theme, notificationSettings, language]);
+    }, [isOpen, notificationSettings, theme, language]);
 
     React.useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -70,15 +73,16 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, userRole, onClose
     }, [isOpen, onClose]);
 
     const handleNotificationToggle = (key: keyof NotificationSettings) => {
-        setLocalSettings(prev => ({...prev, notifications: { ...prev.notifications, [key]: !prev.notifications[key] }}));
+        setLocalNotifications(prev => ({ ...prev, [key]: !prev[key] }));
     };
     
     const handleThemeToggle = () => {
-        setLocalSettings(prev => ({ ...prev, theme: prev.theme === 'dark' ? 'light' : 'dark' }));
+        setLocalTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
     };
 
     const handleSaveChanges = () => {
-        onSaveSettings(localSettings);
+        onSaveSettings(localNotifications);
+        setTheme(localTheme);
         if (localLanguage !== language) {
             setLanguage(localLanguage);
         }
@@ -87,7 +91,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, userRole, onClose
 
     if (!isOpen) return null;
 
-    const inputClass = "w-full px-3 py-2 bg-neutral-100 dark:bg-neutral-700 border border-neutral-300 dark:border-neutral-600 rounded-md focus:ring-2 focus:ring-[#32ff84] focus:outline-none text-black dark:text-white placeholder:text-neutral-500";
+    const inputClass = "w-full px-3 py-2 bg-slate-100 dark:bg-neutral-700 border border-slate-300 dark:border-neutral-600 rounded-md focus:ring-2 focus:ring-[#32ff84] focus:outline-none text-black dark:text-white placeholder:text-neutral-500";
     
     const renderContent = () => {
         switch (activeTab) {
@@ -106,7 +110,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, userRole, onClose
                                 <input type="email" defaultValue="demo@dripfy.com" className={inputClass} />
                             </FormField>
                              <FormField label={t('settings.profile.password')}>
-                                <button onClick={onChangePasswordClick} className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-neutral-200 dark:bg-neutral-700 text-black dark:text-white text-sm font-semibold rounded-lg hover:bg-neutral-300 dark:hover:bg-neutral-600 transition-colors">
+                                <button onClick={onChangePasswordClick} className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-slate-100 dark:bg-neutral-700 text-black dark:text-white text-sm font-semibold rounded-lg hover:bg-slate-200 dark:hover:bg-neutral-600 transition-colors">
                                     <Key size={16}/>
                                     {t('settings.profile.changePassword')}
                                 </button>
@@ -131,9 +135,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, userRole, onClose
                                     <option value="ar">العربية</option>
                                 </select>
                             </FormField>
-                            <Toggle label={t('settings.settings.darkMode')} enabled={localSettings.theme === 'dark'} onToggle={handleThemeToggle} />
-                            <Toggle label={t('settings.settings.emailNotifications')} enabled={localSettings.notifications.email} onToggle={() => handleNotificationToggle('email')} />
-                            <Toggle label={t('settings.settings.pushNotifications')} enabled={localSettings.notifications.push} onToggle={() => handleNotificationToggle('push')} />
+                            <Toggle label={t('settings.settings.darkMode')} enabled={localTheme === 'dark'} onToggle={handleThemeToggle} />
+                            <Toggle label={t('settings.settings.emailNotifications')} enabled={localNotifications.email} onToggle={() => handleNotificationToggle('email')} />
+                            <Toggle label={t('settings.settings.pushNotifications')} enabled={localNotifications.push} onToggle={() => handleNotificationToggle('push')} />
                         </div>
                     </div>
                 );
@@ -146,9 +150,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, userRole, onClose
                         </div>
                         <div className="space-y-3">
                            {userRole === 'admin' && (
-                                <button onClick={onViewAuditLog} className="w-full text-left p-3 bg-neutral-100 dark:bg-neutral-700/50 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-md transition-colors">{t('settings.privacy.auditLog')}</button>
+                                <button onClick={onViewAuditLog} className="w-full text-left p-3 bg-slate-100 dark:bg-neutral-700/50 hover:bg-slate-200 dark:hover:bg-neutral-700 rounded-md transition-colors">{t('settings.privacy.auditLog')}</button>
                            )}
-                           <button onClick={onExportData} className="w-full text-left p-3 bg-neutral-100 dark:bg-neutral-700/50 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-md transition-colors">{t('settings.privacy.exportData')}</button>
+                           <button onClick={onExportData} className="w-full text-left p-3 bg-slate-100 dark:bg-neutral-700/50 hover:bg-slate-200 dark:hover:bg-neutral-700 rounded-md transition-colors">{t('settings.privacy.exportData')}</button>
                            <button onClick={onDeleteAccount} className="w-full text-left p-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 dark:text-red-400 rounded-md transition-colors">{t('settings.privacy.deleteAccount')}</button>
                         </div>
                     </div>
@@ -172,17 +176,17 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, userRole, onClose
             aria-modal="true"
             aria-labelledby={modalTitleId}
         >
-            <div className="bg-white dark:bg-neutral-800 text-black dark:text-white rounded-xl border border-neutral-200 dark:border-neutral-700 w-full max-w-3xl h-[70vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
-                <header className="p-4 flex justify-between items-center border-b border-neutral-200 dark:border-neutral-700 flex-shrink-0">
+            <div className="bg-white dark:bg-neutral-800 text-black dark:text-white rounded-xl border border-slate-200 dark:border-neutral-700 w-full max-w-3xl h-[70vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+                <header className="p-4 flex justify-between items-center border-b border-slate-200 dark:border-neutral-700 flex-shrink-0">
                     <h2 id={modalTitleId} className="text-xl font-bold">{t('settings.title')}</h2>
                     <button onClick={onClose} className="text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors">
                         <X size={24} />
                     </button>
                 </header>
                 <div className="flex flex-grow overflow-hidden">
-                    <aside className="w-1/4 border-r border-neutral-200 dark:border-neutral-700 p-4 space-y-2">
+                    <aside className="w-1/4 border-r border-slate-200 dark:border-neutral-700 p-4 space-y-2 bg-slate-50 dark:bg-neutral-900/50">
                         {tabs.map(tab => (
-                            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`w-full flex items-center gap-3 p-2 rounded-md text-sm font-medium transition-colors ${activeTab === tab.id ? 'bg-[#32ff84]/10 text-[#32ff84]' : 'text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700'}`}>
+                            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`w-full flex items-center gap-3 p-2 rounded-md text-sm font-medium transition-colors ${activeTab === tab.id ? 'bg-[#32ff84]/10 text-[#32ff84]' : 'text-neutral-600 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-neutral-700'}`}>
                                 {tab.icon}
                                 <span>{tab.label}</span>
                             </button>
@@ -192,8 +196,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, userRole, onClose
                         {renderContent()}
                     </main>
                 </div>
-                 <footer className="p-4 flex justify-end items-center gap-4 border-t border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 flex-shrink-0 rounded-b-xl">
-                    <button onClick={onClose} className="px-4 py-2 bg-neutral-200 dark:bg-neutral-700 text-black dark:text-white text-sm font-semibold rounded-lg hover:bg-neutral-300 dark:hover:bg-neutral-600 transition-colors">
+                 <footer className="p-4 flex justify-end items-center gap-4 border-t border-slate-200 dark:border-neutral-700 bg-slate-50 dark:bg-neutral-800/50 flex-shrink-0 rounded-b-xl">
+                    <button onClick={onClose} className="px-4 py-2 bg-slate-200 dark:bg-neutral-700 text-black dark:text-white text-sm font-semibold rounded-lg hover:bg-slate-300 dark:hover:bg-neutral-600 transition-colors">
                         {t('settings.closeButton')}
                     </button>
                     <button onClick={handleSaveChanges} className="px-4 py-2 bg-[#32ff84] text-black text-sm font-semibold rounded-lg hover:bg-green-400 transition-colors">

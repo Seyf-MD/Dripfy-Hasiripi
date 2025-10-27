@@ -30,13 +30,13 @@ const AdminPanelTab: React.FC<AdminPanelTabProps> = ({ users, permissions, audit
                 return (
                      <div className="space-y-4">
                         {users.map(user => (
-                            <div key={user.id} onClick={() => onOpenModal(user, 'users')} className="bg-white dark:bg-neutral-800 p-4 rounded-lg border border-neutral-200 dark:border-neutral-700 cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-700/50 transition-colors">
+                            <div key={user.id} onClick={() => onOpenModal(user, 'users')} className="bg-white dark:bg-neutral-800 p-4 rounded-lg border border-slate-200 dark:border-neutral-700 cursor-pointer hover:bg-slate-100 dark:hover:bg-neutral-700/50 transition-colors">
                                 <div className="flex justify-between items-center">
                                     <div>
                                         <h3 className="font-semibold text-black dark:text-white">{user.name}</h3>
                                         <p className="text-sm text-neutral-500 dark:text-neutral-400">{user.email}</p>
                                     </div>
-                                    <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${user.role === 'admin' ? 'bg-green-500/20 text-[#32ff84]' : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300'}`}>
+                                    <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${user.role === 'admin' ? 'bg-green-500/20 text-[#32ff84]' : 'bg-slate-200 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300'}`}>
                                     {user.role === 'admin' ? <ShieldCheck size={14} className="mx-1.5"/> : <Edit2 size={14} className="mx-1.5"/>} {t(`userRoles.${user.role}`)}
                                     </span>
                                 </div>
@@ -46,7 +46,7 @@ const AdminPanelTab: React.FC<AdminPanelTabProps> = ({ users, permissions, audit
                 );
             case 'audit':
                 return (
-                    <div className="space-y-3 bg-neutral-100 dark:bg-neutral-800/50 p-4 rounded-lg border border-neutral-200 dark:border-neutral-700 max-h-[60vh] overflow-y-auto">
+                    <div className="space-y-3 bg-slate-100 dark:bg-neutral-800/50 p-4 rounded-lg border border-slate-200 dark:border-neutral-700 max-h-[60vh] overflow-y-auto">
                         {auditLog.map(log => (
                             <div key={log.id} className="text-sm p-3 bg-white dark:bg-neutral-800 rounded-md">
                                 <div className="flex justify-between items-center">
@@ -69,7 +69,7 @@ const AdminPanelTab: React.FC<AdminPanelTabProps> = ({ users, permissions, audit
                 return (
                     <div className="space-y-4">
                         {signupRequests.length > 0 ? signupRequests.map(req => (
-                            <div key={req.id} className="bg-white dark:bg-neutral-800 p-4 rounded-lg border border-neutral-200 dark:border-neutral-700">
+                            <div key={req.id} className="bg-white dark:bg-neutral-800 p-4 rounded-lg border border-slate-200 dark:border-neutral-700">
                                 <div className="flex flex-wrap justify-between items-start gap-4">
                                     <div>
                                         <h3 className="font-semibold text-black dark:text-white">{req.name}</h3>
@@ -77,48 +77,43 @@ const AdminPanelTab: React.FC<AdminPanelTabProps> = ({ users, permissions, audit
                                         <p className="text-sm text-neutral-400 dark:text-neutral-500">{req.phone} &bull; {t(`positions.${req.position.replace(/ /g, '')}`)}</p>
                                     </div>
                                     <div className="flex items-center gap-2 flex-shrink-0">
-                                        <button onClick={() => onApproveSignup(req.id)} className="flex items-center gap-1.5 px-3 py-1 bg-green-500/10 text-green-600 dark:text-green-300 text-xs font-semibold rounded-md hover:bg-green-500/20 transition-colors">
-                                            <CheckCircle size={14}/> {t('admin.approve')}
-                                        </button>
-                                        <button onClick={() => onDenySignup(req.id)} className="flex items-center gap-1.5 px-3 py-1 bg-red-500/10 text-red-500 dark:text-red-300 text-xs font-semibold rounded-md hover:bg-red-500/20 transition-colors">
-                                            <XCircle size={14}/> {t('admin.deny')}
-                                        </button>
+                                        <button onClick={() => onDenySignup(req.id)} className="p-2 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-500 dark:text-red-400 transition-colors"><XCircle size={20}/></button>
+                                        <button onClick={() => onApproveSignup(req.id)} className="p-2 rounded-full bg-green-500/10 hover:bg-green-500/20 text-green-500 dark:text-green-400 transition-colors"><CheckCircle size={20}/></button>
                                     </div>
                                 </div>
                             </div>
-                        )) : <p className="text-neutral-500 text-center py-4">{t('admin.noRequests')}</p>}
+                        )) : <p className="text-center text-neutral-500 dark:text-neutral-400 py-8">{t('admin.noRequests')}</p>}
                     </div>
-                )
+                );
+            default:
+                return null;
         }
     }
 
     return (
-        <div className="animate-fade-in">
-            <div className="mb-6 border-b border-neutral-200 dark:border-neutral-700">
-                <nav className="-mb-px flex space-x-6 overflow-x-auto" aria-label="Admin Tabs">
-                    {subTabs.map((tab) => (
-                        <button
-                            key={tab.id}
+        <div className="animate-fade-in flex flex-col lg:flex-row gap-8">
+            <aside className="lg:w-1/4">
+                <nav className="flex flex-row lg:flex-col gap-2">
+                    {subTabs.map(tab => (
+                        <button 
+                            key={tab.id} 
                             onClick={() => setActiveSubTab(tab.id)}
-                            className={`
-                                whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 transition-colors
-                                ${activeSubTab === tab.id
-                                    ? 'border-[#32ff84] text-[#32ff84]'
-                                    : 'border-transparent text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white hover:border-neutral-400 dark:hover:border-neutral-500'
-                                }
-                            `}
+                            className={`w-full flex items-center justify-between p-3 rounded-lg text-sm font-semibold transition-colors ${activeSubTab === tab.id ? 'bg-[#32ff84] text-black' : 'bg-slate-100 dark:bg-neutral-800 hover:bg-slate-200 dark:hover:bg-neutral-700'}`}
                         >
-                            {tab.icon}
-                            <span>{tab.label}</span>
+                            <div className="flex items-center gap-3">
+                                {tab.icon}
+                                <span>{tab.label}</span>
+                            </div>
                             {tab.count !== undefined && tab.count > 0 && (
-                                <span className="ml-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">{tab.count}</span>
+                                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${activeSubTab === tab.id ? 'bg-black/20' : 'bg-[#32ff84] text-black'}`}>{tab.count}</span>
                             )}
                         </button>
                     ))}
                 </nav>
-            </div>
-            
-            {renderContent()}
+            </aside>
+            <main className="flex-1">
+                {renderContent()}
+            </main>
         </div>
     );
 };

@@ -65,7 +65,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onSignupRequest }) => {
         setSignupData(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
     
-    const inputClass = "appearance-none rounded-none relative block w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-900 text-black dark:text-white placeholder-neutral-500 focus:outline-none focus:ring-[#32ff84] focus:border-[#32ff84] focus:z-10 sm:text-sm";
+    const inputClass = "appearance-none rounded-none relative block w-full px-3 py-2 border border-slate-300 dark:border-neutral-600 bg-white dark:bg-neutral-900 text-black dark:text-white placeholder-neutral-500 focus:outline-none focus:ring-[#32ff84] focus:border-[#32ff84] focus:z-10 sm:text-sm";
 
     const renderContent = () => {
         if (view === 'verify') {
@@ -150,11 +150,11 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onSignupRequest }) => {
 
 
     return (
-        <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 flex items-center justify-center animate-fade-in p-4">
+        <div className="min-h-screen bg-slate-100 dark:bg-neutral-900 flex items-center justify-center animate-fade-in p-4">
              <div className="absolute top-6 right-6">
                 <LanguageSwitcher />
             </div>
-            <div className="w-full max-w-md p-8 space-y-6 bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 shadow-2xl">
+            <div className="w-full max-w-md p-8 space-y-6 bg-white dark:bg-neutral-800 rounded-xl border border-slate-200 dark:border-neutral-700 shadow-2xl">
                 {view !== 'verify' && (
                     <div className="text-center">
                         <div className="h-12 flex items-center justify-center">

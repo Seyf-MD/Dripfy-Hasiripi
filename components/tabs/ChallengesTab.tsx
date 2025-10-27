@@ -43,7 +43,7 @@ const ChallengesTab: React.FC<ChallengesTabProps> = ({ challenges, advantages, c
     const { t } = useLanguage();
     const [editingItem, setEditingItem] = React.useState<{ type: 'challenge' | 'advantage', id: string, field: 'title' | 'description' } | null>(null);
 
-    const inputClasses = "w-full bg-neutral-200 dark:bg-neutral-700 border-transparent focus:bg-neutral-300 dark:focus:bg-neutral-600 rounded p-1 text-sm focus:ring-2 focus:ring-[#32ff84] focus:outline-none text-black dark:text-white";
+    const inputClasses = "w-full bg-slate-100 dark:bg-neutral-700 border-transparent focus:bg-slate-200 dark:focus:bg-neutral-600 rounded p-1 text-sm focus:ring-2 focus:ring-[#32ff84] focus:outline-none text-black dark:text-white";
 
     const handleCellClick = (e: React.MouseEvent, type: 'challenge' | 'advantage', id: string, field: 'title' | 'description') => {
         e.stopPropagation();

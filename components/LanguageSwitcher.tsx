@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useLanguage } from '../i18n/LanguageContext';
+import * as React from 'react';
+import { useLanguage, Language } from '../i18n/LanguageContext';
 import { ChevronDown } from 'lucide-react';
 
 const languages = [
@@ -12,12 +12,12 @@ const languages = [
 
 const LanguageSwitcher: React.FC = () => {
   const { language, setLanguage } = useLanguage();
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [isOpen, setIsOpen] = React.useState(false);
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
 
   const selectedLanguage = languages.find(l => l.code === language) || languages[0];
 
-  useEffect(() => {
+  React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
@@ -31,7 +31,7 @@ const LanguageSwitcher: React.FC = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg shadow-sm text-sm font-medium text-neutral-200 hover:bg-neutral-700 hover:border-neutral-500 transition-colors"
+        className="flex items-center gap-2 px-3 py-2 bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-sm text-sm font-medium text-neutral-800 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-500 transition-colors"
       >
         <span>{selectedLanguage.flag}</span>
         <span className="hidden sm:inline">{selectedLanguage.name}</span>
@@ -39,16 +39,16 @@ const LanguageSwitcher: React.FC = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-48 bg-neutral-800 border border-neutral-700 rounded-lg shadow-lg z-20 animate-fade-in-up origin-top-right">
+        <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-lg z-20 animate-fade-in-up origin-top-right">
           <ul className="py-1">
             {languages.map(lang => (
               <li key={lang.code}>
                 <button
                   onClick={() => {
-                    setLanguage(lang.code as any);
+                    setLanguage(lang.code as Language);
                     setIsOpen(false);
                   }}
-                  className="w-full text-left flex items-center gap-3 px-4 py-2 text-sm text-neutral-200 hover:bg-neutral-700 transition-colors"
+                  className="w-full text-left flex items-center gap-3 px-4 py-2 text-sm text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
                 >
                   <span className="text-lg">{lang.flag}</span>
                   <span>{lang.name}</span>

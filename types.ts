@@ -33,11 +33,15 @@ export interface Advantage {
 
 export interface Contact {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   role: string;
   type: 'Company' | 'Individual';
   email: string;
   phone?: string;
+  address?: string;
+  city?: string;
+  country?: string;
 }
 
 export interface Task {
@@ -88,7 +92,14 @@ export interface SignupRequest {
     timestamp: string;
 }
 
+export interface NotificationSettings {
+    email: boolean;
+    push: boolean;
+}
+
+export type Theme = 'light' | 'dark';
 export type UserRole = 'admin' | 'user';
+export type AdminSubTab = 'permissions' | 'audit' | 'requests';
 
 export type DataItem = ScheduleEvent | FinancialRecord | Challenge | Advantage | Contact | Task | User;
 

@@ -1,6 +1,6 @@
-import React, { createContext, useState, useContext, ReactNode, useMemo, useEffect } from 'react';
+import * as React from 'react';
 
-type Language = 'en' | 'tr' | 'de' | 'ru' | 'ar';
+export type Language = 'en' | 'tr' | 'de' | 'ru' | 'ar';
 type Translations = { [key: string]: any };
 
 interface LanguageContextType {
@@ -9,14 +9,14 @@ interface LanguageContextType {
   t: (key: string) => string;
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+const LanguageContext = React.createContext<LanguageContextType | undefined>(undefined);
 
-export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState<Language>('tr');
-  const [translations, setTranslations] = useState<{ [key in Language]: Translations } | null>(null);
-  const [loadingError, setLoadingError] = useState<string | null>(null);
+export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [language, setLanguage] = React.useState<Language>('tr');
+  const [translations, setTranslations] = React.useState<{ [key in Language]: Translations } | null>(null);
+  const [loadingError, setLoadingError] = React.useState<string | null>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     async function loadTranslations() {
       try {
         const responses = await Promise.all([
@@ -44,27 +44,37 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     loadTranslations();
   }, []);
 
+  // Updated translation function to handle nested keys
   const t = (key: string): string => {
     if (!translations) return key;
 
-    const currentTranslations = translations[language] || translations.en;
-    
-    // Direct lookup for flat keys
-    if (currentTranslations && typeof currentTranslations[key] === 'string') {
-        return currentTranslations[key];
+    const resolve = (path: string, obj: any): string | undefined => {
+        return path.split('.').reduce((prev, curr) => {
+            return prev ? prev[curr] : undefined;
+        }, obj);
+    };
+
+    const currentTranslations = translations[language];
+    let translation = resolve(key, currentTranslations);
+
+    if (typeof translation === 'string') {
+      return translation;
+    }
+
+    // Fallback to English if translation is not found in the current language
+    if (language !== 'en') {
+      const fallbackTranslations = translations.en;
+      translation = resolve(key, fallbackTranslations);
+      if (typeof translation === 'string') {
+        return translation;
+      }
     }
     
-    // Fallback to English if not found in the current language
-    const fallbackTranslations = translations.en;
-    if (fallbackTranslations && typeof fallbackTranslations[key] === 'string') {
-        return fallbackTranslations[key];
-    }
-    
-    // If not found anywhere, return the key
+    // If not found anywhere, return the key itself
     return key;
   };
   
-  const value = useMemo(() => ({ language, setLanguage, t }), [language, translations]);
+  const value = React.useMemo(() => ({ language, setLanguage, t }), [language, translations]);
   
   if (loadingError) {
     return (
@@ -92,7 +102,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
 };
 
 export const useLanguage = (): LanguageContextType => {
-  const context = useContext(LanguageContext);
+  const context = React.useContext(LanguageContext);
   if (context === undefined) {
     throw new Error('useLanguage must be used within a LanguageProvider');
   }

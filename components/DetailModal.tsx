@@ -1,266 +1,161 @@
-import React, { useState, useEffect } from 'react';
-import { DataItem, DashboardData, UserRole, UserPermission } from '../types';
-import { X, Save, Trash2 } from 'lucide-react';
+import * as React from 'react';
+import { DataItem, ScheduleEvent, FinancialRecord, Challenge, Advantage, Contact, Task, User } from '../types';
+import { X, Edit, Trash2 } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
 
+type ModalType = 'schedule' | 'financials' | 'challenges' | 'advantages' | 'contacts' | 'tasks' | 'users';
+
 interface DetailModalProps {
-    modalState: {
-        item: DataItem | Partial<DataItem>;
-        type: keyof DashboardData;
-        isNew?: boolean;
-    } | null;
-    isOpen: boolean;
+    item: DataItem;
+    type: ModalType;
+    canEdit: boolean;
     onClose: () => void;
-    onSave: (item: DataItem) => void;
-    onDelete: (item: DataItem) => void;
-    userRole: UserRole | null;
-    permissions: UserPermission[];
+    onEdit: (item: DataItem, type: ModalType) => void;
+    onDelete: (itemId: string, type: ModalType) => void;
 }
 
-const FormField: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
-    <div className="mb-4">
-        <label className="block text-sm font-medium text-neutral-400 mb-1">{label}</label>
-        {children}
+const DetailRow: React.FC<{ label: string; children: React.ReactNode; className?: string }> = ({ label, children, className }) => (
+    <div className={`grid grid-cols-3 gap-4 py-3 border-b border-neutral-200 dark:border-neutral-700/50 ${className}`}>
+        <dt className="text-sm font-medium text-neutral-500 dark:text-neutral-400">{label}</dt>
+        <dd className="text-sm text-black dark:text-white col-span-2">{children}</dd>
     </div>
 );
 
-const getSingularName = (pluralName: string) => {
-    if (pluralName === 'schedule') return 'schedule';
-    if (pluralName.endsWith('s')) return pluralName.slice(0, -1);
-    return pluralName;
-};
 
-const DetailModal: React.FC<DetailModalProps> = ({ modalState, isOpen, onClose, onSave, onDelete, userRole, permissions }) => {
-    const [formData, setFormData] = useState<DataItem | Partial<DataItem> | null>(null);
-    const { t, language } = useLanguage();
+const DetailModal: React.FC<DetailModalProps> = ({ item, type, canEdit, onClose, onEdit, onDelete }) => {
+    const { t } = useLanguage();
 
-    useEffect(() => {
-        if (modalState) {
-            setFormData(modalState.item);
-        }
-    }, [modalState]);
-
-    if (!isOpen || !modalState || !formData) return null;
-
-    const { type, isNew } = modalState;
-
-    const isReadOnly = (() => {
-        if (userRole === 'admin') {
-            return false;
-        }
-        if (userRole === 'user') {
-            const userPerms = permissions.find(p => p.userName === 'Demo User');
-            if (userPerms && type in userPerms.permissions) {
-                return !userPerms.permissions[type as keyof typeof userPerms.permissions].edit;
+    React.useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                onClose();
             }
-            return true; 
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [onClose]);
+    
+    const renderDetails = () => {
+        switch (type) {
+            case 'schedule': {
+                const event = item as ScheduleEvent;
+                return (
+                    <dl>
+                        <DetailRow label={t('schedule.day')}>{t(`days.${event.day.toLowerCase()}`)}</DetailRow>
+                        <DetailRow label={t('schedule.time')}>{event.time}</DetailRow>
+                        <DetailRow label={t('schedule.participants')}>{event.participants.join(', ')}</DetailRow>
+                        <DetailRow label={t('schedule.type')}>{event.type}</DetailRow>
+                    </dl>
+                );
+            }
+            case 'financials': {
+                const record = item as FinancialRecord;
+                return (
+                    <dl>
+                        <DetailRow label={t('financials.amount')}>
+                            <span className={record.amount < 0 ? 'text-red-500 dark:text-red-400' : 'text-green-600 dark:text-green-400'}>
+                                {new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(record.amount)}
+                            </span>
+                        </DetailRow>
+                        <DetailRow label={t('financials.status')}>{t(`status.${record.status.toLowerCase()}`)}</DetailRow>
+                        <DetailRow label={t('financials.dueDate')}>{new Date(record.dueDate).toLocaleDateString()}</DetailRow>
+                        <DetailRow label={t('financials.type')}>{record.type === 'Incoming' ? t('financials.incoming') : t('financials.outgoing')}</DetailRow>
+                    </dl>
+                );
+            }
+            case 'challenges': {
+                const challenge = item as Challenge;
+                return (
+                    <dl>
+                        <DetailRow label={t('challenges.description')}>{challenge.description}</DetailRow>
+                        <DetailRow label={t('challenges.severity')}>{challenge.severity}</DetailRow>
+                    </dl>
+                );
+            }
+            case 'advantages': {
+                const advantage = item as Advantage;
+                 return (
+                    <dl>
+                        <DetailRow label={t('advantages.description')}>{advantage.description}</DetailRow>
+                    </dl>
+                );
+            }
+            case 'contacts': {
+                const contact = item as Contact;
+                return (
+                     <dl>
+                        <DetailRow label={t('contacts.role')}>{contact.role}</DetailRow>
+                        <DetailRow label={t('contacts.type')}>{contact.type}</DetailRow>
+                        <DetailRow label={t('contacts.email')}>{contact.email}</DetailRow>
+                        {contact.phone && <DetailRow label={t('contacts.phone')}>{contact.phone}</DetailRow>}
+                        {contact.address && <DetailRow label={t('contacts.address')}>{`${contact.address}, ${contact.city}, ${contact.country}`}</DetailRow>}
+                    </dl>
+                );
+            }
+            case 'tasks': {
+                const task = item as Task;
+                return (
+                     <dl>
+                        <DetailRow label={t('tasks.priority')}>{task.priority}</DetailRow>
+                        <DetailRow label={t('tasks.status')}>{t(`status.${task.status.toLowerCase().replace(' ', '')}`)}</DetailRow>
+                        <DetailRow label={t('tasks.dueDate')}>{new Date(task.dueDate).toLocaleDateString()}</DetailRow>
+                        <DetailRow label={t('tasks.assignee')}>{task.assignee}</DetailRow>
+                    </dl>
+                );
+            }
+            case 'users': {
+                const user = item as User;
+                return (
+                     <dl>
+                        <DetailRow label={t('users.email')}>{user.email}</DetailRow>
+                        <DetailRow label={t('users.role')}>{user.role}</DetailRow>
+                        <DetailRow label={t('users.lastLogin')}>{new Date(user.lastLogin).toLocaleString()}</DetailRow>
+                    </dl>
+                );
+            }
+            default:
+                return <p>No details available.</p>;
         }
-        return true; 
-    })();
-
-
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        const { name, value, type: inputType } = e.target;
-        
-        let finalValue: any = value;
-        if (inputType === 'number') {
-            finalValue = parseFloat(value) || 0;
-        }
-        if (name === 'participants') {
-            finalValue = value.split(',').map(p => p.trim()).filter(Boolean);
-        }
-
-        setFormData(prev => prev ? { ...prev, [name]: finalValue } : null);
-    };
-
-    const handleSave = () => {
-        if(formData) onSave(formData as DataItem);
-    };
-
-    const handleDelete = () => {
-        if(formData) onDelete(formData as DataItem);
     };
     
-    const renderFormFields = () => {
-        const item = formData as any;
-        const inputClass = "w-full px-3 py-2 bg-neutral-900 border border-neutral-600 rounded-md focus:ring-2 focus:ring-[#32ff84] focus:outline-none text-white placeholder:text-neutral-500 disabled:bg-neutral-800 disabled:cursor-not-allowed";
-
-        switch (type) {
-            case 'schedule':
-                return (
-                    <>
-                        <FormField label={t('modal.schedule.title')}>
-                            <input type="text" name="title" value={item.title || ''} onChange={handleInputChange} className={inputClass} disabled={isReadOnly} />
-                        </FormField>
-                        <div className="grid grid-cols-2 gap-4">
-                            <FormField label={t('modal.schedule.day')}>
-                                <select name="day" value={item.day || 'Monday'} onChange={handleInputChange} className={inputClass} disabled={isReadOnly}>
-                                    {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(d => <option key={d} value={d}>{t(`days.${d.toLowerCase()}`)}</option>)}
-                                </select>
-                            </FormField>
-                            <FormField label={t('modal.schedule.time')}>
-                                <input type="time" name="time" value={item.time || ''} onChange={handleInputChange} className={inputClass} disabled={isReadOnly} />
-                            </FormField>
-                        </div>
-                        <FormField label={t('modal.schedule.participants')}>
-                             <input type="text" name="participants" value={(item.participants || []).join(', ')} onChange={handleInputChange} className={inputClass} disabled={isReadOnly} placeholder="Marcus, PR Team" />
-                        </FormField>
-                         <FormField label={t('modal.type')}>
-                            <select name="type" value={item.type || 'Meeting'} onChange={handleInputChange} className={inputClass} disabled={isReadOnly}>
-                                {['Meeting', 'Call', 'Event'].map(t => <option key={t} value={t}>{t}</option>)}
-                            </select>
-                        </FormField>
-                    </>
-                );
-            case 'financials':
-                return (
-                    <>
-                        <FormField label={t('modal.financials.description')}>
-                            <input type="text" name="description" value={item.description || ''} onChange={handleInputChange} className={inputClass} disabled={isReadOnly} />
-                        </FormField>
-                        <div className="grid grid-cols-2 gap-4">
-                            <FormField label={t('modal.financials.amount')}>
-                                <input type="number" name="amount" value={item.amount || 0} onChange={handleInputChange} className={inputClass} disabled={isReadOnly} />
-                            </FormField>
-                            <FormField label={t('modal.type')}>
-                                 <select name="type" value={item.type || 'Outgoing'} onChange={handleInputChange} className={inputClass} disabled={isReadOnly}>
-                                    {['Incoming', 'Outgoing'].map(t => <option key={t} value={t}>{t}</option>)}
-                                </select>
-                            </FormField>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <FormField label={t('modal.status')}>
-                                 <select name="status" value={item.status || 'Pending'} onChange={handleInputChange} className={inputClass} disabled={isReadOnly}>
-                                    {['Paid', 'Pending', 'Overdue'].map(s => <option key={s} value={s}>{t(`status.${s.toLowerCase()}`)}</option>)}
-                                </select>
-                            </FormField>
-                            <FormField label={t('modal.dueDate')}>
-                                <input type="date" name="dueDate" value={item.dueDate ? new Date(item.dueDate).toISOString().split('T')[0] : ''} onChange={handleInputChange} className={inputClass} disabled={isReadOnly} />
-                            </FormField>
-                        </div>
-                    </>
-                );
-            case 'challenges':
-                return (
-                    <>
-                        <FormField label={t('modal.challenges.title')}>
-                            <input type="text" name="title" value={item.title || ''} onChange={handleInputChange} className={inputClass} disabled={isReadOnly} />
-                        </FormField>
-                        <FormField label={t('modal.challenges.description')}>
-                            <textarea name="description" value={item.description || ''} onChange={handleInputChange} className={inputClass} disabled={isReadOnly} rows={3}></textarea>
-                        </FormField>
-                        <FormField label={t('modal.challenges.severity')}>
-                            <select name="severity" value={item.severity || 'Medium'} onChange={handleInputChange} className={inputClass} disabled={isReadOnly}>
-                                {['High', 'Medium', 'Low'].map(s => <option key={s} value={s}>{t(`priority.${s.toLowerCase()}`)}</option>)}
-                            </select>
-                        </FormField>
-                    </>
-                );
-            case 'advantages':
-                return (
-                    <>
-                        <FormField label={t('modal.advantages.title')}>
-                            <input type="text" name="title" value={item.title || ''} onChange={handleInputChange} className={inputClass} disabled={isReadOnly} />
-                        </FormField>
-                        <FormField label={t('modal.advantages.description')}>
-                            <textarea name="description" value={item.description || ''} onChange={handleInputChange} className={inputClass} disabled={isReadOnly} rows={3}></textarea>
-                        </FormField>
-                    </>
-                );
-            case 'contacts':
-                return (
-                    <>
-                        <FormField label={t('modal.contacts.name')}>
-                            <input type="text" name="name" value={item.name || ''} onChange={handleInputChange} className={inputClass} disabled={isReadOnly} />
-                        </FormField>
-                        <FormField label={t('modal.contacts.role')}>
-                            <input type="text" name="role" value={item.role || ''} onChange={handleInputChange} className={inputClass} disabled={isReadOnly} />
-                        </FormField>
-                        <FormField label={t('modal.contacts.email')}>
-                            <input type="email" name="email" value={item.email || ''} onChange={handleInputChange} className={inputClass} disabled={isReadOnly} />
-                        </FormField>
-                        <FormField label={t('modal.contacts.phone')}>
-                            <input type="tel" name="phone" value={item.phone || ''} onChange={handleInputChange} className={inputClass} disabled={isReadOnly} />
-                        </FormField>
-                        <FormField label={t('modal.type')}>
-                            <select name="type" value={item.type || 'Individual'} onChange={handleInputChange} className={inputClass} disabled={isReadOnly}>
-                                {['Company', 'Individual'].map(t => <option key={t} value={t}>{t}</option>)}
-                            </select>
-                        </FormField>
-                    </>
-                );
-            case 'tasks':
-                return (
-                    <>
-                        <FormField label={t('modal.tasks.title')}>
-                            <input type="text" name="title" value={item.title || ''} onChange={handleInputChange} className={inputClass} disabled={isReadOnly} />
-                        </FormField>
-                        <FormField label={t('modal.tasks.assignee')}>
-                            <input type="text" name="assignee" value={item.assignee || ''} onChange={handleInputChange} className={inputClass} disabled={isReadOnly} />
-                        </FormField>
-                        <div className="grid grid-cols-2 gap-4">
-                            <FormField label={t('modal.tasks.priority')}>
-                                <select name="priority" value={item.priority || 'Medium'} onChange={handleInputChange} className={inputClass} disabled={isReadOnly}>
-                                    {['High', 'Medium', 'Low'].map(p => <option key={p} value={p}>{t(`priority.${p.toLowerCase()}`)}</option>)}
-                                </select>
-                            </FormField>
-                             <FormField label={t('modal.status')}>
-                                 <select name="status" value={item.status || 'To Do'} onChange={handleInputChange} className={inputClass} disabled={isReadOnly}>
-                                    {['To Do', 'In Progress', 'Done'].map(s => <option key={s} value={s}>{t(`taskStatus.${s.replace(' ', '')}`)}</option>)}
-                                </select>
-                            </FormField>
-                        </div>
-                         <FormField label={t('modal.dueDate')}>
-                            <input type="date" name="dueDate" value={item.dueDate ? new Date(item.dueDate).toISOString().split('T')[0] : ''} onChange={handleInputChange} className={inputClass} disabled={isReadOnly} />
-                        </FormField>
-                    </>
-                );
-            case 'users':
-                 return (
-                    <>
-                        <FormField label={t('modal.users.name')}>
-                            <input type="text" name="name" value={item.name || ''} onChange={handleInputChange} className={inputClass} disabled={isReadOnly} />
-                        </FormField>
-                        <FormField label={t('modal.users.email')}>
-                            <input type="email" name="email" value={item.email || ''} onChange={handleInputChange} className={inputClass} disabled={isReadOnly} />
-                        </FormField>
-                        <FormField label={t('modal.users.role')}>
-                            <select name="role" value={item.role || 'user'} onChange={handleInputChange} className={inputClass} disabled={isReadOnly}>
-                                {['admin', 'user'].map(r => <option key={r} value={r}>{t(`userRoles.${r}`)}</option>)}
-                            </select>
-                        </FormField>
-                    </>
-                );
-            default:
-                return <p className="text-neutral-400">{t('modal.noFields')}</p>;
-        }
+    const getTitle = () => {
+        if ('title' in item) return item.title;
+        if ('name' in item) return item.name;
+        if ('firstName' in item && 'lastName' in item) return `${item.firstName} ${item.lastName}`;
+        if ('description' in item) return (item as FinancialRecord).description;
+        return t('detailModal.details');
     }
 
-    const titleType = t(`dataTypes.${getSingularName(type)}`);
-    
+    const modalTitleId = 'detail-modal-title';
+
     return (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
-            <div className="bg-neutral-800 rounded-xl border border-neutral-700 w-full max-w-lg max-h-[90vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
-                <header className="p-4 flex justify-between items-center border-b border-neutral-700 flex-shrink-0">
-                    <h2 className="text-xl font-bold text-white capitalize">{isNew ? t('modal.createNew') : t('modal.edit')} {titleType}</h2>
-                    <button onClick={onClose} className="text-neutral-400 hover:text-white transition-colors">
+        <div
+            className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 animate-fade-in"
+            onClick={onClose}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={modalTitleId}
+        >
+            <div className="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 w-full max-w-lg flex flex-col" onClick={(e) => e.stopPropagation()}>
+                <header className="p-4 flex justify-between items-center border-b border-neutral-200 dark:border-neutral-700">
+                    <h2 id={modalTitleId} className="text-xl font-bold text-black dark:text-white break-all">{getTitle()}</h2>
+                    <button onClick={onClose} className="text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors flex-shrink-0 ml-4">
                         <X size={24} />
                     </button>
                 </header>
-                <main className="p-6 overflow-y-auto">
-                    <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
-                        {renderFormFields()}
-                    </form>
+                <main className="p-6">
+                    {renderDetails()}
                 </main>
-                {!isReadOnly && (
-                    <footer className="p-4 flex justify-end items-center gap-4 border-t border-neutral-700 flex-shrink-0">
-                        {!isNew && (
-                            <button onClick={handleDelete} className="flex items-center gap-2 px-4 py-2 bg-red-600/20 text-red-300 text-sm font-semibold rounded-lg hover:bg-red-600/30 transition-colors">
-                                <Trash2 size={16} /> {t('modal.delete')}
-                            </button>
-                        )}
-                        <button onClick={handleSave} className="flex items-center gap-2 px-4 py-2 bg-[#32ff84] text-black text-sm font-semibold rounded-lg hover:bg-green-400 transition-colors">
-                            <Save size={16} /> {isNew ? t('modal.create') : t('modal.save')}
+                {canEdit && (
+                     <footer className="p-4 flex justify-end items-center gap-4 border-t border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 rounded-b-xl">
+                        <button onClick={() => onDelete(item.id, type)} className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-500 dark:text-red-400 text-sm font-semibold rounded-lg hover:bg-red-500/20 transition-colors">
+                            <Trash2 size={16} /> {t('actions.delete')}
+                        </button>
+                        <button onClick={() => onEdit(item, type)} className="flex items-center gap-2 px-4 py-2 bg-[#32ff84] text-black text-sm font-semibold rounded-lg hover:bg-green-400 transition-colors">
+                            <Edit size={16} /> {t('actions.edit')}
                         </button>
                     </footer>
                 )}

@@ -1,199 +1,163 @@
-import React, { useState, useMemo } from 'react';
-import { Task, UserPermission, UserRole } from '../../types';
-import { ArrowUp, ArrowDown, PlusCircle } from 'lucide-react';
+import * as React from 'react';
+import { Task } from '../../types';
+import { Plus, CheckCircle, Clock, Loader } from 'lucide-react';
 import { useLanguage } from '../../i18n/LanguageContext';
 
 interface TasksTabProps {
     data: Task[];
-    userRole: UserRole | null;
-    onOpenModal: (item: Task | Partial<Task>, type: 'tasks', isNew?: boolean) => void;
-    onUpdateTask: (taskId: string, field: keyof Task, value: any) => void;
-    permissions: UserPermission[];
+    canEdit: boolean;
+    onOpenModal: (item: Task, type: 'tasks') => void;
+    onUpdateStatus: (taskId: string, newStatus: Task['status']) => void;
 }
 
-type SortKey = keyof Task;
-type SortDirection = 'ascending' | 'descending';
+type TaskStatus = 'To Do' | 'In Progress' | 'Done';
 
-const getPriorityColor = (priority: string) => {
-    const colors = { High: 'bg-red-500/20 text-red-300', Medium: 'bg-yellow-500/20 text-yellow-300', Low: 'bg-blue-500/20 text-blue-300'};
-    return colors[priority as keyof typeof colors] || 'bg-neutral-700';
-}
-
-const getStatusColor = (status: string) => {
-    const colors = { 'To Do': 'bg-neutral-600 text-neutral-300', 'In Progress': 'bg-purple-500/20 text-purple-300', Done: 'bg-green-500/20 text-green-300' };
-    return colors[status as keyof typeof colors] || 'bg-neutral-700';
-}
-
-const TasksTab: React.FC<TasksTabProps> = ({ data, userRole, onOpenModal, onUpdateTask, permissions }) => {
-    const { t } = useLanguage();
-    const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: SortDirection } | null>({ key: 'dueDate', direction: 'ascending' });
-    const [editingCell, setEditingCell] = useState<{ taskId: string; field: keyof Task } | null>(null);
-
-    const canEdit = useMemo(() => {
-        if (userRole === 'admin') return true;
-        if (userRole === 'user') {
-            const userPerms = permissions.find(p => p.userName === 'Demo User');
-            return userPerms?.permissions?.tasks?.edit || false;
-        }
-        return false;
-    }, [userRole, permissions]);
-
-    const sortedData = useMemo(() => {
-        let sortableItems = [...data];
-        if (sortConfig !== null) {
-            sortableItems.sort((a, b) => {
-                const aValue = a[sortConfig.key];
-                const bValue = b[sortConfig.key];
-                let comparison = 0;
-                
-                if (sortConfig.key === 'priority') {
-                    const order = { 'High': 3, 'Medium': 2, 'Low': 1 };
-                    comparison = (order[aValue as keyof typeof order] || 0) - (order[bValue as keyof typeof order] || 0);
-                } else if (sortConfig.key === 'status') {
-                     const order = { 'To Do': 1, 'In Progress': 2, 'Done': 3 };
-                     comparison = (order[aValue as keyof typeof order] || 0) - (order[bValue as keyof typeof order] || 0);
-                } else if (sortConfig.key === 'dueDate') {
-                    comparison = new Date(aValue).getTime() - new Date(bValue).getTime();
-                } else {
-                    comparison = String(aValue).localeCompare(String(bValue));
-                }
-
-                return sortConfig.direction === 'ascending' ? comparison : -comparison;
-            });
-        }
-        return sortableItems;
-    }, [data, sortConfig]);
-
-    const requestSort = (key: SortKey) => {
-        let direction: SortDirection = 'ascending';
-        if (sortConfig && sortConfig.key === key && sortConfig.direction === 'ascending') {
-            direction = 'descending';
-        }
-        setSortConfig({ key, direction });
-    };
-
-    const getSortIcon = (key: SortKey) => {
-        if (!sortConfig || sortConfig.key !== key) return <ArrowDown size={14} className="opacity-0 group-hover:opacity-50 transition-opacity" />;
-        return sortConfig.direction === 'ascending' ? <ArrowUp size={14} className="text-[#32ff84]"/> : <ArrowDown size={14} className="text-[#32ff84]"/>;
-    };
-
-     const headers: { key: SortKey; label: string }[] = [
-        { key: 'title', label: t('tasks.task') }, 
-        { key: 'assignee', label: t('tasks.assignee') }, 
-        { key: 'priority', label: t('tasks.priority') },
-        { key: 'status', label: t('tasks.status') }, 
-        { key: 'dueDate', label: t('tasks.dueDate') },
-    ];
+const TaskCard: React.FC<{ task: Task; onOpenModal: () => void; onDragStart: (e: React.DragEvent<HTMLDivElement>, taskId: string) => void; canEdit: boolean; }> = ({ task, onOpenModal, onDragStart, canEdit }) => {
     
-    const handleAddNew = () => {
-        onOpenModal({ title: '', priority: 'Medium', status: 'To Do', dueDate: new Date().toISOString().split('T')[0], assignee: ''}, 'tasks', true);
+    const getPriorityColor = (priority: string) => {
+        switch (priority) {
+            case 'High': return 'bg-red-500';
+            case 'Medium': return 'bg-yellow-500';
+            case 'Low': return 'bg-blue-500';
+            default: return 'bg-neutral-500';
+        }
     }
     
-    const handleCellClick = (taskId: string, field: keyof Task) => {
+    return (
+        <div 
+            draggable={canEdit}
+            onDragStart={(e) => onDragStart(e, task.id)}
+            onClick={onOpenModal}
+            className={`bg-white dark:bg-neutral-800 p-4 rounded-lg border border-neutral-200 dark:border-neutral-700 ${canEdit ? 'cursor-grab' : 'cursor-default'} hover:bg-neutral-100 dark:hover:bg-neutral-700/50 transition-colors shadow-sm`}
+        >
+            <div className="flex justify-between items-start">
+                <p className="text-sm font-semibold text-black dark:text-white break-words">{task.title}</p>
+                <div className={`w-2.5 h-2.5 rounded-full ${getPriorityColor(task.priority)} flex-shrink-0 mt-1`}></div>
+            </div>
+            <div className="flex items-center justify-between mt-4">
+                <div className="text-xs text-neutral-500 dark:text-neutral-400">
+                    <p>{task.assignee}</p>
+                    <p className="mt-0.5">{new Date(task.dueDate).toLocaleDateString()}</p>
+                </div>
+                <div className="w-8 h-8 rounded-full bg-neutral-200 dark:bg-neutral-700 flex items-center justify-center text-xs font-bold text-neutral-600 dark:text-neutral-300">
+                    {task.assignee.substring(0,2).toUpperCase()}
+                </div>
+            </div>
+        </div>
+    )
+}
+
+const TaskColumn: React.FC<{ 
+    status: TaskStatus;
+    tasks: Task[];
+    onOpenModal: (task: Task) => void;
+    onDragStart: (e: React.DragEvent<HTMLDivElement>, taskId: string) => void;
+    onDrop: (e: React.DragEvent<HTMLDivElement>, status: TaskStatus) => void;
+    canEdit: boolean;
+}> = ({ status, tasks, onOpenModal, onDragStart, onDrop, canEdit }) => {
+    const { t } = useLanguage();
+    const [isDragOver, setIsDragOver] = React.useState(false);
+    
+    const statusInfo = {
+        'To Do': { icon: <Clock size={16} />, color: 'text-blue-500 dark:text-blue-400', label: t('status.todo') },
+        'In Progress': { icon: <Loader size={16} />, color: 'text-yellow-500 dark:text-yellow-400', label: t('status.inprogress') },
+        'Done': { icon: <CheckCircle size={16} />, color: 'text-green-500 dark:text-green-400', label: t('status.done') },
+    }
+
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
         if (canEdit) {
-            setEditingCell({ taskId, field });
+            setIsDragOver(true);
+        }
+    }
+    
+    const handleDragLeave = () => {
+        setIsDragOver(false);
+    }
+    
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        if (canEdit) {
+            onDrop(e, status);
+        }
+        setIsDragOver(false);
+    }
+    
+    return (
+        <div 
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            className={`flex-1 min-w-[300px] bg-neutral-100 dark:bg-neutral-900/50 rounded-lg p-3 transition-colors ${isDragOver ? 'bg-neutral-200 dark:bg-neutral-700/50' : ''}`}
+        >
+            <div className={`flex items-center justify-between mb-4 px-2 py-1 rounded ${statusInfo[status].color.replace('text-', 'bg-')}/10`}>
+                <div className={`flex items-center gap-2 font-semibold text-sm ${statusInfo[status].color}`}>
+                    {statusInfo[status].icon}
+                    <span>{statusInfo[status].label}</span>
+                </div>
+                <span className="text-sm font-bold text-neutral-400 dark:text-neutral-500">{tasks.length}</span>
+            </div>
+            <div className="space-y-3 h-full overflow-y-auto max-h-[calc(100vh-350px)] p-1">
+                {tasks.map(task => (
+                    <TaskCard key={task.id} task={task} onOpenModal={() => onOpenModal(task)} onDragStart={onDragStart} canEdit={canEdit} />
+                ))}
+            </div>
+        </div>
+    )
+}
+
+const TasksTab: React.FC<TasksTabProps> = ({ data, canEdit, onOpenModal, onUpdateStatus }) => {
+    const { t } = useLanguage();
+
+    const tasksByStatus = React.useMemo(() => {
+        const columns: Record<TaskStatus, Task[]> = {
+            'To Do': [],
+            'In Progress': [],
+            'Done': [],
+        };
+        data.forEach(task => {
+            if (columns[task.status as TaskStatus]) {
+                columns[task.status as TaskStatus].push(task);
+            }
+        });
+        // Sort tasks within each column by priority
+        for (const status in columns) {
+            columns[status as TaskStatus].sort((a, b) => {
+                const priorityOrder = { 'High': 0, 'Medium': 1, 'Low': 2 };
+                return priorityOrder[a.priority] - priorityOrder[b.priority];
+            });
+        }
+        return columns;
+    }, [data]);
+
+    const handleDragStart = (e: React.DragEvent<HTMLDivElement>, taskId: string) => {
+        e.dataTransfer.setData("taskId", taskId);
+    };
+
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>, newStatus: TaskStatus) => {
+        const taskId = e.dataTransfer.getData("taskId");
+        const task = data.find(t => t.id === taskId);
+        if (task && task.status !== newStatus) {
+            onUpdateStatus(taskId, newStatus);
         }
     };
-
-    const handleUpdate = (taskId: string, field: keyof Task, value: any) => {
-        onUpdateTask(taskId, field, value);
-        setEditingCell(null);
-    };
-
-    const inputClasses = "w-full bg-neutral-700 border-transparent focus:bg-neutral-600 rounded p-1.5 text-sm focus:ring-2 focus:ring-[#32ff84] focus:outline-none text-white";
-
+    
     return (
         <div className="animate-fade-in">
-             <div className="flex justify-end mb-4">
-                {userRole === 'admin' && (
-                    <button onClick={handleAddNew} className="flex items-center gap-2 px-4 py-2 bg-[#32ff84] text-black text-sm font-semibold rounded-lg hover:bg-green-400 transition-colors">
-                        <PlusCircle size={18}/> {t('tasks.newTask')}
+             <div className="flex justify-between items-center mb-4">
+                <div>
+                     {/* Can add filters here later */}
+                </div>
+                {canEdit && (
+                    <button onClick={() => onOpenModal({} as Task, 'tasks')} className="flex items-center gap-2 px-4 py-2 bg-[#32ff84] text-black text-sm font-semibold rounded-lg hover:bg-green-400 transition-colors">
+                        <Plus size={18}/> {t('tasks.newTask')}
                     </button>
                 )}
             </div>
-            <div className="overflow-x-auto bg-neutral-800/50 rounded-lg border border-neutral-700">
-                <table className="min-w-full divide-y divide-neutral-700">
-                    <thead className="bg-neutral-800">
-                        <tr>
-                            {headers.map(header => (
-                                <th key={header.key} scope="col" className="py-3.5 px-3 text-left text-sm font-semibold text-white first:pl-4 first:sm:pl-6">
-                                    <button onClick={() => requestSort(header.key)} className="flex items-center gap-2 group text-white hover:text-[#32ff84] transition-colors">
-                                        {header.label} {getSortIcon(header.key)}
-                                    </button>
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-neutral-800 bg-neutral-900/50">
-                        {sortedData.map((task) => (
-                            <tr key={task.id} className="hover:bg-neutral-800/70 group">
-                                <td onClick={() => onOpenModal(task, 'tasks')} className="w-1/3 py-4 pl-4 pr-3 text-sm font-medium text-white sm:pl-6 cursor-pointer">{task.title}</td>
-                                
-                                <td onClick={() => handleCellClick(task.id, 'assignee')} className="whitespace-nowrap px-3 py-2 text-sm text-neutral-400 cursor-pointer">
-                                    {editingCell?.taskId === task.id && editingCell?.field === 'assignee' ? (
-                                        <input
-                                            type="text"
-                                            defaultValue={task.assignee}
-                                            onBlur={(e) => handleUpdate(task.id, 'assignee', e.target.value)}
-                                            onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
-                                            autoFocus
-                                            className={inputClasses}
-                                        />
-                                    ) : ( task.assignee )}
-                                </td>
-                                
-                                <td onClick={() => handleCellClick(task.id, 'priority')} className="whitespace-nowrap px-3 py-2 text-sm cursor-pointer">
-                                    {editingCell?.taskId === task.id && editingCell?.field === 'priority' ? (
-                                        <select
-                                            defaultValue={task.priority}
-                                            onChange={(e) => handleUpdate(task.id, 'priority', e.target.value)}
-                                            onBlur={() => setEditingCell(null)}
-                                            autoFocus
-                                            className={inputClasses}
-                                        >
-                                            <option value="High">{t('priority.high')}</option>
-                                            <option value="Medium">{t('priority.medium')}</option>
-                                            <option value="Low">{t('priority.low')}</option>
-                                        </select>
-                                    ) : (
-                                        <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${getPriorityColor(task.priority)}`}>{t(`priority.${task.priority.toLowerCase()}`)}</span>
-                                    )}
-                                </td>
-
-                                <td onClick={() => handleCellClick(task.id, 'status')} className="whitespace-nowrap px-3 py-2 text-sm cursor-pointer">
-                                     {editingCell?.taskId === task.id && editingCell?.field === 'status' ? (
-                                        <select
-                                            defaultValue={task.status}
-                                            onChange={(e) => handleUpdate(task.id, 'status', e.target.value)}
-                                            onBlur={() => setEditingCell(null)}
-                                            autoFocus
-                                            className={inputClasses}
-                                        >
-                                            <option value="To Do">{t('taskStatus.ToDo')}</option>
-                                            <option value="In Progress">{t('taskStatus.InProgress')}</option>
-                                            <option value="Done">{t('taskStatus.Done')}</option>
-                                        </select>
-                                    ) : (
-                                        <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${getStatusColor(task.status)}`}>{t(`taskStatus.${task.status.replace(' ', '')}`)}</span>
-                                    )}
-                                </td>
-
-                                <td onClick={() => handleCellClick(task.id, 'dueDate')} className="whitespace-nowrap px-3 py-2 text-sm text-neutral-400 cursor-pointer">
-                                    {editingCell?.taskId === task.id && editingCell?.field === 'dueDate' ? (
-                                        <input
-                                            type="date"
-                                            defaultValue={task.dueDate}
-                                            onBlur={(e) => handleUpdate(task.id, 'dueDate', e.target.value)}
-                                            onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
-                                            autoFocus
-                                            className={inputClasses}
-                                        />
-                                    ) : ( task.dueDate )}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+            <div className="flex flex-col lg:flex-row gap-6">
+                <TaskColumn status="To Do" tasks={tasksByStatus['To Do']} onOpenModal={(task) => onOpenModal(task, 'tasks')} onDragStart={handleDragStart} onDrop={handleDrop} canEdit={canEdit} />
+                <TaskColumn status="In Progress" tasks={tasksByStatus['In Progress']} onOpenModal={(task) => onOpenModal(task, 'tasks')} onDragStart={handleDragStart} onDrop={handleDrop} canEdit={canEdit} />
+                <TaskColumn status="Done" tasks={tasksByStatus['Done']} onOpenModal={(task) => onOpenModal(task, 'tasks')} onDragStart={handleDragStart} onDrop={handleDrop} canEdit={canEdit} />
             </div>
         </div>
     );

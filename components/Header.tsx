@@ -1,7 +1,9 @@
-import React from 'react';
+import * as React from 'react';
 import LanguageSwitcher from './LanguageSwitcher';
 import ProfileDropdown from './ProfileDropdown';
-import { UserRole } from '../types';
+import { UserRole, Theme } from '../types';
+import { useLanguage } from '../i18n/LanguageContext';
+import { Sun, Moon } from 'lucide-react';
 
 type SettingsTab = 'profile' | 'settings' | 'privacy';
 
@@ -9,21 +11,40 @@ interface HeaderProps {
     userRole: UserRole | null;
     onLogout: () => void;
     onOpenSettings: (tab: SettingsTab) => void;
+    theme: Theme;
+    setTheme: (theme: Theme) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ userRole, onLogout, onOpenSettings }) => {
+const Header: React.FC<HeaderProps> = ({ userRole, onLogout, onOpenSettings, theme, setTheme }) => {
+    const { t } = useLanguage();
     const userName = userRole === 'admin' ? 'Admin User' : 'Demo User';
     const userEmail = userRole === 'admin' ? 'admin@dripfy.de' : 'demo@dripfy.com';
 
+    const handleThemeToggle = () => {
+        setTheme(theme === 'dark' ? 'light' : 'dark');
+    };
+
     return (
-        <header className="bg-neutral-900/80 backdrop-blur-sm sticky top-0 z-40 border-b border-neutral-800">
+        <header className="bg-neutral-50/80 dark:bg-neutral-900/80 backdrop-blur-sm sticky top-0 z-40 border-b border-neutral-200 dark:border-neutral-800">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
-                    <div className="flex items-center">
-                         <h1 className="text-2xl font-bold text-[#32ff84] brand-glow">dripfy<span className="text-neutral-400">.</span></h1>
+                    <div>
+                         <h1 className="text-4xl font-bold text-[#32ff84] brand-glow">dripfy<span className="text-neutral-400">.</span></h1>
+                         <p className="text-sm text-neutral-500 dark:text-neutral-400 tracking-wide -mt-0.5">{t('login.subtitle')}</p>
                     </div>
                     <div className="flex items-center gap-4">
                         <LanguageSwitcher />
+                        <button
+                            onClick={handleThemeToggle}
+                            className="flex items-center justify-center w-10 h-10 bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+                            aria-label={theme === 'dark' ? 'Activate light mode' : 'Activate dark mode'}
+                        >
+                            {theme === 'dark' ? (
+                                <Sun size={20} className="text-neutral-600 dark:text-neutral-300" />
+                            ) : (
+                                <Moon size={20} className="text-neutral-600 dark:text-neutral-300" />
+                            )}
+                        </button>
                         <ProfileDropdown 
                             userName={userName}
                             userEmail={userEmail}

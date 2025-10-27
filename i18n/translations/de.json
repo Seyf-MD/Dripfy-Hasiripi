@@ -46,9 +46,9 @@
         "meetingsThisWeek": "Meetings diese Woche",
         "pendingPayments": "Ausstehende Zahlungen",
         "startThisWeek": "Start diese Woche",
-        "activeEscrows": "Aktive Treuhandschaften",
-        "inCompensation": "In Entschädigung",
-        "testCondition": "Testbedingung",
+        "activePartners": "Aktive Partner",
+        "acrossAllRegions": "In allen Regionen",
+        "taskCompletion": "Aufgabenerfüllung",
         "progress": "Fortschritt"
     },
     "tabs": {

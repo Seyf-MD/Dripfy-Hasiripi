@@ -46,9 +46,9 @@
         "meetingsThisWeek": "Bu hafta başlayan toplantılar",
         "pendingPayments": "Bekleyen Ödemeler",
         "startThisWeek": "Bu hafta başla",
-        "activeEscrows": "Aktif Emanetler",
-        "inCompensation": "Tazminat içinde",
-        "testCondition": "Test Koşulu",
+        "activePartners": "Aktif Partnerler",
+        "acrossAllRegions": "Tüm bölgelerde",
+        "taskCompletion": "Görev Tamamlama",
         "progress": "İlerleme"
     },
     "tabs": {

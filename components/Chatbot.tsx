@@ -149,14 +149,14 @@ const Chatbot: React.FC<ChatbotProps> = ({ dataContext }) => {
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 bg-[#32ff84] text-black p-4 rounded-full shadow-lg shadow-green-500/20 hover:scale-105 transition-transform"
+        className="fixed bottom-6 right-6 bg-[#32ff84] text-black p-4 rounded-full shadow-lg shadow-green-500/20 hover:scale-105 transition-transform z-50"
         aria-label={t('chatbot.toggle')}
       >
         {isOpen ? <X size={24} /> : <MessageSquare size={24} />}
       </button>
 
       {isOpen && (
-        <div className="fixed bottom-20 right-6 w-full max-w-sm h-[70vh] max-h-[600px] bg-white dark:bg-neutral-900 rounded-xl shadow-2xl flex flex-col border border-slate-200 dark:border-neutral-700 overflow-hidden animate-fade-in-up">
+        <div className="fixed bottom-20 right-6 w-full max-w-sm h-[70vh] max-h-[600px] bg-white dark:bg-neutral-900 rounded-xl shadow-2xl flex flex-col border border-slate-200 dark:border-neutral-700 overflow-hidden animate-fade-in-up z-50">
           <header className="p-4 bg-slate-50 dark:bg-neutral-800/50 border-b border-slate-200 dark:border-neutral-700 flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#32ff84] to-green-400 flex items-center justify-center text-black">

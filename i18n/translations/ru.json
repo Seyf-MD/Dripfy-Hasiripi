@@ -46,9 +46,9 @@
         "meetingsThisWeek": "Встречи на этой неделе",
         "pendingPayments": "Ожидающие платежи",
         "startThisWeek": "Начало на этой неделе",
-        "activeEscrows": "Активные эскроу",
-        "inCompensation": "В компенсации",
-        "testCondition": "Условие теста",
+        "activePartners": "Активные партнеры",
+        "acrossAllRegions": "Во всех регионах",
+        "taskCompletion": "Выполнение задач",
         "progress": "Прогресс"
     },
     "tabs": {

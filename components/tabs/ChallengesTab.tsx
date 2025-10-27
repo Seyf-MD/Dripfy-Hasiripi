@@ -64,7 +64,7 @@ const ChallengesTab: React.FC<ChallengesTabProps> = ({ challenges, advantages, c
     };
     
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-fade-in">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 animate-fade-in">
             {/* Challenges Column */}
             <div>
                 <div className="flex justify-between items-center mb-4">
@@ -75,17 +75,17 @@ const ChallengesTab: React.FC<ChallengesTabProps> = ({ challenges, advantages, c
                         </button>
                     )}
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-3">
                     {challenges.map((challenge, index) => {
                         const styles = severityStyles[challenge.severity];
                         return (
                             <div
                                 key={challenge.id}
                                 onClick={() => editingItem ? null : onOpenModal(challenge, 'challenges')}
-                                className={`bg-white dark:bg-neutral-800 p-4 rounded-lg border ${styles.borderColor} flex flex-col justify-between cursor-pointer transition-all duration-300 hover:-translate-y-1 ${styles.glow} animate-fade-in-up`}
+                                className={`bg-white dark:bg-neutral-800 p-3 rounded-lg border ${styles.borderColor} flex flex-col justify-between cursor-pointer transition-all duration-300 hover:-translate-y-1 ${styles.glow} animate-fade-in-up`}
                                 style={{ animationDelay: `${index * 50}ms` }}
                             >
-                                <div className="flex justify-between items-start gap-4">
+                                <div className="flex justify-between items-start gap-3">
                                     <div className="flex-1">
                                         {editingItem?.type === 'challenge' && editingItem.id === challenge.id && editingItem.field === 'title' ? (
                                             <input type="text" defaultValue={challenge.title} onBlur={(e) => handleUpdate('challenge', challenge.id, 'title', e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }} onClick={(e) => e.stopPropagation()} autoFocus className={`${inputClasses} font-semibold mb-1`} />
@@ -94,16 +94,16 @@ const ChallengesTab: React.FC<ChallengesTabProps> = ({ challenges, advantages, c
                                         )}
 
                                         {editingItem?.type === 'challenge' && editingItem.id === challenge.id && editingItem.field === 'description' ? (
-                                            <textarea defaultValue={challenge.description} onBlur={(e) => handleUpdate('challenge', challenge.id, 'description', e.target.value)} onClick={(e) => e.stopPropagation()} autoFocus rows={2} className={`${inputClasses} mt-1`} />
+                                            <textarea defaultValue={challenge.description} onBlur={(e) => handleUpdate('challenge', challenge.id, 'description', e.target.value)} onClick={(e) => e.stopPropagation()} autoFocus rows={2} className={`${inputClasses} mt-1 text-xs`} />
                                         ) : (
-                                            <p onClick={(e) => handleCellClick(e, 'challenge', challenge.id, 'description')} className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">{challenge.description}</p>
+                                            <p onClick={(e) => handleCellClick(e, 'challenge', challenge.id, 'description')} className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">{challenge.description}</p>
                                         )}
                                     </div>
-                                     <div className={`p-2 rounded-lg ${styles.tagBg} flex-shrink-0`}>
+                                     <div className={`p-1.5 rounded-md ${styles.tagBg} flex-shrink-0`}>
                                         {styles.icon}
                                     </div>
                                 </div>
-                                <div className={`mt-3 text-xs font-semibold px-2 py-1 rounded-full self-start ${styles.tagBg} ${styles.textColor}`}>
+                                <div className={`mt-2 text-xs font-semibold px-2 py-1 rounded-full self-start ${styles.tagBg} ${styles.textColor}`}>
                                     {t(`challenges.severities.${challenge.severity.toLowerCase()}`)}
                                 </div>
                             </div>
@@ -122,29 +122,29 @@ const ChallengesTab: React.FC<ChallengesTabProps> = ({ challenges, advantages, c
                         </button>
                     )}
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-3">
                     {advantages.map((advantage, index) => (
                          <div
                             key={advantage.id}
                             onClick={() => editingItem ? null : onOpenModal(advantage, 'advantages')}
-                            className="bg-white dark:bg-neutral-800 p-4 rounded-lg border border-green-500/30 dark:border-green-500/50 cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-green-900/40 animate-fade-in-up"
+                            className="bg-white dark:bg-neutral-800 p-3 rounded-lg border border-green-500/30 dark:border-green-500/50 cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-green-900/40 animate-fade-in-up"
                             style={{ animationDelay: `${index * 50}ms` }}
                           >
-                            <div className="flex justify-between items-start gap-4">
+                            <div className="flex justify-between items-start gap-3">
                               <div className="flex-1">
                                  {editingItem?.type === 'advantage' && editingItem.id === advantage.id && editingItem.field === 'title' ? (
                                     <input type="text" defaultValue={advantage.title} onBlur={(e) => handleUpdate('advantage', advantage.id, 'title', e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }} onClick={(e) => e.stopPropagation()} autoFocus className={`${inputClasses} font-semibold mb-1`} />
-                                ) : (
+                                 ) : (
                                     <h3 onClick={(e) => handleCellClick(e, 'advantage', advantage.id, 'title')} className="font-semibold text-black dark:text-white leading-tight">{advantage.title}</h3>
-                                )}
+                                 )}
 
                                 {editingItem?.type === 'advantage' && editingItem.id === advantage.id && editingItem.field === 'description' ? (
-                                    <textarea defaultValue={advantage.description} onBlur={(e) => handleUpdate('advantage', advantage.id, 'description', e.target.value)} onClick={(e) => e.stopPropagation()} autoFocus rows={2} className={`${inputClasses} mt-1`} />
-                                ) : (
-                                    <p onClick={(e) => handleCellClick(e, 'advantage', advantage.id, 'description')} className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">{advantage.description}</p>
-                                )}
+                                    <textarea defaultValue={advantage.description} onBlur={(e) => handleUpdate('advantage', advantage.id, 'description', e.target.value)} onClick={(e) => e.stopPropagation()} autoFocus rows={2} className={`${inputClasses} mt-1 text-xs`} />
+                                 ) : (
+                                    <p onClick={(e) => handleCellClick(e, 'advantage', advantage.id, 'description')} className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">{advantage.description}</p>
+                                 )}
                               </div>
-                              <div className="p-2 rounded-lg bg-green-500/10 flex-shrink-0">
+                              <div className="p-1.5 rounded-md bg-green-500/10 flex-shrink-0">
                                 <Sparkles size={20} className="text-green-500 dark:text-green-400" />
                               </div>
                             </div>

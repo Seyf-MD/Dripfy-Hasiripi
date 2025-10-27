@@ -316,25 +316,28 @@ function App() {
 
   return (
     <div className="bg-slate-50 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 min-h-screen font-sans">
-      <Header 
-        userRole={userRole} 
-        onLogout={handleLogout} 
-        onOpenSettings={handleOpenSettings}
-      />
-      
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold animate-slide-in-up" style={{ animationDelay: '100ms' }}>{t('dashboard.title')}</h1>
-        <StatCards setActiveTab={setActiveTab} onPendingPaymentsClick={() => { setActiveTab('Financials'); setFinancialsDateFilter('week'); }} />
-        <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} userRole={userRole} />
+      <div className="isolate">
+        <Header 
+          userRole={userRole} 
+          onLogout={handleLogout} 
+          onOpenSettings={handleOpenSettings}
+        />
         
-        <div className="mt-8">
-            {renderActiveTab()}
-        </div>
-      </main>
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <h1 className="text-3xl font-bold animate-slide-in-up" style={{ animationDelay: '100ms' }}>{t('dashboard.title')}</h1>
+          <StatCards schedule={dashboardData.schedule} contacts={dashboardData.contacts} tasks={dashboardData.tasks} financials={dashboardData.financials} setActiveTab={setActiveTab} onPendingPaymentsClick={() => { setActiveTab('Financials'); setFinancialsDateFilter('week'); }} />
+          <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} userRole={userRole} />
+          
+          <div className="mt-8">
+              {renderActiveTab()}
+          </div>
+        </main>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Footer />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Footer />
+        </div>
       </div>
+
 
       <Chatbot dataContext={{ ...dashboardData, activeView: activeTab }} />
       

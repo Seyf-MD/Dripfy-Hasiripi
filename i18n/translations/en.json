@@ -46,9 +46,9 @@
         "meetingsThisWeek": "Meetings starting this week",
         "pendingPayments": "Pending Payments",
         "startThisWeek": "Start this week",
-        "activeEscrows": "Active Escrows",
-        "inCompensation": "In compensation",
-        "testCondition": "Test Condition",
+        "activePartners": "Active Partners",
+        "acrossAllRegions": "Across all regions",
+        "taskCompletion": "Task Completion",
         "progress": "Progress"
     },
     "tabs": {

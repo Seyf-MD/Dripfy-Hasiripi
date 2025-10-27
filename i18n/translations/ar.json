@@ -46,9 +46,9 @@
         "meetingsThisWeek": "اجتماعات تبدأ هذا الأسبوع",
         "pendingPayments": "المدفوعات المعلقة",
         "startThisWeek": "بداية هذا الأسبوع",
-        "activeEscrows": "الضمانات النشطة",
-        "inCompensation": "في التعويض",
-        "testCondition": "شرط الاختبار",
+        "activePartners": "الشركاء النشطون",
+        "acrossAllRegions": "في جميع المناطق",
+        "taskCompletion": "إنجاز المهام",
         "progress": "التقدم"
     },
     "tabs": {

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Briefcase, Euro, Users, BarChart2 } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
+import { Task, Contact, ScheduleEvent, FinancialRecord } from '../types';
 
 interface StatCardProps {
   icon: React.ReactNode;
@@ -31,19 +32,38 @@ const StatCard: React.FC<StatCardProps> = ({ icon, title, value, subValue, child
 );
 
 interface StatCardsProps {
+  schedule: ScheduleEvent[];
+  contacts: Contact[];
+  tasks: Task[];
+  financials: FinancialRecord[];
   setActiveTab: (tab: string) => void;
   onPendingPaymentsClick: () => void;
 }
 
-const StatCards: React.FC<StatCardsProps> = ({ setActiveTab, onPendingPaymentsClick }) => {
+const StatCards: React.FC<StatCardsProps> = ({ schedule, contacts, tasks, financials, setActiveTab, onPendingPaymentsClick }) => {
   const { t } = useLanguage();
+  
+  const totalTasks = tasks.length;
+  const completedTasks = tasks.filter(task => task.status === 'Done').length;
+  const completionPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+  const activePartnersCount = contacts.length;
+  const totalMeetingsCount = schedule.length;
+
+  const pendingPaymentsAmount = financials
+    .filter(record => record.status === 'Pending')
+    .reduce((sum, record) => sum + record.amount, 0);
+
+  const formattedPendingPayments = new Intl.NumberFormat('de-DE').format(Math.abs(pendingPaymentsAmount));
+  const pendingPaymentsValue = `€${formattedPendingPayments}`;
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
       <StatCard
         delay={200}
         icon={<Briefcase size={20} />}
         title={t('statCards.totalMeetings')}
-        value="53"
+        value={totalMeetingsCount.toString()}
         subValue={t('statCards.meetingsThisWeek')}
         onClick={() => setActiveTab('Calendar')}
       />
@@ -51,27 +71,27 @@ const StatCards: React.FC<StatCardsProps> = ({ setActiveTab, onPendingPaymentsCl
         delay={300}
         icon={<Euro size={20} />}
         title={t('statCards.pendingPayments')}
-        value="€64.100"
+        value={pendingPaymentsValue}
         subValue={t('statCards.startThisWeek')}
         onClick={onPendingPaymentsClick}
       />
       <StatCard
         delay={400}
         icon={<Users size={20} />}
-        title={t('statCards.activeEscrows')}
-        value="35"
-        subValue={t('statCards.inCompensation')}
+        title={t('statCards.activePartners')}
+        value={activePartnersCount.toString()}
+        subValue={t('statCards.acrossAllRegions')}
         onClick={() => setActiveTab('Contacts')}
       />
       <StatCard
         delay={500}
         icon={<BarChart2 size={20} />}
-        title={t('statCards.testCondition')}
-        value="72%"
+        title={t('statCards.taskCompletion')}
+        value={`${completionPercentage}%`}
         onClick={() => setActiveTab('Tasks')}
       >
         <div className="w-full bg-slate-200 dark:bg-neutral-700 rounded-full h-2">
-          <div className="bg-[#32ff84] h-2 rounded-full" style={{ width: '72%' }}></div>
+          <div className="bg-[#32ff84] h-2 rounded-full" style={{ width: `${completionPercentage}%` }}></div>
         </div>
       </StatCard>
     </div>

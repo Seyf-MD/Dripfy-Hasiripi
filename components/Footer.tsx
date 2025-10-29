@@ -1,43 +1,92 @@
 import * as React from 'react';
 import { Instagram, Linkedin } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
+import BrandLogo from './BrandLogo';
+import { LegalPageKey } from '../data/legalContent';
 
-const Footer: React.FC = () => {
+interface FooterProps {
+  onNavigateLegal?: (page: LegalPageKey) => void;
+}
+
+const legalLinkMap: Record<LegalPageKey, string> = {
+  impressum: 'https://dripfy.de/pages/impressum',
+  privacy: 'https://dripfy.de/pages/datenschutz-gemass-dsgvo',
+  terms: 'https://dripfy.de/pages/website-terms-conditions',
+};
+
+const Footer: React.FC<FooterProps> = ({ onNavigateLegal }) => {
   const { t } = useLanguage();
+
+  const renderLegalLink = (label: string, key: LegalPageKey) => {
+    if (!onNavigateLegal) {
+      return (
+        <a
+          href={legalLinkMap[key]}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-[var(--drip-text)] dark:hover:text-white transition-colors"
+        >
+          {label}
+        </a>
+      );
+    }
+
+    return (
+      <button
+        type="button"
+        onClick={() => onNavigateLegal(key)}
+        className="text-left w-full hover:text-[var(--drip-text)] dark:hover:text-white transition-colors"
+      >
+        {label}
+      </button>
+    );
+  };
+
   return (
-    <footer className="mt-12 py-8 border-t border-neutral-200 dark:border-neutral-800 text-neutral-500 dark:text-neutral-500 text-sm">
+    <footer className="mt-12 py-8 border-t border-neutral-200 dark:border-neutral-800 text-[var(--drip-muted)] dark:text-neutral-500 text-sm">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* Company Info */}
         <div>
-          <h3 className="font-bold text-base text-[#32ff84] brand-glow">dripfy<span className="text-neutral-400">.</span></h3>
+          <BrandLogo className="h-8 w-auto mb-3" />
           <p className="mt-2">Dripfy GmbH</p>
           <p>Leipziger Pl. 15, 90491 Nürnberg</p>
           <p className="mt-2">
-            <a href="mailto:info@dripfy.de" className="hover:text-black dark:hover:text-white transition-colors">info@dripfy.de</a>
+            <a href="mailto:info@dripfy.de" className="hover:text-[var(--drip-text)] dark:hover:text-white transition-colors">
+              info@dripfy.de
+            </a>
           </p>
           <p>
-            <a href="tel:+491742433558" className="hover:text-black dark:hover:text-white transition-colors">+49 174 2433558</a>
+            <a href="tel:+491742433558" className="hover:text-[var(--drip-text)] dark:hover:text-white transition-colors">
+              +49 174 2433558
+            </a>
           </p>
         </div>
 
-        {/* Links */}
         <div>
-          <h4 className="font-semibold text-neutral-700 dark:text-neutral-300 mb-2">{t('footer.links')}</h4>
+          <h4 className="font-semibold text-[var(--drip-text)] dark:text-neutral-300 mb-2">{t('footer.links')}</h4>
           <ul className="space-y-2">
-            <li><a href="https://dripfy.de/impressum" target="_blank" rel="noopener noreferrer" className="hover:text-black dark:hover:text-white transition-colors">{t('footer.imprint')}</a></li>
-            <li><a href="https://dripfy.de/datenschutz" target="_blank" rel="noopener noreferrer" className="hover:text-black dark:hover:text-white transition-colors">{t('footer.privacy')}</a></li>
-            <li><a href="https://dripfy.de/agb" target="_blank" rel="noopener noreferrer" className="hover:text-black dark:hover:text-white transition-colors">{t('footer.terms')}</a></li>
+            <li>{renderLegalLink(t('footer.imprint'), 'impressum')}</li>
+            <li>{renderLegalLink(t('footer.privacy'), 'privacy')}</li>
+            <li>{renderLegalLink(t('footer.terms'), 'terms')}</li>
           </ul>
         </div>
 
-        {/* Social Media */}
         <div>
-          <h4 className="font-semibold text-neutral-700 dark:text-neutral-300 mb-2">{t('footer.followUs')}</h4>
+          <h4 className="font-semibold text-[var(--drip-text)] dark:text-neutral-300 mb-2">{t('footer.followUs')}</h4>
           <div className="flex items-center space-x-4">
-            <a href="https://www.instagram.com/dripfy.de/" target="_blank" rel="noopener noreferrer" className="hover:text-black dark:hover:text-white transition-colors">
+            <a
+              href="https://www.instagram.com/dripfy.de/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-[var(--drip-text)] dark:hover:text-white transition-colors"
+            >
               <Instagram size={24} />
             </a>
-            <a href="https://www.linkedin.com/company/dripfy/" target="_blank" rel="noopener noreferrer" className="hover:text-black dark:hover:text-white transition-colors">
+            <a
+              href="https://www.linkedin.com/company/dripfy/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-[var(--drip-text)] dark:hover:text-white transition-colors"
+            >
               <Linkedin size={24} />
             </a>
           </div>

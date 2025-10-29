@@ -84,7 +84,7 @@ const DatePicker: React.FC<DatePickerProps> = ({ selectedDate, onDateSelect, onC
                 <button onClick={handleNextMonth} className="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-neutral-700"><ChevronRight size={16}/></button>
                 <button onClick={handleNextYear} className="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-neutral-700"><ChevronsRight size={16}/></button>
             </div>
-            <div className="grid grid-cols-7 text-center text-xs text-neutral-500 dark:text-neutral-400 mb-2">
+            <div className="grid grid-cols-7 text-center text-xs text-[var(--drip-muted)] dark:text-neutral-400 mb-2">
                 {weekDayLabels.map(day => <div key={day}>{day}</div>)}
             </div>
             <div className="grid grid-cols-7 text-center text-sm">
@@ -100,7 +100,7 @@ const DatePicker: React.FC<DatePickerProps> = ({ selectedDate, onDateSelect, onC
                             onClick={() => { onDateSelect(day); onClose(); }}
                             className={`
                                 w-9 h-9 flex items-center justify-center rounded-full transition-colors
-                                ${isSelected ? 'bg-[#32ff84] text-black font-bold' : 'hover:bg-slate-100 dark:hover:bg-neutral-700'}
+                                ${isSelected ? 'bg-[var(--drip-primary)] text-white font-bold' : 'hover:bg-slate-100 dark:hover:bg-neutral-700'}
                                 ${isToday && !isSelected ? 'border border-slate-400 dark:border-neutral-500' : ''}
                             `}
                         >
@@ -216,11 +216,11 @@ const CalendarTab: React.FC<CalendarTabProps> = ({ data, canEdit, onOpenModal })
                     const dayKey = day.toLocaleString('en-us', { weekday: 'long' }) as ScheduleEvent['day'];
                     const isToday = isSameDay(day, today);
                     return (
-                         <div key={day.toISOString()} className={`flex flex-col min-w-[140px] ${index > 0 ? 'border-l border-slate-200 dark:border-neutral-700' : ''} ${isToday ? 'bg-slate-50 dark:bg-neutral-700/20' : ''}`}>
-                            <div className={`p-3 font-bold text-center border-b border-slate-200 dark:border-neutral-700 transition-colors ${isToday ? 'bg-[#32ff84]/10' : 'bg-white dark:bg-neutral-800'}`}>
+                        <div key={day.toISOString()} className={`flex flex-col min-w-[140px] ${index > 0 ? 'border-l border-slate-200 dark:border-neutral-700' : ''} ${isToday ? 'bg-slate-50 dark:bg-neutral-700/20' : ''}`}>
+                            <div className={`p-3 font-bold text-center border-b border-slate-200 dark:border-neutral-700 transition-colors ${isToday ? 'bg-[color:rgba(75,165,134,0.12)]' : 'bg-white dark:bg-neutral-800'}`}>
                                 <div className="flex items-center justify-center gap-2">
-                                    <span className={isToday ? 'text-[#32ff84]' : 'text-neutral-700 dark:text-neutral-300'}>{dayName}</span>
-                                    <span className={`text-sm ${isToday ? 'text-black dark:text-white' : 'text-neutral-500'}`}>{day.getDate()}</span>
+                                    <span className={isToday ? 'text-[var(--drip-primary)]' : 'text-[var(--drip-text)] dark:text-neutral-300'}>{dayName}</span>
+                                    <span className={`text-sm ${isToday ? 'text-[var(--drip-text)] dark:text-white' : 'text-neutral-500'}`}>{day.getDate()}</span>
                                 </div>
                             </div>
                             <div className="p-2 space-y-2 flex-grow min-h-[300px]">
@@ -228,10 +228,10 @@ const CalendarTab: React.FC<CalendarTabProps> = ({ data, canEdit, onOpenModal })
                                     <div 
                                         key={event.id} 
                                         onClick={() => onOpenModal(event, 'schedule')} 
-                                        className="bg-slate-50 dark:bg-neutral-900/50 p-3 rounded-md border border-slate-200 dark:border-neutral-700 cursor-pointer hover:bg-slate-100 dark:hover:bg-neutral-700/50 hover:border-[#32ff84]/50 transition-all text-left shadow"
+                                        className="bg-slate-50 dark:bg-neutral-900/50 p-3 rounded-md border border-slate-200 dark:border-neutral-700 cursor-pointer hover:bg-slate-100 dark:hover:bg-neutral-700/50 hover:border-[color:rgba(75,165,134,0.45)] transition-all text-left shadow"
                                     >
-                                        <p className="text-sm font-bold text-black dark:text-white leading-tight break-words">{event.title}</p>
-                                        <div className="flex items-center gap-1.5 mt-2 text-xs text-neutral-500 dark:text-neutral-400">
+                                        <p className="text-sm font-bold text-[var(--drip-text)] dark:text-white leading-tight break-words">{event.title}</p>
+                                        <div className="flex items-center gap-1.5 mt-2 text-xs text-[var(--drip-muted)] dark:text-neutral-400">
                                             {getTypeIcon(event.type)}
                                             <span>{event.time}</span>
                                         </div>
@@ -240,7 +240,7 @@ const CalendarTab: React.FC<CalendarTabProps> = ({ data, canEdit, onOpenModal })
                                 {canEdit && (
                                      <button 
                                         onClick={() => handleAddNew(day)}
-                                        className="w-full flex items-center justify-center text-neutral-400 dark:text-neutral-600 hover:bg-slate-100 dark:hover:bg-neutral-700/50 hover:text-[#32ff84] rounded-md transition-colors py-2 group mt-2"
+                                        className="w-full flex items-center justify-center text-neutral-400 dark:text-neutral-600 hover:bg-slate-100 dark:hover:bg-neutral-700/50 hover:text-[var(--drip-primary)] rounded-md transition-colors py-2 group mt-2"
                                         aria-label={`${t('calendar.addEventTo')} ${dayName}`}
                                     >
                                          <PlusCircle size={16} className="opacity-50 group-hover:opacity-100 transition-opacity" />
@@ -258,7 +258,7 @@ const CalendarTab: React.FC<CalendarTabProps> = ({ data, canEdit, onOpenModal })
         const monthDayLabels = [t('daysShort.mon'), t('daysShort.tue'), t('daysShort.wed'), t('daysShort.thu'), t('daysShort.fri'), t('daysShort.sat'), t('daysShort.sun')];
         return(
             <div className="bg-white dark:bg-neutral-800/50 rounded-lg border border-slate-200 dark:border-neutral-700">
-                <div className="grid grid-cols-7 text-center font-bold text-neutral-500 dark:text-neutral-400 border-b border-slate-200 dark:border-neutral-700">
+                <div className="grid grid-cols-7 text-center font-bold text-[var(--drip-muted)] dark:text-neutral-400 border-b border-slate-200 dark:border-neutral-700">
                     {monthDayLabels.map(day => (
                         <div key={day} className="py-2">{day}</div>
                     ))}
@@ -271,14 +271,14 @@ const CalendarTab: React.FC<CalendarTabProps> = ({ data, canEdit, onOpenModal })
                             <div key={index} className={`relative h-32 p-2 border-b border-r border-slate-200 dark:border-neutral-700 ${!day ? 'bg-slate-50 dark:bg-neutral-800/30' : 'hover:bg-slate-50 dark:hover:bg-neutral-700/30'} transition-colors`}>
                                 {day && (
                                     <>
-                                        <span className={`text-sm ${isToday ? 'bg-[#32ff84] text-black rounded-full w-6 h-6 flex items-center justify-center font-bold' : 'text-neutral-800 dark:text-neutral-200'}`}>{day.getDate()}</span>
+                                        <span className={`text-sm ${isToday ? 'bg-[var(--drip-primary)] text-white rounded-full w-6 h-6 flex items-center justify-center font-bold' : 'text-neutral-800 dark:text-neutral-200'}`}>{day.getDate()}</span>
                                         <div className="mt-1 space-y-1 overflow-y-auto max-h-20">
                                             {dayEvents.map(event => (
                                                 <div key={event.id} onClick={() => onOpenModal(event, 'schedule')} className="text-xs text-left px-1 py-0.5 bg-blue-500/20 text-blue-500 dark:text-blue-300 rounded truncate cursor-pointer hover:bg-blue-500/40">{event.title}</div>
                                             ))}
                                         </div>
                                         {canEdit && (
-                                            <button onClick={() => handleAddNew(day)} className="absolute bottom-1 right-1 text-neutral-400 dark:text-neutral-600 hover:text-[#32ff84] opacity-0 hover:opacity-100 transition-opacity"><PlusCircle size={16}/></button>
+                                            <button onClick={() => handleAddNew(day)} className="absolute bottom-1 right-1 text-neutral-400 dark:text-neutral-600 hover:text-[var(--drip-primary)] opacity-0 hover:opacity-100 transition-opacity"><PlusCircle size={16}/></button>
                                         )}
                                     </>
                                 )}
@@ -324,11 +324,11 @@ const CalendarTab: React.FC<CalendarTabProps> = ({ data, canEdit, onOpenModal })
 
                 <div className="flex items-center gap-2">
                     <div className="flex items-center bg-slate-100 dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 rounded-lg p-1">
-                        <button onClick={() => setView('month')} className={`px-3 py-1 text-sm font-semibold rounded-md ${view === 'month' ? 'bg-[#32ff84] text-black' : 'hover:bg-slate-200 dark:hover:bg-neutral-700'}`}>{t('calendar.month')}</button>
-                        <button onClick={() => setView('week')} className={`px-3 py-1 text-sm font-semibold rounded-md ${view === 'week' ? 'bg-[#32ff84] text-black' : 'hover:bg-slate-200 dark:hover:bg-neutral-700'}`}>{t('calendar.week')}</button>
+                        <button onClick={() => setView('month')} className={`px-3 py-1 text-sm font-semibold rounded-md ${view === 'month' ? 'bg-[var(--drip-primary)] text-white' : 'hover:bg-slate-200 dark:hover:bg-neutral-700'}`}>{t('calendar.month')}</button>
+                        <button onClick={() => setView('week')} className={`px-3 py-1 text-sm font-semibold rounded-md ${view === 'week' ? 'bg-[var(--drip-primary)] text-white' : 'hover:bg-slate-200 dark:hover:bg-neutral-700'}`}>{t('calendar.week')}</button>
                     </div>
                      {canEdit && (
-                        <button onClick={() => handleAddNew(new Date())} className="flex items-center gap-2 px-4 py-2 bg-[#32ff84] text-black text-sm font-semibold rounded-lg hover:bg-green-400 transition-colors">
+                        <button onClick={() => handleAddNew(new Date())} className="flex items-center gap-2 px-4 py-2 bg-[var(--drip-primary)] text-white text-sm font-semibold rounded-lg hover:bg-[var(--drip-primary-dark)] transition-colors">
                             <PlusCircle size={18}/> {t('calendar.newEvent')}
                         </button>
                     )}

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useLanguage, Language } from '../i18n/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
 import { ChevronDown } from 'lucide-react';
 
 const languages = [
@@ -12,6 +13,7 @@ const languages = [
 
 const LanguageSwitcher: React.FC = () => {
   const { language, setLanguage } = useLanguage();
+  const { theme } = useTheme();
   const [isOpen, setIsOpen] = React.useState(false);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
 
@@ -31,7 +33,11 @@ const LanguageSwitcher: React.FC = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 bg-slate-100 dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 rounded-lg shadow-sm text-sm font-medium text-neutral-800 dark:text-neutral-200 hover:bg-slate-200 dark:hover:bg-neutral-700 hover:border-slate-300 dark:hover:border-neutral-500 transition-colors"
+        className={`flex items-center gap-2 px-3 py-2 rounded-lg shadow-sm text-sm font-medium transition-colors border ${
+          theme === 'light'
+            ? 'bg-[var(--drip-card)] border-[var(--drip-border)] text-[var(--drip-text)] hover:bg-[var(--drip-surface)]'
+            : 'bg-neutral-800 border-neutral-700 text-neutral-200 hover:bg-neutral-700'
+        }`}
       >
         <span>{selectedLanguage.flag}</span>
         <span className="hidden sm:inline">{selectedLanguage.name}</span>
@@ -39,7 +45,13 @@ const LanguageSwitcher: React.FC = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 rounded-lg shadow-lg z-20 animate-fade-in-up origin-top-right">
+        <div
+          className={`absolute top-full right-0 mt-2 w-48 rounded-lg shadow-lg z-20 animate-fade-in-up origin-top-right border ${
+            theme === 'light'
+              ? 'bg-[var(--drip-card)] border-[var(--drip-border)]'
+              : 'bg-neutral-800 border-neutral-700'
+          }`}
+        >
           <ul className="py-1">
             {languages.map(lang => (
               <li key={lang.code}>
@@ -48,7 +60,11 @@ const LanguageSwitcher: React.FC = () => {
                     setLanguage(lang.code as Language);
                     setIsOpen(false);
                   }}
-                  className="w-full text-left flex items-center gap-3 px-4 py-2 text-sm text-neutral-800 dark:text-neutral-200 hover:bg-slate-100 dark:hover:bg-neutral-700 transition-colors"
+                  className={`w-full text-left flex items-center gap-3 px-4 py-2 text-sm transition-colors ${
+                    theme === 'light'
+                      ? 'text-[var(--drip-text)] hover:bg-[var(--drip-surface)]'
+                      : 'text-neutral-200 hover:bg-neutral-700'
+                  }`}
                 >
                   <span className="text-lg">{lang.flag}</span>
                   <span>{lang.name}</span>

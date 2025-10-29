@@ -22,10 +22,10 @@ interface SettingsModalProps {
 
 const Toggle: React.FC<{ label: string; enabled: boolean; onToggle: () => void }> = ({ label, enabled, onToggle }) => (
     <div className="flex items-center justify-between w-full">
-        <span className="font-medium text-neutral-600 dark:text-neutral-300">{label}</span>
+        <span className="font-medium text-[color:var(--drip-text-soft)] dark:text-neutral-300">{label}</span>
         <button
             onClick={onToggle}
-            className={`w-12 h-6 rounded-full p-1 transition-colors ${enabled ? 'bg-[#32ff84]' : 'bg-slate-200 dark:bg-neutral-700'}`}
+            className={`w-12 h-6 rounded-full p-1 transition-colors ${enabled ? 'bg-[var(--drip-primary)]' : 'bg-slate-200 dark:bg-neutral-700'}`}
         >
             <span className={`block w-4 h-4 rounded-full bg-white transform transition-transform ${enabled ? 'translate-x-6' : 'translate-x-0'}`} />
         </button>
@@ -34,7 +34,7 @@ const Toggle: React.FC<{ label: string; enabled: boolean; onToggle: () => void }
 
 const FormField: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
     <div>
-        <label className="block text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-1.5">{label}</label>
+        <label className="block text-sm font-medium text-[var(--drip-muted)] dark:text-neutral-400 mb-1.5">{label}</label>
         {children}
     </div>
 );
@@ -91,7 +91,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, userRole, onClose
 
     if (!isOpen) return null;
 
-    const inputClass = "w-full px-3 py-2 bg-slate-100 dark:bg-neutral-700 border border-slate-300 dark:border-neutral-600 rounded-md focus:ring-2 focus:ring-[#32ff84] focus:outline-none text-black dark:text-white placeholder:text-neutral-500";
+    const inputClass = "w-full px-3 py-2 bg-slate-100 dark:bg-neutral-700 border border-slate-300 dark:border-neutral-600 rounded-md focus:ring-2 focus:ring-[var(--drip-primary)] focus:outline-none focus:border-[var(--drip-primary)] text-[var(--drip-text)] dark:text-white placeholder:text-neutral-500";
     
     const renderContent = () => {
         switch (activeTab) {
@@ -99,8 +99,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, userRole, onClose
                 return (
                     <div className="space-y-6">
                         <div>
-                            <h3 className="text-lg font-semibold text-black dark:text-white">{t('settings.profile.title')}</h3>
-                            <p className="text-sm text-neutral-500 dark:text-neutral-400">{t('settings.profile.subtitle')}</p>
+                            <h3 className="text-lg font-semibold text-[var(--drip-text)] dark:text-white">{t('settings.profile.title')}</h3>
+                            <p className="text-sm text-[var(--drip-muted)] dark:text-neutral-400">{t('settings.profile.subtitle')}</p>
                         </div>
                         <div className="space-y-4">
                             <FormField label={t('settings.profile.name')}>
@@ -109,8 +109,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, userRole, onClose
                             <FormField label={t('settings.profile.email')}>
                                 <input type="email" defaultValue="demo@dripfy.com" className={inputClass} />
                             </FormField>
-                             <FormField label={t('settings.profile.password')}>
-                                <button onClick={onChangePasswordClick} className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-slate-100 dark:bg-neutral-700 text-black dark:text-white text-sm font-semibold rounded-lg hover:bg-slate-200 dark:hover:bg-neutral-600 transition-colors">
+                            <FormField label={t('settings.profile.password')}>
+                                <button onClick={onChangePasswordClick} className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-slate-100 dark:bg-neutral-700 text-[var(--drip-text)] dark:text-white text-sm font-semibold rounded-lg hover:bg-slate-200 dark:hover:bg-neutral-600 transition-colors">
                                     <Key size={16}/>
                                     {t('settings.profile.changePassword')}
                                 </button>
@@ -122,8 +122,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, userRole, onClose
                 return (
                      <div className="space-y-6">
                         <div>
-                            <h3 className="text-lg font-semibold text-black dark:text-white">{t('settings.settings.title')}</h3>
-                            <p className="text-sm text-neutral-500 dark:text-neutral-400">{t('settings.settings.subtitle')}</p>
+                            <h3 className="text-lg font-semibold text-[var(--drip-text)] dark:text-white">{t('settings.settings.title')}</h3>
+                            <p className="text-sm text-[var(--drip-muted)] dark:text-neutral-400">{t('settings.settings.subtitle')}</p>
                         </div>
                         <div className="space-y-4">
                            <FormField label={t('settings.settings.language')}>
@@ -145,8 +145,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, userRole, onClose
                  return (
                      <div className="space-y-6">
                         <div>
-                            <h3 className="text-lg font-semibold text-black dark:text-white">{t('settings.privacy.title')}</h3>
-                            <p className="text-sm text-neutral-500 dark:text-neutral-400">{t('settings.privacy.subtitle')}</p>
+                            <h3 className="text-lg font-semibold text-[var(--drip-text)] dark:text-white">{t('settings.privacy.title')}</h3>
+                            <p className="text-sm text-[var(--drip-muted)] dark:text-neutral-400">{t('settings.privacy.subtitle')}</p>
                         </div>
                         <div className="space-y-3">
                            {userRole === 'admin' && (
@@ -176,17 +176,17 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, userRole, onClose
             aria-modal="true"
             aria-labelledby={modalTitleId}
         >
-            <div className="bg-white dark:bg-neutral-800 text-black dark:text-white rounded-xl border border-slate-200 dark:border-neutral-700 w-full max-w-3xl h-[70vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-white dark:bg-neutral-800 text-[var(--drip-text)] dark:text-white rounded-xl border border-slate-200 dark:border-neutral-700 w-full max-w-3xl h-[70vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
                 <header className="p-4 flex justify-between items-center border-b border-slate-200 dark:border-neutral-700 flex-shrink-0">
                     <h2 id={modalTitleId} className="text-xl font-bold">{t('settings.title')}</h2>
-                    <button onClick={onClose} className="text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors">
+                    <button onClick={onClose} className="text-[var(--drip-muted)] dark:text-neutral-400 hover:text-[var(--drip-text)] dark:hover:text-white transition-colors">
                         <X size={24} />
                     </button>
                 </header>
                 <div className="flex flex-grow overflow-hidden">
                     <aside className="w-1/4 border-r border-slate-200 dark:border-neutral-700 p-4 space-y-2 bg-slate-50 dark:bg-neutral-900/50">
                         {tabs.map(tab => (
-                            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`w-full flex items-center gap-3 p-2 rounded-md text-sm font-medium transition-colors ${activeTab === tab.id ? 'bg-[#32ff84]/10 text-[#32ff84]' : 'text-neutral-600 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-neutral-700'}`}>
+                            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`w-full flex items-center gap-3 p-2 rounded-md text-sm font-medium transition-colors ${activeTab === tab.id ? 'bg-[color:rgba(75,165,134,0.12)] text-[var(--drip-primary)] dark:text-[var(--drip-primary)]' : 'text-[color:var(--drip-text-soft)] dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-neutral-700'}`}>
                                 {tab.icon}
                                 <span>{tab.label}</span>
                             </button>
@@ -197,10 +197,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, userRole, onClose
                     </main>
                 </div>
                  <footer className="p-4 flex justify-end items-center gap-4 border-t border-slate-200 dark:border-neutral-700 bg-slate-50 dark:bg-neutral-800/50 flex-shrink-0 rounded-b-xl">
-                    <button onClick={onClose} className="px-4 py-2 bg-slate-200 dark:bg-neutral-700 text-black dark:text-white text-sm font-semibold rounded-lg hover:bg-slate-300 dark:hover:bg-neutral-600 transition-colors">
+                    <button onClick={onClose} className="px-4 py-2 bg-slate-200 dark:bg-neutral-700 text-[var(--drip-text)] dark:text-white text-sm font-semibold rounded-lg hover:bg-slate-300 dark:hover:bg-neutral-600 transition-colors">
                         {t('settings.closeButton')}
                     </button>
-                    <button onClick={handleSaveChanges} className="px-4 py-2 bg-[#32ff84] text-black text-sm font-semibold rounded-lg hover:bg-green-400 transition-colors">
+                    <button onClick={handleSaveChanges} className="px-4 py-2 bg-[var(--drip-primary)] text-white text-sm font-semibold rounded-lg hover:bg-[var(--drip-primary-dark)] transition-colors">
                         {t('settings.saveButton')}
                     </button>
                 </footer>

@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Briefcase, Euro, Users, BarChart2 } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
 import { Task, Contact, ScheduleEvent, FinancialRecord } from '../types';
+import { useTheme } from '../context/ThemeContext';
 
 interface StatCardProps {
   icon: React.ReactNode;
@@ -13,23 +14,35 @@ interface StatCardProps {
   onClick?: () => void;
 }
 
-const StatCard: React.FC<StatCardProps> = ({ icon, title, value, subValue, children, delay, onClick }) => (
-  <div 
-    onClick={onClick}
-    className={`bg-white dark:bg-neutral-800 p-5 rounded-xl border border-slate-200 dark:border-neutral-700 flex flex-col justify-between h-full transition-all duration-300 hover:border-[#32ff84]/50 hover:shadow-2xl hover:shadow-black/20 hover:-translate-y-1 animate-slide-in-up ${onClick ? 'cursor-pointer' : ''}`}
-    style={{ animationDelay: `${delay}ms` }}
-  >
-    <div>
-      <div className="flex justify-between items-center text-neutral-500 dark:text-neutral-400">
-        <span className="text-sm font-medium">{title}</span>
-        {icon}
+const StatCard: React.FC<StatCardProps> = ({ icon, title, value, subValue, children, delay, onClick }) => {
+  const { theme } = useTheme();
+
+  const containerClasses = theme === 'light'
+    ? 'bg-[var(--drip-card)] border-[var(--drip-border)] hover:border-[var(--drip-primary)] hover:shadow-[0_18px_36px_-24px_rgba(75,165,134,0.65)]'
+    : 'bg-neutral-800 border-neutral-700 hover:border-[var(--drip-primary)] hover:shadow-2xl hover:shadow-black/20';
+
+  const labelColor = theme === 'light' ? 'text-[var(--drip-muted)]' : 'text-neutral-400';
+  const valueColor = theme === 'light' ? 'text-[var(--drip-text)]' : 'text-white';
+  const subValueColor = theme === 'light' ? 'text-[var(--drip-muted)]' : 'text-neutral-400';
+
+  return (
+    <div 
+      onClick={onClick}
+      className={`p-5 rounded-xl border flex flex-col justify-between h-full transition-all duration-300 hover:-translate-y-1 animate-slide-in-up ${containerClasses} ${onClick ? 'cursor-pointer' : ''}`}
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      <div>
+        <div className={`flex justify-between items-center ${labelColor}`}>
+          <span className="text-sm font-medium">{title}</span>
+          {icon}
+        </div>
+        <p className={`text-3xl font-bold mt-2 ${valueColor}`}>{value}</p>
+        {subValue && <p className={`text-xs mt-1 ${subValueColor}`}>{subValue}</p>}
       </div>
-      <p className="text-3xl font-bold text-neutral-800 dark:text-white mt-2">{value}</p>
-      {subValue && <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{subValue}</p>}
+      {children && <div className="mt-4">{children}</div>}
     </div>
-    {children && <div className="mt-4">{children}</div>}
-  </div>
-);
+  );
+};
 
 interface StatCardsProps {
   schedule: ScheduleEvent[];
@@ -42,6 +55,7 @@ interface StatCardsProps {
 
 const StatCards: React.FC<StatCardsProps> = ({ schedule, contacts, tasks, financials, setActiveTab, onPendingPaymentsClick }) => {
   const { t } = useLanguage();
+  const { theme } = useTheme();
   
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter(task => task.status === 'Done').length;
@@ -90,8 +104,14 @@ const StatCards: React.FC<StatCardsProps> = ({ schedule, contacts, tasks, financ
         value={`${completionPercentage}%`}
         onClick={() => setActiveTab('Tasks')}
       >
-        <div className="w-full bg-slate-200 dark:bg-neutral-700 rounded-full h-2">
-          <div className="bg-[#32ff84] h-2 rounded-full" style={{ width: `${completionPercentage}%` }}></div>
+        <div
+          className="w-full rounded-full h-2 bg-slate-200 dark:bg-neutral-700"
+          style={{ backgroundColor: theme === 'light' ? 'rgba(75, 165, 134, 0.25)' : undefined }}
+        >
+          <div
+            className="h-2 rounded-full bg-[var(--drip-primary)]"
+            style={{ width: `${completionPercentage}%` }}
+          ></div>
         </div>
       </StatCard>
     </div>

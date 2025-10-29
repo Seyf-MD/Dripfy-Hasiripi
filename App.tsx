@@ -15,11 +15,14 @@ import DetailModal from './components/DetailModal';
 import EditModal from './components/EditModal';
 import SettingsModal from './components/SettingsModal';
 import PasswordChangeModal from './components/PasswordChangeModal';
+import LegalPage from './components/LegalPage';
+import { LegalPageKey } from './data/legalContent';
 
 import { mockData } from './data/mockData';
 import { DashboardData, UserRole, DataItem, SignupRequest, ScheduleEvent, FinancialRecord, Challenge, Advantage, Contact, Task, User, UserPermission, AdminSubTab, NotificationSettings } from './types';
 import { useLanguage } from './i18n/LanguageContext';
 import { useTheme } from './context/ThemeContext';
+import { finalizeSignup, fetchSignupRequests, resolveSignupRequest, SignupFinalizePayload } from './services/signupService';
 
 type ModalType = 'schedule' | 'financials' | 'challenges' | 'advantages' | 'contacts' | 'tasks' | 'users';
 type SettingsPanelTab = 'profile' | 'settings' | 'privacy';
@@ -31,12 +34,41 @@ function App() {
   const [dashboardData, setDashboardData] = React.useState<DashboardData>(mockData);
   const [activeTab, setActiveTab] = React.useState<string>('Calendar');
   const [adminPanelSubTab, setAdminPanelSubTab] = React.useState<AdminSubTab>('permissions');
+  const [activeLegalPage, setActiveLegalPage] = React.useState<LegalPageKey | null>(null);
   
   // App-wide settings
   const [notificationSettings, setNotificationSettings] = React.useState<NotificationSettings>({
     email: false,
     push: true,
   });
+
+  React.useEffect(() => {
+    let active = true;
+    const loadRequests = async () => {
+      try {
+        const requests = await fetchSignupRequests();
+        if (!active || !Array.isArray(requests)) return;
+        setDashboardData(prev => {
+          const remoteIds = new Set(requests.map(req => req.id));
+          const mappedRequests = requests.map(req => ({
+            ...req,
+            timestamp: req.timestamp ?? new Date().toISOString(),
+          }));
+          const localRemainder = prev.signupRequests.filter(req => !remoteIds.has(req.id));
+          return {
+            ...prev,
+            signupRequests: [...mappedRequests, ...localRemainder],
+          };
+        });
+      } catch (error) {
+        console.error('Signup requests fetch failed:', error);
+      }
+    };
+    loadRequests();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   // Modal States
   const [detailModalItem, setDetailModalItem] = React.useState<{ item: DataItem, type: ModalType } | null>(null);
@@ -71,6 +103,7 @@ function App() {
   const handleLogout = () => {
     setUserRole(null);
     setActiveTab('Calendar');
+    setActiveLegalPage(null);
   };
 
   const handleOpenDetailModal = (item: DataItem, type: ModalType) => {
@@ -144,77 +177,127 @@ function App() {
   }
   
   const handleApproveSignup = (requestId: string) => {
-     setDashboardData(prev => {
-        const request = prev.signupRequests.find(r => r.id === requestId);
-        if (!request) return prev;
+    setDashboardData(prev => {
+      const request = prev.signupRequests.find(r => r.id === requestId);
+      if (!request) return prev;
 
-        const newUser: User = {
-            id: `u${Date.now()}`,
-            name: request.name,
-            email: request.email,
-            role: 'user' as UserRole,
-            lastLogin: new Date().toISOString()
-        };
-        
-        const newPermission = {
-            userId: newUser.id,
-            userName: newUser.name,
-            permissions: {
-                schedule: { view: true, edit: false },
-                financials: { view: true, edit: false },
-                challenges: { view: true, edit: false },
-                advantages: { view: true, edit: false },
-                contacts: { view: true, edit: false },
-                tasks: { view: true, edit: false },
-            }
-        };
+      const newUser: User = {
+        id: `u${Date.now()}`,
+        name: request.name,
+        email: request.email,
+        role: 'user' as UserRole,
+        lastLogin: new Date().toISOString(),
+      };
 
-        const newAuditLog = {
-            id: `l${Date.now()}`,
-            user: 'Admin User',
-            action: 'Approved' as const,
-            targetType: 'SignupRequest',
-            targetId: requestId,
-            timestamp: new Date().toISOString(),
-            details: `Approved signup for ${request.name} and created new user.`
-        };
+      const newPermission = {
+        userId: newUser.id,
+        userName: newUser.name,
+        permissions: {
+          schedule: { view: true, edit: false },
+          financials: { view: true, edit: false },
+          challenges: { view: true, edit: false },
+          advantages: { view: true, edit: false },
+          contacts: { view: true, edit: false },
+          tasks: { view: true, edit: false },
+        },
+      };
 
-        return {
-            ...prev,
-            users: [...prev.users, newUser],
-            userPermissions: [...prev.userPermissions, newPermission],
-            signupRequests: prev.signupRequests.filter(r => r.id !== requestId),
-            auditLog: [newAuditLog, ...prev.auditLog]
-        }
+      const newAuditLog = {
+        id: `l${Date.now()}`,
+        user: 'Admin User',
+        action: 'Approved' as const,
+        targetType: 'SignupRequest',
+        targetId: requestId,
+        timestamp: new Date().toISOString(),
+        details: `Approved signup for ${request.name} and created new user.`,
+      };
+
+      const newContact: Contact = {
+        id: `c${Date.now()}`,
+        firstName: request.firstName || request.name,
+        lastName: request.lastName || '',
+        role: request.position,
+        type: 'Individual',
+        email: request.email,
+        phone: request.phone,
+        country: request.country,
+      };
+
+      resolveSignupRequest(requestId).catch(error => console.error('Signup request resolve failed:', error));
+
+      return {
+        ...prev,
+        users: [...prev.users, newUser],
+        userPermissions: [...prev.userPermissions, newPermission],
+        signupRequests: prev.signupRequests.filter(r => r.id !== requestId),
+        contacts: [newContact, ...prev.contacts],
+        auditLog: [newAuditLog, ...prev.auditLog],
+      };
     });
   }
 
   const handleDenySignup = (requestId: string) => {
-      setDashboardData(prev => {
-        const request = prev.signupRequests.find(r => r.id === requestId);
-        if (!request) return prev;
-        
-        const newAuditLog = {
-            id: `l${Date.now()}`,
-            user: 'Admin User',
-            action: 'Denied' as const,
-            targetType: 'SignupRequest',
-            targetId: requestId,
-            timestamp: new Date().toISOString(),
-            details: `Denied signup request for ${request.name}.`
-        };
+    setDashboardData(prev => {
+      const request = prev.signupRequests.find(r => r.id === requestId);
+      if (!request) return prev;
 
-        return {
-            ...prev,
-            signupRequests: prev.signupRequests.filter(r => r.id !== requestId),
-            auditLog: [newAuditLog, ...prev.auditLog]
-        }
+      const newAuditLog = {
+        id: `l${Date.now()}`,
+        user: 'Admin User',
+        action: 'Denied' as const,
+        targetType: 'SignupRequest',
+        targetId: requestId,
+        timestamp: new Date().toISOString(),
+        details: `Denied signup request for ${request.name}.`,
+      };
+
+      resolveSignupRequest(requestId).catch(error => console.error('Signup request resolve failed:', error));
+
+      return {
+        ...prev,
+        signupRequests: prev.signupRequests.filter(r => r.id !== requestId),
+        auditLog: [newAuditLog, ...prev.auditLog],
+      };
     });
   }
 
-  const handleSignupRequest = (signupData: Omit<SignupRequest, 'id' | 'status' | 'timestamp'>) => {
-      // For demo, just show an alert. In a real app, this would be an async operation.
-      alert(t('signup.requestReceived'));
+  const handleSignupRequest = async ({ email, code }: { email: string; code: string }): Promise<SignupRequest> => {
+    try {
+      const payload: SignupFinalizePayload = await finalizeSignup(email, code);
+      const fullName = payload.name?.trim() || `${payload.firstName ?? ''} ${payload.lastName ?? ''}`.trim();
+
+      const normalized: SignupRequest = {
+        id: payload.id,
+        name: fullName,
+        firstName: payload.firstName,
+        lastName: payload.lastName,
+        email: payload.email,
+        phone: payload.phone,
+        countryCode: payload.countryCode,
+        country: payload.country,
+        company: payload.company,
+        position: payload.position,
+        status: 'pending',
+        timestamp: payload.timestamp || new Date().toISOString(),
+      };
+
+      setDashboardData(prev => {
+        const existing = prev.signupRequests.filter(req => req.id !== normalized.id);
+        return {
+          ...prev,
+          signupRequests: [normalized, ...existing],
+        };
+      });
+
+      return normalized;
+    } catch (error) {
+      console.error('Signup request failed:', error);
+      const fallback = t('signup.requestError');
+      if (error instanceof Error) {
+        throw new Error(error.message || fallback);
+      }
+      throw new Error(fallback);
+    }
   };
 
   const handleViewAuditLog = () => {
@@ -244,6 +327,14 @@ function App() {
       if (window.confirm(t('settings.privacy.deleteAccountConfirm'))) {
           handleLogout();
       }
+  };
+
+  const handleOpenLegalPage = (page: LegalPageKey) => {
+    setActiveLegalPage(page);
+  };
+
+  const handleCloseLegalPage = () => {
+    setActiveLegalPage(null);
   };
 
 
@@ -311,20 +402,36 @@ function App() {
   }, [userRole, activeTab]);
 
   if (!userRole) {
-    return <LoginPage onLogin={handleLogin} onSignupRequest={handleSignupRequest} />;
+    return (
+      <>
+        <LoginPage
+          onLogin={handleLogin}
+          onSignupRequest={handleSignupRequest}
+          onOpenLegal={handleOpenLegalPage}
+        />
+        {activeLegalPage && (
+          <LegalPage page={activeLegalPage} onClose={handleCloseLegalPage} />
+        )}
+      </>
+    );
   }
 
+  const baseContainerClass = `min-h-screen min-h-[100svh] min-h-[100dvh] font-sans w-full ${
+    theme === 'light'
+      ? 'bg-[var(--drip-surface)] text-[var(--drip-text)]'
+      : 'bg-[var(--drip-dark-surface)] text-[var(--drip-dark-text)]'
+  }`;
+
   return (
-    <div className="bg-slate-50 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 min-h-screen font-sans">
-      <div className="isolate">
+    <div className={baseContainerClass}>
+      <div className="isolate w-full">
         <Header 
           userRole={userRole} 
           onLogout={handleLogout} 
           onOpenSettings={handleOpenSettings}
         />
         
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <h1 className="text-3xl font-bold animate-slide-in-up" style={{ animationDelay: '100ms' }}>{t('dashboard.title')}</h1>
+        <main className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
           <StatCards schedule={dashboardData.schedule} contacts={dashboardData.contacts} tasks={dashboardData.tasks} financials={dashboardData.financials} setActiveTab={setActiveTab} onPendingPaymentsClick={() => { setActiveTab('Financials'); setFinancialsDateFilter('week'); }} />
           <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} userRole={userRole} />
           
@@ -333,8 +440,8 @@ function App() {
           </div>
         </main>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Footer />
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+          <Footer onNavigateLegal={handleOpenLegalPage} />
         </div>
       </div>
 
@@ -383,6 +490,10 @@ function App() {
         isOpen={passwordChangeModalOpen}
         onClose={() => setPasswordChangeModalOpen(false)}
       />
+
+      {activeLegalPage && (
+        <LegalPage page={activeLegalPage} onClose={handleCloseLegalPage} />
+      )}
 
     </div>
   );

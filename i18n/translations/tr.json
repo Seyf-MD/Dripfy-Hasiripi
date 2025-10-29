@@ -11,12 +11,32 @@
     "signup": {
         "prompt": "Hesabınız yok mu? Kayıt olun",
         "loginPrompt": "Zaten bir hesabınız var mı? Giriş yapın",
-        "namePlaceholder": "Ad Soyad",
+        "firstNamePlaceholder": "Ad",
+        "lastNamePlaceholder": "Soyad",
         "emailPlaceholder": "E-posta adresi",
-        "phonePlaceholder": "Telefon Numarası",
+        "phonePlaceholder": "Telefon numarası",
+        "companyPlaceholder": "Firma (opsiyonel)",
+        "countryCodeLabel": "Ülke kodu",
         "passwordPlaceholder": "Şifre Oluştur",
         "signUpButton": "Kayıt Ol",
-        "requestReceived": "Kayıt talebiniz alındı! Bir yönetici yakında inceleyecektir."
+        "requestReceived": "Kayıt talebiniz alındı! Bir yönetici yakında inceleyecektir.",
+        "requestError": "Kayıt talebi gönderilemedi. Lütfen kısa bir süre sonra tekrar deneyin.",
+        "errors": {
+            "firstName": "Lütfen ad bölümüne en az 2 karakter girin.",
+            "lastName": "Lütfen soyad bölümüne en az 2 karakter girin.",
+            "email": "Geçerli bir e-posta adresi girin.",
+            "phone": "Geçerli bir telefon numarası girin.",
+            "countryCode": "Lütfen ülke kodu seçin.",
+            "position": "Lütfen pozisyon seçin."
+        },
+        "notification": {
+            "codeSentTitle": "Doğrulama kodu gönderildi",
+            "codeSentBody": "Lütfen e-postanızı kontrol edin ve 6 haneli kodu girin.",
+            "successTitle": "Kayıt talebiniz alındı",
+            "successBody": "Yönetici talebinizi inceleyip kısa sürede erişiminizi açacaktır.",
+            "errorTitle": "Bir sorun oluştu",
+            "errorBody": "Lütfen tekrar deneyin veya sorun devam ederse destekle iletişime geçin."
+        }
     },
     "verify": {
         "title": "E-postanızı doğrulayın",
@@ -198,6 +218,7 @@
     "actions": {
         "edit": "Düzenle",
         "delete": "Sil",
+        "close": "Kapat",
         "save": "Kaydet",
         "cancel": "İptal"
     },
@@ -286,5 +307,15 @@
         "time": "Saat",
         "participants": "Katılımcılar",
         "type": "Tür"
+    },
+    "legal": {
+        "title": {
+            "impressum": "Künye",
+            "privacy": "Gizlilik Politikası",
+            "terms": "Şartlar ve Koşullar"
+        },
+        "lightMode": "Aydınlık mod",
+        "darkMode": "Karanlık mod",
+        "backToDashboard": "Kontrol paneline dön"
     }
 }

@@ -11,12 +11,32 @@
     "signup": {
         "prompt": "Kein Konto? Registrieren",
         "loginPrompt": "Bereits ein Konto? Anmelden",
-        "namePlaceholder": "Vollständiger Name",
+        "firstNamePlaceholder": "Vorname",
+        "lastNamePlaceholder": "Nachname",
         "emailPlaceholder": "E-Mail-Adresse",
         "phonePlaceholder": "Telefonnummer",
+        "companyPlaceholder": "Firma (optional)",
+        "countryCodeLabel": "Ländervorwahl",
         "passwordPlaceholder": "Passwort erstellen",
         "signUpButton": "Registrieren",
-        "requestReceived": "Registrierungsanfrage erhalten! Ein Administrator wird sie in Kürze prüfen."
+        "requestReceived": "Registrierungsanfrage erhalten! Ein Administrator wird sie in Kürze prüfen.",
+        "requestError": "Registrierungsanfrage konnte nicht gesendet werden. Bitte versuche es später erneut.",
+        "errors": {
+            "firstName": "Bitte gib mindestens 2 Zeichen für den Vornamen ein.",
+            "lastName": "Bitte gib mindestens 2 Zeichen für den Nachnamen ein.",
+            "email": "Bitte eine gültige E-Mail-Adresse eingeben.",
+            "phone": "Bitte eine gültige Telefonnummer eingeben.",
+            "countryCode": "Bitte eine Ländervorwahl auswählen.",
+            "position": "Bitte eine Position auswählen."
+        },
+        "notification": {
+            "codeSentTitle": "Bestätigungscode gesendet",
+            "codeSentBody": "Bitte prüfe dein Postfach und gib den 6-stelligen Code ein.",
+            "successTitle": "Registrierungsanfrage eingegangen",
+            "successBody": "Ein Administrator prüft deine Anfrage und schaltet dich bald frei.",
+            "errorTitle": "Es ist ein Fehler aufgetreten",
+            "errorBody": "Bitte versuche es erneut oder kontaktiere den Support."
+        }
     },
     "verify": {
         "title": "Bestätigen Sie Ihre E-Mail",
@@ -198,6 +218,7 @@
     "actions": {
         "edit": "Bearbeiten",
         "delete": "Löschen",
+        "close": "Schließen",
         "save": "Speichern",
         "cancel": "Abbrechen"
     },
@@ -286,5 +307,15 @@
         "time": "Uhrzeit",
         "participants": "Teilnehmer",
         "type": "Typ"
+    },
+    "legal": {
+        "title": {
+            "impressum": "Impressum",
+            "privacy": "Datenschutz",
+            "terms": "Website-Nutzungsbedingungen"
+        },
+        "lightMode": "Heller Modus",
+        "darkMode": "Dunkler Modus",
+        "backToDashboard": "Zurück zum Dashboard"
     }
 }

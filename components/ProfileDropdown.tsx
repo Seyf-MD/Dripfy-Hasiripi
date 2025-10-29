@@ -37,14 +37,14 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ userName, userEmail, 
                 onClick={() => setIsOpen(!isOpen)}
                 className="flex items-center justify-center w-10 h-10 bg-slate-100 dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 rounded-full hover:bg-slate-200 dark:hover:bg-neutral-700 transition-colors"
             >
-                <User size={20} className="text-neutral-600 dark:text-neutral-300" />
+                <User size={20} className="text-[color:var(--drip-text-soft)] dark:text-neutral-300" />
             </button>
 
             {isOpen && (
                 <div className="absolute top-full right-0 mt-2 w-64 bg-white dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 rounded-lg shadow-lg z-50 animate-fade-in-up origin-top-right">
                     <div className="p-4 border-b border-slate-200 dark:border-neutral-700">
-                        <p className="font-semibold text-black dark:text-white truncate">{userName}</p>
-                        <p className="text-sm text-neutral-500 dark:text-neutral-400 truncate">{userEmail}</p>
+                        <p className="font-semibold text-[var(--drip-text)] dark:text-white truncate">{userName}</p>
+                        <p className="text-sm text-[var(--drip-muted)] dark:text-neutral-400 truncate">{userEmail}</p>
                     </div>
                     <ul className="py-2">
                         <li>

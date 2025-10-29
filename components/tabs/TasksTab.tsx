@@ -31,15 +31,15 @@ const TaskCard: React.FC<{ task: Task; onOpenModal: () => void; onDragStart: (e:
             className={`bg-white dark:bg-neutral-800 p-4 rounded-lg border border-slate-200 dark:border-neutral-700 ${canEdit ? 'cursor-grab' : 'cursor-default'} hover:bg-slate-50 dark:hover:bg-neutral-700/50 transition-colors shadow-sm`}
         >
             <div className="flex justify-between items-start">
-                <p className="text-sm font-semibold text-black dark:text-white break-words">{task.title}</p>
+                <p className="text-sm font-semibold text-[var(--drip-text)] dark:text-white break-words">{task.title}</p>
                 <div className={`w-2.5 h-2.5 rounded-full ${getPriorityColor(task.priority)} flex-shrink-0 mt-1`}></div>
             </div>
             <div className="flex items-center justify-between mt-4">
-                <div className="text-xs text-neutral-500 dark:text-neutral-400">
+                <div className="text-xs text-[var(--drip-muted)] dark:text-neutral-400">
                     <p>{task.assignee}</p>
                     <p className="mt-0.5">{new Date(task.dueDate).toLocaleDateString()}</p>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-neutral-700 flex items-center justify-center text-xs font-bold text-neutral-600 dark:text-neutral-300">
+                <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-neutral-700 flex items-center justify-center text-xs font-bold text-[color:var(--drip-text-soft)] dark:text-neutral-300">
                     {task.assignee.substring(0,2).toUpperCase()}
                 </div>
             </div>
@@ -95,7 +95,7 @@ const TaskColumn: React.FC<{
                     {statusInfo[status].icon}
                     <span>{statusInfo[status].label}</span>
                 </div>
-                <span className="text-sm font-bold text-neutral-400 dark:text-neutral-500">{tasks.length}</span>
+                <span className="text-sm font-bold text-[var(--drip-muted)]/80 dark:text-neutral-500">{tasks.length}</span>
             </div>
             <div className="space-y-3 h-full overflow-y-auto max-h-[calc(100vh-350px)] p-1">
                 {tasks.map(task => (
@@ -149,7 +149,7 @@ const TasksTab: React.FC<TasksTabProps> = ({ data, canEdit, onOpenModal, onUpdat
                      {/* Can add filters here later */}
                 </div>
                 {canEdit && (
-                    <button onClick={() => onOpenModal({} as Task, 'tasks')} className="flex items-center gap-2 px-4 py-2 bg-[#32ff84] text-black text-sm font-semibold rounded-lg hover:bg-green-400 transition-colors">
+                    <button onClick={() => onOpenModal({} as Task, 'tasks')} className="flex items-center gap-2 px-4 py-2 bg-[var(--drip-primary)] text-white text-sm font-semibold rounded-lg hover:bg-[var(--drip-primary-dark)] transition-colors">
                         <Plus size={18}/> {t('tasks.newTask')}
                     </button>
                 )}

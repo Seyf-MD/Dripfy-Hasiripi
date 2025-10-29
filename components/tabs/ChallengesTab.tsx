@@ -43,7 +43,7 @@ const ChallengesTab: React.FC<ChallengesTabProps> = ({ challenges, advantages, c
     const { t } = useLanguage();
     const [editingItem, setEditingItem] = React.useState<{ type: 'challenge' | 'advantage', id: string, field: 'title' | 'description' } | null>(null);
 
-    const inputClasses = "w-full bg-slate-100 dark:bg-neutral-700 border-transparent focus:bg-slate-200 dark:focus:bg-neutral-600 rounded p-1 text-sm focus:ring-2 focus:ring-[#32ff84] focus:outline-none text-black dark:text-white";
+    const inputClasses = "w-full bg-slate-100 dark:bg-neutral-700 border-transparent focus:bg-slate-200 dark:focus:bg-neutral-600 rounded p-1 text-sm focus:ring-2 focus:ring-[var(--drip-primary)] focus:outline-none focus:border-[var(--drip-primary)] text-[var(--drip-text)] dark:text-white";
 
     const handleCellClick = (e: React.MouseEvent, type: 'challenge' | 'advantage', id: string, field: 'title' | 'description') => {
         e.stopPropagation();
@@ -90,13 +90,13 @@ const ChallengesTab: React.FC<ChallengesTabProps> = ({ challenges, advantages, c
                                         {editingItem?.type === 'challenge' && editingItem.id === challenge.id && editingItem.field === 'title' ? (
                                             <input type="text" defaultValue={challenge.title} onBlur={(e) => handleUpdate('challenge', challenge.id, 'title', e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }} onClick={(e) => e.stopPropagation()} autoFocus className={`${inputClasses} font-semibold mb-1`} />
                                         ) : (
-                                            <h3 onClick={(e) => handleCellClick(e, 'challenge', challenge.id, 'title')} className="font-semibold text-black dark:text-white leading-tight">{challenge.title}</h3>
+                                            <h3 onClick={(e) => handleCellClick(e, 'challenge', challenge.id, 'title')} className="font-semibold text-[var(--drip-text)] dark:text-white leading-tight">{challenge.title}</h3>
                                         )}
 
                                         {editingItem?.type === 'challenge' && editingItem.id === challenge.id && editingItem.field === 'description' ? (
                                             <textarea defaultValue={challenge.description} onBlur={(e) => handleUpdate('challenge', challenge.id, 'description', e.target.value)} onClick={(e) => e.stopPropagation()} autoFocus rows={2} className={`${inputClasses} mt-1 text-xs`} />
                                         ) : (
-                                            <p onClick={(e) => handleCellClick(e, 'challenge', challenge.id, 'description')} className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">{challenge.description}</p>
+                                            <p onClick={(e) => handleCellClick(e, 'challenge', challenge.id, 'description')} className="text-xs text-[var(--drip-muted)] dark:text-neutral-400 mt-1">{challenge.description}</p>
                                         )}
                                     </div>
                                      <div className={`p-1.5 rounded-md ${styles.tagBg} flex-shrink-0`}>
@@ -135,13 +135,13 @@ const ChallengesTab: React.FC<ChallengesTabProps> = ({ challenges, advantages, c
                                  {editingItem?.type === 'advantage' && editingItem.id === advantage.id && editingItem.field === 'title' ? (
                                     <input type="text" defaultValue={advantage.title} onBlur={(e) => handleUpdate('advantage', advantage.id, 'title', e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }} onClick={(e) => e.stopPropagation()} autoFocus className={`${inputClasses} font-semibold mb-1`} />
                                  ) : (
-                                    <h3 onClick={(e) => handleCellClick(e, 'advantage', advantage.id, 'title')} className="font-semibold text-black dark:text-white leading-tight">{advantage.title}</h3>
+                                    <h3 onClick={(e) => handleCellClick(e, 'advantage', advantage.id, 'title')} className="font-semibold text-[var(--drip-text)] dark:text-white leading-tight">{advantage.title}</h3>
                                  )}
 
                                 {editingItem?.type === 'advantage' && editingItem.id === advantage.id && editingItem.field === 'description' ? (
                                     <textarea defaultValue={advantage.description} onBlur={(e) => handleUpdate('advantage', advantage.id, 'description', e.target.value)} onClick={(e) => e.stopPropagation()} autoFocus rows={2} className={`${inputClasses} mt-1 text-xs`} />
                                  ) : (
-                                    <p onClick={(e) => handleCellClick(e, 'advantage', advantage.id, 'description')} className="text-xs text-neutral-600 dark:text-neutral-400 mt-1">{advantage.description}</p>
+                                    <p onClick={(e) => handleCellClick(e, 'advantage', advantage.id, 'description')} className="text-xs text-[var(--drip-muted)] dark:text-neutral-400 mt-1">{advantage.description}</p>
                                  )}
                               </div>
                               <div className="p-1.5 rounded-md bg-green-500/10 flex-shrink-0">

@@ -85,8 +85,13 @@ export interface UserPermission {
 export interface SignupRequest {
     id: string;
     name: string;
+    firstName?: string;
+    lastName?: string;
     email: string;
     phone: string;
+    countryCode?: string;
+    country?: string;
+    company?: string;
     position: string;
     status: 'pending';
     timestamp: string;

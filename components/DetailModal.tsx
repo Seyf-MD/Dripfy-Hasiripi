@@ -16,8 +16,8 @@ interface DetailModalProps {
 
 const DetailRow: React.FC<{ label: string; children: React.ReactNode; className?: string }> = ({ label, children, className }) => (
     <div className={`grid grid-cols-3 gap-4 py-3 border-b border-neutral-200 dark:border-neutral-700/50 ${className}`}>
-        <dt className="text-sm font-medium text-neutral-500 dark:text-neutral-400">{label}</dt>
-        <dd className="text-sm text-black dark:text-white col-span-2">{children}</dd>
+        <dt className="text-sm font-medium text-[var(--drip-muted)] dark:text-neutral-400">{label}</dt>
+        <dd className="text-sm text-[var(--drip-text)] dark:text-white col-span-2">{children}</dd>
     </div>
 );
 
@@ -141,8 +141,8 @@ const DetailModal: React.FC<DetailModalProps> = ({ item, type, canEdit, onClose,
         >
             <div className="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 w-full max-w-lg flex flex-col" onClick={(e) => e.stopPropagation()}>
                 <header className="p-4 flex justify-between items-center border-b border-neutral-200 dark:border-neutral-700">
-                    <h2 id={modalTitleId} className="text-xl font-bold text-black dark:text-white break-all">{getTitle()}</h2>
-                    <button onClick={onClose} className="text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors flex-shrink-0 ml-4">
+                    <h2 id={modalTitleId} className="text-xl font-bold text-[var(--drip-text)] dark:text-white break-all">{getTitle()}</h2>
+                    <button onClick={onClose} className="text-[var(--drip-muted)] dark:text-neutral-400 hover:text-[var(--drip-text)] dark:hover:text-white transition-colors flex-shrink-0 ml-4">
                         <X size={24} />
                     </button>
                 </header>
@@ -154,7 +154,7 @@ const DetailModal: React.FC<DetailModalProps> = ({ item, type, canEdit, onClose,
                         <button onClick={() => onDelete(item.id, type)} className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-500 dark:text-red-400 text-sm font-semibold rounded-lg hover:bg-red-500/20 transition-colors">
                             <Trash2 size={16} /> {t('actions.delete')}
                         </button>
-                        <button onClick={() => onEdit(item, type)} className="flex items-center gap-2 px-4 py-2 bg-[#32ff84] text-black text-sm font-semibold rounded-lg hover:bg-green-400 transition-colors">
+                        <button onClick={() => onEdit(item, type)} className="flex items-center gap-2 px-4 py-2 bg-[var(--drip-primary)] text-white text-sm font-semibold rounded-lg hover:bg-[var(--drip-primary-dark)] transition-colors">
                             <Edit size={16} /> {t('actions.edit')}
                         </button>
                     </footer>

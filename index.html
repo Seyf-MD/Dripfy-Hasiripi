@@ -1,10 +1,18 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en" dir="ltr" class="light">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="/favicon.png" sizes="96x96" />
+    <link rel="shortcut icon" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>Dripfy MIS Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -23,8 +31,72 @@
 }
 </script>
 <style>
-  .brand-glow {
-    text-shadow: 0 0 8px rgba(50, 255, 132, 0.4), 0 0 20px rgba(50, 255, 132, 0.3);
+  /* Mobile spacing fix - Remove default margins and padding */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  :root {
+    color-scheme: light dark;
+    background-color: #0f172a;
+  }
+  
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+    overflow-x: hidden;
+    background-color: inherit;
+  }
+
+  html {
+    background-color: #f8fafc;
+  }
+
+  html.dark {
+    background-color: var(--drip-dark-surface);
+    color: var(--drip-dark-text);
+  }
+
+  body {
+    background-color: inherit;
+    color: inherit;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.015em;
+    color: inherit;
+  }
+
+  #root {
+    width: 100%;
+    min-height: 100vh;
+  }
+
+  @supports (min-height: 100dvh) {
+    #root {
+      min-height: 100dvh;
+    }
+  }
+
+  @supports (min-height: 100svh) {
+    #root {
+      min-height: 100svh;
+    }
+  }
+
+  @supports (-webkit-touch-callout: none) {
+    #root {
+      min-height: -webkit-fill-available;
+    }
   }
   @keyframes slide-in-up {
     from {
@@ -61,6 +133,184 @@
   .animate-fade-in {
       animation: fade-in 0.4s ease-out forwards;
       opacity: 0;
+  }
+
+  :root {
+    --drip-primary: #4ba586;
+    --drip-primary-dark: #307a07;
+    --drip-primary-muted: #84a084;
+    --drip-accent: #94a073;
+    --drip-surface: #edf6ed;
+    --drip-card: #faf9f6;
+    --drip-border: #c8d9b9;
+    --drip-text: #1e332a;
+    --drip-text-soft: rgba(30, 51, 42, 0.75);
+    --drip-muted: #2f4a3b;
+    --drip-dark-surface: #0b1612;
+    --drip-dark-surface-rgb: 11, 22, 18;
+    --drip-dark-elevated: #13241e;
+    --drip-dark-elevated-rgb: 19, 36, 30;
+    --drip-dark-card: #1b3329;
+    --drip-dark-card-rgb: 27, 51, 41;
+    --drip-dark-border: #244137;
+    --drip-dark-border-soft: rgba(36, 65, 55, 0.6);
+    --drip-dark-text: #e1f1ea;
+    --drip-dark-text-soft: rgba(225, 241, 234, 0.75);
+    --drip-dark-muted: #8caea1;
+    --drip-dark-muted-soft: rgba(140, 174, 161, 0.75);
+  }
+
+  html.light,
+  html.light body {
+    background-color: var(--drip-surface);
+    color: var(--drip-text);
+  }
+
+  html.light .bg-white {
+    background-color: var(--drip-card) !important;
+  }
+
+  html.light .bg-white\/80 {
+    background-color: rgba(250, 249, 246, 0.88) !important;
+  }
+
+  html.light .bg-slate-50,
+  html.light .bg-slate-100,
+  html.light .bg-slate-200 {
+    background-color: #e9f2ea !important;
+  }
+
+  html.light .border-slate-200,
+  html.light .border-slate-300 {
+    border-color: var(--drip-border) !important;
+  }
+
+  html.light .text-neutral-500,
+  html.light .text-neutral-400 {
+    color: var(--drip-muted) !important;
+  }
+
+  html.light .text-neutral-600 {
+    color: #2e4636 !important;
+  }
+
+  html.light .shadow-2xl {
+    --tw-shadow-color: rgba(75, 165, 134, 0.25) !important;
+  }
+
+  html.dark,
+  html.dark body {
+    background-color: var(--drip-dark-surface);
+    color: var(--drip-dark-text);
+  }
+
+  html.dark .dark\:bg-neutral-950 {
+    background-color: #07100c !important;
+  }
+
+  html.dark .dark\:bg-neutral-900 {
+    background-color: var(--drip-dark-surface) !important;
+  }
+
+  html.dark .dark\:bg-neutral-900\/50 {
+    background-color: rgba(var(--drip-dark-surface-rgb), 0.5) !important;
+  }
+
+  html.dark .dark\:bg-neutral-900\/70 {
+    background-color: rgba(var(--drip-dark-surface-rgb), 0.7) !important;
+  }
+
+  html.dark .dark\:bg-neutral-800 {
+    background-color: var(--drip-dark-elevated) !important;
+  }
+
+  html.dark .dark\:bg-neutral-800\/50 {
+    background-color: rgba(var(--drip-dark-elevated-rgb), 0.5) !important;
+  }
+
+  html.dark .dark\:bg-neutral-800\/30 {
+    background-color: rgba(var(--drip-dark-elevated-rgb), 0.3) !important;
+  }
+
+  html.dark .dark\:bg-neutral-800\/20 {
+    background-color: rgba(var(--drip-dark-elevated-rgb), 0.2) !important;
+  }
+
+  html.dark .dark\:bg-neutral-800\/10 {
+    background-color: rgba(var(--drip-dark-elevated-rgb), 0.1) !important;
+  }
+
+  html.dark .dark\:bg-neutral-700 {
+    background-color: var(--drip-dark-card) !important;
+  }
+
+  html.dark .dark\:bg-neutral-700\/50 {
+    background-color: rgba(var(--drip-dark-card-rgb), 0.5) !important;
+  }
+
+  html.dark .dark\:bg-neutral-700\/20 {
+    background-color: rgba(var(--drip-dark-card-rgb), 0.2) !important;
+  }
+
+  html.dark .dark\:bg-neutral-700\/30 {
+    background-color: rgba(var(--drip-dark-card-rgb), 0.3) !important;
+  }
+
+  html.dark .dark\:bg-neutral-700\/20' {
+    background-color: rgba(var(--drip-dark-card-rgb), 0.2) !important;
+  }
+
+  html.dark .dark\:bg-neutral-900\/50' {
+    background-color: rgba(var(--drip-dark-surface-rgb), 0.5) !important;
+  }
+
+  html.dark .dark\:border-neutral-700 {
+    border-color: var(--drip-dark-border) !important;
+  }
+
+  html.dark .dark\:border-neutral-700\/50,
+  html.dark .dark\:border-neutral-700\/20 {
+    border-color: var(--drip-dark-border-soft) !important;
+  }
+
+  html.dark .dark\:border-neutral-800 {
+    border-color: rgba(var(--drip-dark-border-rgb, 36, 65, 55), 0.85) !important;
+  }
+
+  html.dark .dark\:text-white,
+  html.dark .dark\:text-neutral-100 {
+    color: var(--drip-dark-text) !important;
+  }
+
+  html.dark .dark\:text-neutral-200,
+  html.dark .dark\:text-neutral-300 {
+    color: var(--drip-dark-text-soft) !important;
+  }
+
+  html.dark .dark\:text-neutral-400,
+  html.dark .dark\:text-white\/70 {
+    color: var(--drip-dark-muted) !important;
+  }
+
+  html.dark .dark\:text-neutral-500,
+  html.dark .dark\:text-neutral-600 {
+    color: var(--drip-dark-muted-soft) !important;
+  }
+
+  html.dark .dark\:hover\:bg-neutral-700:hover {
+    background-color: rgba(var(--drip-dark-card-rgb), 0.85) !important;
+  }
+
+  html.dark .dark\:hover\:bg-neutral-700\/50:hover {
+    background-color: rgba(var(--drip-dark-card-rgb), 0.45) !important;
+  }
+
+  html.dark .dark\:hover\:border-neutral-500:hover {
+    border-color: rgba(140, 174, 161, 0.6) !important;
+  }
+
+  html.dark .dark\:hover\:text-neutral-300:hover {
+    color: var(--drip-dark-text) !important;
   }
 </style>
 </head>

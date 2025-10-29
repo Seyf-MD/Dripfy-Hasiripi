@@ -16,7 +16,7 @@ interface EditModalProps {
 
 const FormField: React.FC<{ label: string; children: React.ReactNode; className?: string }> = ({ label, children, className }) => (
     <div className={className}>
-        <label className="block text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-1.5">{label}</label>
+        <label className="block text-sm font-medium text-[var(--drip-muted)] dark:text-neutral-400 mb-1.5">{label}</label>
         {children}
     </div>
 );
@@ -68,7 +68,7 @@ const EditModal: React.FC<EditModalProps> = ({ item, type, isNew, onClose, onSav
         onSave(formData as DataItem, type);
     };
     
-    const inputClass = "w-full px-3 py-2 bg-neutral-100 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 rounded-md focus:ring-2 focus:ring-[#32ff84] focus:outline-none text-black dark:text-white placeholder:text-neutral-500";
+    const inputClass = "w-full px-3 py-2 bg-neutral-100 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 rounded-md focus:ring-2 focus:ring-[var(--drip-primary)] focus:border-[var(--drip-primary)] focus:outline-none text-[var(--drip-text)] dark:text-white placeholder:text-neutral-500";
 
     const renderFormFields = () => {
         switch (type) {
@@ -224,8 +224,8 @@ const EditModal: React.FC<EditModalProps> = ({ item, type, isNew, onClose, onSav
         >
             <div className="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 w-full max-w-lg flex flex-col" onClick={(e) => e.stopPropagation()}>
                 <header className="p-4 flex justify-between items-center border-b border-neutral-200 dark:border-neutral-700">
-                    <h2 id={modalTitleId} className="text-xl font-bold text-black dark:text-white">{title}</h2>
-                    <button onClick={onClose} className="text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors">
+                    <h2 id={modalTitleId} className="text-xl font-bold text-[var(--drip-text)] dark:text-white">{title}</h2>
+                    <button onClick={onClose} className="text-[var(--drip-muted)] dark:text-neutral-400 hover:text-[var(--drip-text)] dark:hover:text-white transition-colors">
                         <X size={24} />
                     </button>
                 </header>
@@ -234,10 +234,10 @@ const EditModal: React.FC<EditModalProps> = ({ item, type, isNew, onClose, onSav
                         {renderFormFields()}
                     </main>
                     <footer className="p-4 flex justify-end items-center gap-4 border-t border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 rounded-b-xl">
-                        <button type="button" onClick={onClose} className="px-4 py-2 bg-neutral-200 dark:bg-neutral-700 text-black dark:text-white text-sm font-semibold rounded-lg hover:bg-neutral-300 dark:hover:bg-neutral-600 transition-colors">
+                        <button type="button" onClick={onClose} className="px-4 py-2 bg-neutral-200 dark:bg-neutral-700 text-[var(--drip-text)] dark:text-white text-sm font-semibold rounded-lg hover:bg-neutral-300 dark:hover:bg-neutral-600 transition-colors">
                             {t('actions.cancel')}
                         </button>
-                        <button type="submit" className="flex items-center gap-2 px-4 py-2 bg-[#32ff84] text-black text-sm font-semibold rounded-lg hover:bg-green-400 transition-colors">
+                        <button type="submit" className="flex items-center gap-2 px-4 py-2 bg-[var(--drip-primary)] text-white text-sm font-semibold rounded-lg hover:bg-[var(--drip-primary-dark)] transition-colors">
                             <Save size={16} /> {t('actions.save')}
                         </button>
                     </footer>

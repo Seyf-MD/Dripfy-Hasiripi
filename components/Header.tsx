@@ -1,6 +1,7 @@
 import * as React from 'react';
 import LanguageSwitcher from './LanguageSwitcher';
 import ProfileDropdown from './ProfileDropdown';
+import BrandLogo from './BrandLogo';
 import { UserRole } from '../types';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
@@ -24,25 +25,33 @@ const Header: React.FC<HeaderProps> = ({ userRole, onLogout, onOpenSettings }) =
         setTheme(theme === 'dark' ? 'light' : 'dark');
     };
 
+    const headerClasses = theme === 'light'
+        ? 'bg-[rgba(250,249,246,0.92)] border-[var(--drip-border)]'
+        : 'bg-neutral-900/80 border-neutral-800';
+
+    const themeToggleClasses = theme === 'light'
+        ? 'bg-[color:rgba(75,165,134,0.1)] border-[var(--drip-primary)] text-[var(--drip-primary)] hover:bg-[var(--drip-primary)] hover:text-white shadow-sm'
+        : 'bg-[color:rgba(36,65,55,0.6)] border-[var(--drip-primary)] text-[var(--drip-dark-text)] hover:bg-[var(--drip-primary)] hover:text-white shadow-sm';
+
     return (
-        <header className="bg-white/80 dark:bg-neutral-900/80 backdrop-blur-sm sticky top-0 z-30 border-b border-slate-200 dark:border-neutral-800">
+        <header className={`${headerClasses} backdrop-blur-sm sticky top-0 z-30 border-b`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
-                    <div>
-                         <h1 className="text-4xl font-bold text-[#32ff84] brand-glow">dripfy<span className="text-neutral-400">.</span></h1>
-                         <p className="text-sm text-neutral-500 dark:text-neutral-400 tracking-wide -mt-0.5">{t('login.subtitle')}</p>
+                    <div className="flex flex-col">
+                        <BrandLogo className="h-10 w-auto sm:h-12" />
+                        <p className={`text-sm tracking-wide mt-1 ${theme === 'light' ? 'text-[var(--drip-muted)]' : 'text-neutral-400'}`}>{t('login.subtitle')}</p>
                     </div>
                     <div className="flex items-center gap-4">
                         <LanguageSwitcher />
                         <button
                             onClick={handleThemeToggle}
-                            className="flex items-center justify-center w-10 h-10 bg-slate-100 dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 rounded-full hover:bg-slate-200 dark:hover:bg-neutral-700 transition-colors"
+                            className={`flex items-center justify-center w-10 h-10 rounded-full transition-colors border ${themeToggleClasses}`}
                             aria-label={theme === 'dark' ? 'Activate light mode' : 'Activate dark mode'}
                         >
                             {theme === 'dark' ? (
-                                <Sun size={20} className="text-neutral-600 dark:text-neutral-300" />
+                                <Sun size={20} className="text-[var(--drip-dark-text)]" />
                             ) : (
-                                <Moon size={20} className="text-neutral-600 dark:text-neutral-300" />
+                                <Moon size={20} className="text-[var(--drip-muted)]" />
                             )}
                         </button>
                         <ProfileDropdown 

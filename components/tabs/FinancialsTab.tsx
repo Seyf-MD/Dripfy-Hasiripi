@@ -78,7 +78,9 @@ const FinancialsTab: React.FC<FinancialsTabProps> = ({ data, canEdit, onOpenModa
 
     const getSortIcon = (key: SortKey) => {
         if (!sortConfig || sortConfig.key !== key) return <ArrowDown size={14} className="opacity-0 group-hover:opacity-50 transition-opacity" />;
-        return sortConfig.direction === 'ascending' ? <ArrowUp size={14} className="text-[#32ff84]"/> : <ArrowDown size={14} className="text-[#32ff84]"/>;
+        return sortConfig.direction === 'ascending'
+            ? <ArrowUp size={14} className="text-[var(--drip-primary)]"/>
+            : <ArrowDown size={14} className="text-[var(--drip-primary)]"/>;
     };
 
     const headers: { key: SortKey; label: string }[] = [
@@ -108,13 +110,13 @@ const FinancialsTab: React.FC<FinancialsTabProps> = ({ data, canEdit, onOpenModa
         setEditingCell(null);
     };
 
-    const inputClasses = "w-full bg-slate-100 dark:bg-neutral-700 border-transparent focus:bg-slate-200 dark:focus:bg-neutral-600 rounded p-1.5 text-sm focus:ring-2 focus:ring-[#32ff84] focus:outline-none text-black dark:text-white";
+    const inputClasses = "w-full bg-slate-100 dark:bg-neutral-700 border-transparent focus:bg-slate-200 dark:focus:bg-neutral-600 rounded p-1.5 text-sm focus:ring-2 focus:ring-[var(--drip-primary)] focus:outline-none focus:border-[var(--drip-primary)] text-[var(--drip-text)] dark:text-white";
 
     return (
         <div className="animate-fade-in">
              <div className="flex justify-end mb-4">
                 {canEdit && (
-                    <button onClick={handleAddNew} className="flex items-center gap-2 px-4 py-2 bg-[#32ff84] text-black text-sm font-semibold rounded-lg hover:bg-green-400 transition-colors">
+                    <button onClick={handleAddNew} className="flex items-center gap-2 px-4 py-2 bg-[var(--drip-primary)] text-white text-sm font-semibold rounded-lg hover:bg-[var(--drip-primary-dark)] transition-colors">
                         <PlusCircle size={18}/> {t('financials.newRecord')}
                     </button>
                 )}
@@ -125,7 +127,7 @@ const FinancialsTab: React.FC<FinancialsTabProps> = ({ data, canEdit, onOpenModa
                         <tr>
                             {headers.map(header => (
                                 <th key={header.key} scope="col" className="py-3.5 px-3 text-left text-sm font-semibold text-neutral-800 dark:text-white first:pl-4 first:sm:pl-6">
-                                    <button onClick={() => requestSort(header.key)} className="flex items-center gap-2 group text-neutral-800 dark:text-white hover:text-[#32ff84] transition-colors">
+                                    <button onClick={() => requestSort(header.key)} className="flex items-center gap-2 group text-neutral-800 dark:text-white hover:text-[var(--drip-primary)] transition-colors">
                                         {header.label} {getSortIcon(header.key)}
                                     </button>
                                 </th>
@@ -135,9 +137,9 @@ const FinancialsTab: React.FC<FinancialsTabProps> = ({ data, canEdit, onOpenModa
                     <tbody className="divide-y divide-slate-200 dark:divide-neutral-800 bg-white dark:bg-neutral-900/50">
                         {filteredAndSortedData.map((record) => (
                             <tr key={record.id} className="hover:bg-slate-50 dark:hover:bg-neutral-800/70 group">
-                                <td onClick={() => onOpenModal(record, 'financials')} className="w-1/3 py-4 pl-4 pr-3 text-sm font-medium text-black dark:text-white sm:pl-6 cursor-pointer">{record.description}</td>
+                                <td onClick={() => onOpenModal(record, 'financials')} className="w-1/3 py-4 pl-4 pr-3 text-sm font-medium text-[var(--drip-text)] dark:text-white sm:pl-6 cursor-pointer">{record.description}</td>
                                 
-                                <td onClick={() => handleCellClick(record.id, 'amount')} className="whitespace-nowrap px-3 py-2 text-sm text-neutral-500 dark:text-neutral-400 cursor-pointer">
+                                <td onClick={() => handleCellClick(record.id, 'amount')} className="whitespace-nowrap px-3 py-2 text-sm text-[var(--drip-muted)] dark:text-neutral-400 cursor-pointer">
                                     {editingCell?.recordId === record.id && editingCell?.field === 'amount' ? (
                                         <input
                                             type="number"
@@ -148,7 +150,7 @@ const FinancialsTab: React.FC<FinancialsTabProps> = ({ data, canEdit, onOpenModa
                                             className={inputClasses}
                                         />
                                     ) : ( 
-                                        <span className={record.amount < 0 ? 'text-red-500 dark:text-red-400' : 'text-green-600 dark:text-green-400'}>
+                                        <span className={record.amount < 0 ? 'text-red-500 dark:text-red-400' : 'text-[var(--drip-primary)] dark:text-[var(--drip-primary)]'}>
                                             {new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(record.amount)}
                                         </span>
                                     )}
@@ -172,7 +174,7 @@ const FinancialsTab: React.FC<FinancialsTabProps> = ({ data, canEdit, onOpenModa
                                     )}
                                 </td>
 
-                                <td onClick={() => handleCellClick(record.id, 'dueDate')} className="whitespace-nowrap px-3 py-2 text-sm text-neutral-500 dark:text-neutral-400 cursor-pointer">
+                                <td onClick={() => handleCellClick(record.id, 'dueDate')} className="whitespace-nowrap px-3 py-2 text-sm text-[var(--drip-muted)] dark:text-neutral-400 cursor-pointer">
                                     {editingCell?.recordId === record.id && editingCell?.field === 'dueDate' ? (
                                         <input
                                             type="date"
@@ -185,7 +187,7 @@ const FinancialsTab: React.FC<FinancialsTabProps> = ({ data, canEdit, onOpenModa
                                     ) : ( new Date(record.dueDate).toLocaleDateString() )}
                                 </td>
 
-                                <td className="whitespace-nowrap px-3 py-2 text-sm text-neutral-500 dark:text-neutral-400">
+                                <td className="whitespace-nowrap px-3 py-2 text-sm text-[var(--drip-muted)] dark:text-neutral-400">
                                     {record.type === 'Incoming' ? 
                                         <span className="flex items-center gap-1.5 text-green-600 dark:text-green-400"><TrendingUp size={16} /> {t('financials.incoming')}</span> : 
                                         <span className="flex items-center gap-1.5 text-red-500 dark:text-red-400"><TrendingDown size={16} /> {t('financials.outgoing')}</span>

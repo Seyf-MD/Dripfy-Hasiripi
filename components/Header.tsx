@@ -2,24 +2,24 @@ import * as React from 'react';
 import LanguageSwitcher from './LanguageSwitcher';
 import ProfileDropdown from './ProfileDropdown';
 import BrandLogo from './BrandLogo';
-import { UserRole } from '../types';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { Sun, Moon } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 type SettingsTab = 'profile' | 'settings' | 'privacy';
 
 interface HeaderProps {
-    userRole: UserRole | null;
     onLogout: () => void;
     onOpenSettings: (tab: SettingsTab) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ userRole, onLogout, onOpenSettings }) => {
+const Header: React.FC<HeaderProps> = ({ onLogout, onOpenSettings }) => {
     const { t } = useLanguage();
     const { theme, setTheme } = useTheme();
-    const userName = userRole === 'admin' ? 'Admin User' : 'Demo User';
-    const userEmail = userRole === 'admin' ? 'admin@dripfy.de' : 'demo@dripfy.com';
+    const { user, isAdmin } = useAuth();
+    const userName = user?.name || (isAdmin ? 'Admin' : 'User');
+    const userEmail = user?.email || 'noreply@example.com';
 
     const handleThemeToggle = () => {
         setTheme(theme === 'dark' ? 'light' : 'dark');

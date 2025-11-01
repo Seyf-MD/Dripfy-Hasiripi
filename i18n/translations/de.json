@@ -6,7 +6,11 @@
         "emailPlaceholder": "E-Mail-Adresse",
         "passwordPlaceholder": "Passwort",
         "signInButton": "Anmelden",
-        "forgotPassword": "Passwort vergessen?"
+        "forgotPassword": "Passwort vergessen?",
+        "errors": {
+            "invalidCredentials": "E-Mail oder Passwort ist falsch.",
+            "generic": "Anmeldung fehlgeschlagen. Bitte versuche es erneut."
+        }
     },
     "signup": {
         "prompt": "Kein Konto? Registrieren",

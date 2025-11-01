@@ -91,12 +91,19 @@ export async function finalizeSignup(email: string, code: string): Promise<Signu
 }
 
 /** Dev ortamında admin paneli için mevcut talepleri listeler. */
-export async function fetchSignupRequests(): Promise<SignupFinalizePayload[]> {
+export async function fetchSignupRequests(token?: string): Promise<SignupFinalizePayload[]> {
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+  };
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
   const response = await fetch(REQUESTS_ENDPOINT, {
     method: 'GET',
-    headers: {
-      'Accept': 'application/json',
-    },
+    headers,
+    credentials: 'include',
   });
 
   const data = await handleResponse(response);
@@ -104,12 +111,19 @@ export async function fetchSignupRequests(): Promise<SignupFinalizePayload[]> {
 }
 
 /** Dev ortamında onay/red sonrası hafızadaki talebi temizler. */
-export async function resolveSignupRequest(id: string): Promise<void> {
+export async function resolveSignupRequest(id: string, token?: string): Promise<void> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
   const response = await fetch(REQUESTS_ENDPOINT, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers,
+    credentials: 'include',
     body: JSON.stringify({ id }),
   });
 

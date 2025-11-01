@@ -2,16 +2,17 @@ import * as React from 'react';
 import { Calendar, Euro, ShieldAlert, Users, ListChecks, Shield } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 
 interface TabNavigationProps {
     activeTab: string;
     setActiveTab: (tab: string) => void;
-    userRole: 'admin' | 'user' | null;
 }
 
-const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab, userRole }) => {
+const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab }) => {
     const { t } = useLanguage();
     const { theme } = useTheme();
+    const { isAdmin } = useAuth();
     
     const allTabs = [
         { name: 'Calendar', icon: <Calendar size={18} />, label: t('tabs.calendar') },
@@ -22,7 +23,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab, 
         { name: 'Admin Panel', icon: <Shield size={18} />, label: t('tabs.adminPanel') },
     ];
 
-    const visibleTabs = userRole === 'admin' ? allTabs : allTabs.filter(tab => tab.name !== 'Admin Panel');
+    const visibleTabs = isAdmin ? allTabs : allTabs.filter(tab => tab.name !== 'Admin Panel');
     
     return (
         <div className="mt-6 animate-slide-in-up" style={{ animationDelay: '600ms' }}>

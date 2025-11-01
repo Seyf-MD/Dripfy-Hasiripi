@@ -9,6 +9,7 @@
     "dev:full": "concurrently \"npm run server\" \"npm run dev\"",
     "build": "vite build",
     "preview": "vite preview",
+    "test": "node --loader ts-node/esm --test server/__tests__/signupCodes.test.ts",
     "build:deploy": "vite build && echo '✅ Build completed! Upload dist/ folder to hosting.com'"
   },
   "dependencies": {

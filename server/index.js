@@ -6,6 +6,12 @@ import nodemailer from 'nodemailer';
 import rateLimit from 'express-rate-limit';
 import authRouter from './auth/index.js';
 import { authenticate } from './auth/middleware.js';
+import {
+  SIGNUP_CODE_TTL,
+  createSignupCodeRecord,
+  deleteSignupCodeRecord,
+  verifySignupCodeAttempt,
+} from './signupCodesStore.js';
 
 /**
  * Geliştirme sırasında çalışan mini API:
@@ -80,8 +86,6 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const SIGNUP_CODE_TTL = Number(process.env.SIGNUP_CODE_TTL || 10 * 60 * 1000);
-const signupCodeStore = new Map();
 // Hafıza içinde tutulan pending talepler (yalnızca dev modunda gereklidir).
 const signupRequestsStore = [];
 
@@ -208,18 +212,26 @@ app.post('/api/signup/send-code', signupRateLimiter, async (req, res) => {
   data.name = data.name || `${data.firstName} ${data.lastName}`.trim();
 
   const code = generateVerificationCode();
+  const ttlMinutes = Math.ceil(SIGNUP_CODE_TTL / (60 * 1000));
+  const requestId = generateRequestId();
   const subject = 'Dripfy doğrulama kodunuz';
-  const text = `Merhaba ${data.firstName || data.name},\n\nDripfy hesabınızı doğrulamak için bu kodu kullanın: ${code}\nKod 10 dakika boyunca geçerlidir.`;
+  const text = `Merhaba ${data.firstName || data.name},\n\nDripfy hesabınızı doğrulamak için bu kodu kullanın: ${code}\nKod ${ttlMinutes} dakika boyunca geçerlidir.`;
   const html = `<p>Merhaba <strong>${data.firstName || data.name}</strong>,</p>
     <p>Dripfy hesabınızı doğrulamak için aşağıdaki kodu kullanın:</p>
     <p style="font-size:24px;font-weight:bold;letter-spacing:4px">${code}</p>
-    <p>Bu kod 10 dakika boyunca geçerlidir.</p>`;
+    <p>Bu kod ${ttlMinutes} dakika boyunca geçerlidir.</p>`;
 
   try {
     await sendMailWithContent({ to: data.email, subject, text, html });
-    const expires = Date.now() + SIGNUP_CODE_TTL;
-    signupCodeStore.set(data.email.toLowerCase(), { code, expires, payload: data });
-    console.log(`[signup-mailer] Verification code ${code} sent to ${data.email}`);
+    createSignupCodeRecord({ email: data.email, code, payload: data });
+    console.log(`[signup-mailer] requestId=${requestId} email=${data.email.toLowerCase()}`);
+    if (process.env.DEBUG_SIGNUP_CODES === 'true') {
+      console.debug('[signup-mailer] debug verification payload', {
+        requestId,
+        email: data.email,
+        code,
+      });
+    }
     return res.json({ ok: true });
   } catch (mailError) {
     console.error('[signup-mailer] Kod gönderimi başarısız:', mailError);
@@ -239,19 +251,29 @@ app.post('/api/signup', signupRateLimiter, async (req, res) => {
     return res.status(400).json({ ok: false, error: 'Doğrulama kodu eksik veya geçersiz' });
   }
 
-  const storeKey = email.toLowerCase();
-  const entry = signupCodeStore.get(storeKey);
+  const result = verifySignupCodeAttempt({ email, code });
 
-  if (!entry || entry.expires < Date.now()) {
-    signupCodeStore.delete(storeKey);
+  if (result.status === 'not-found' || result.status === 'expired') {
+    deleteSignupCodeRecord(email);
     return res.status(400).json({ ok: false, error: 'Doğrulama kodu bulunamadı veya süresi doldu' });
   }
 
-  if (entry.code !== code) {
+  if (result.status === 'locked') {
+    return res.status(400).json({
+      ok: false,
+      error: 'Çok fazla yanlış deneme. Lütfen yeni bir doğrulama kodu talep edin.',
+    });
+  }
+
+  if (result.status === 'mismatch') {
     return res.status(400).json({ ok: false, error: 'Geçersiz doğrulama kodu' });
   }
 
-  const payload = entry.payload;
+  if (result.status !== 'valid') {
+    return res.status(400).json({ ok: false, error: 'Doğrulama kodu bulunamadı veya süresi doldu' });
+  }
+
+  const payload = result.payload;
   payload.name = payload.name || `${payload.firstName} ${payload.lastName}`.trim();
 
   const infoLines = buildInfoLines(payload);
@@ -294,7 +316,7 @@ app.post('/api/signup', signupRateLimiter, async (req, res) => {
       });
     }
 
-    signupCodeStore.delete(storeKey);
+    deleteSignupCodeRecord(email);
 
     const createdAt = Date.now();
     const request = {

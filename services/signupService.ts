@@ -47,12 +47,26 @@ async function handleResponse(response: Response): Promise<any> {
     data = null;
   }
 
+  if (response.status === 401 || response.status === 403) {
+    const errorMessage =
+      (data && typeof data.error === 'string' && data.error) ||
+      'Yetkisiz erişim. Lütfen oturum açtığınızdan emin olun.';
+    throw new SignupError(errorMessage, response.status);
+  }
+
   if (!response.ok || (data && data.ok === false)) {
     const errorMessage = (data && typeof data.error === 'string' && data.error) || 'Signup failed';
     throw new SignupError(errorMessage, response.status);
   }
 
   return data;
+}
+
+function ensureAdminToken(token?: string): string {
+  if (!token) {
+    throw new SignupError('Yönetici oturumu gerekli. Lütfen tekrar giriş yapın.', 401);
+  }
+  return token;
 }
 
 /**
@@ -92,13 +106,11 @@ export async function finalizeSignup(email: string, code: string): Promise<Signu
 
 /** Dev ortamında admin paneli için mevcut talepleri listeler. */
 export async function fetchSignupRequests(token?: string): Promise<SignupFinalizePayload[]> {
+  const authToken = ensureAdminToken(token);
   const headers: Record<string, string> = {
     Accept: 'application/json',
+    Authorization: `Bearer ${authToken}`,
   };
-
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
 
   const response = await fetch(REQUESTS_ENDPOINT, {
     method: 'GET',
@@ -112,13 +124,11 @@ export async function fetchSignupRequests(token?: string): Promise<SignupFinaliz
 
 /** Dev ortamında onay/red sonrası hafızadaki talebi temizler. */
 export async function resolveSignupRequest(id: string, token?: string): Promise<void> {
+  const authToken = ensureAdminToken(token);
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
+    Authorization: `Bearer ${authToken}`,
   };
-
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
 
   const response = await fetch(REQUESTS_ENDPOINT, {
     method: 'POST',

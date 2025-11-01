@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import nodemailer from 'nodemailer';
+import rateLimit from 'express-rate-limit';
 import authRouter from './auth/index.js';
 import { authenticate } from './auth/middleware.js';
 
@@ -26,7 +27,38 @@ app.use(cookieParser());
 
 app.use('/api/auth', authRouter);
 
-const requireAdmin = authenticate({ requiredRole: 'admin' });
+const adminOnlyMiddleware = authenticate({ requiredRole: 'admin' });
+
+const SIGNUP_RATE_LIMIT_WINDOW_MS = 60 * 1000;
+const SIGNUP_RATE_LIMIT_MAX = Math.max(
+  1,
+  Number(process.env.SIGNUP_RATE_LIMIT_PER_MINUTE || 10),
+);
+
+const buildRateLimitResponse = (retryAfterSeconds, reference) => ({
+  ok: false,
+  error: {
+    code: 'RATE_LIMIT_EXCEEDED',
+    message: 'Çok fazla deneme yaptınız. Lütfen biraz sonra tekrar deneyin.',
+    retryAfterSeconds,
+    reference,
+  },
+});
+
+const signupRateLimiter = rateLimit({
+  windowMs: SIGNUP_RATE_LIMIT_WINDOW_MS,
+  max: SIGNUP_RATE_LIMIT_MAX,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  keyGenerator: (req) => req.ip,
+  handler: (req, res, _next, options) => {
+    const retryAfterSeconds = Math.ceil(options.windowMs / 1000);
+    const reference = `rl-${Date.now().toString(36)}`;
+    res.set('Retry-After', retryAfterSeconds.toString());
+    console.warn(`[rate-limit] Too many requests for ${req.ip} on ${req.originalUrl} (ref=${reference})`);
+    res.status(429).json(buildRateLimitResponse(retryAfterSeconds, reference));
+  },
+});
 
 const requiredEnv = ['SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS'];
 const missingEnv = requiredEnv.filter(key => !process.env[key]);
@@ -167,7 +199,7 @@ function generateRequestId() {
   return 'sr' + Math.random().toString(16).slice(2) + Date.now().toString(16);
 }
 
-app.post('/api/signup/send-code', async (req, res) => {
+app.post('/api/signup/send-code', signupRateLimiter, async (req, res) => {
   const validation = validateSignupPayload(req.body) || {};
   if (validation.error) {
     return res.status(400).json({ ok: false, error: validation.error });
@@ -195,7 +227,7 @@ app.post('/api/signup/send-code', async (req, res) => {
   }
 });
 
-app.post('/api/signup', async (req, res) => {
+app.post('/api/signup', signupRateLimiter, async (req, res) => {
   const email = typeof req.body.email === 'string' ? req.body.email.trim() : '';
   const code = typeof req.body.code === 'string' ? req.body.code.trim() : '';
 
@@ -291,14 +323,16 @@ app.post('/api/signup', async (req, res) => {
   }
 });
 
-app.get('/api/signup/requests', requireAdmin, (req, res) => {
+app.use('/api/signup', adminOnlyMiddleware);
+
+app.get('/api/signup/requests', (req, res) => {
   const sorted = [...signupRequestsStore].sort(
     (a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime(),
   );
   res.json({ ok: true, requests: sorted });
 });
 
-app.post('/api/signup/requests', requireAdmin, (req, res) => {
+app.post('/api/signup/requests', (req, res) => {
   const id = typeof req.body.id === 'string' ? req.body.id : '';
   if (!id) {
     return res.status(400).json({ ok: false, error: 'Kayıt talebi bulunamadı' });

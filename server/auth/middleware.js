@@ -4,7 +4,7 @@ export function authenticate({ requiredRole } = {}) {
   return (req, res, next) => {
     const token = extractTokenFromRequest(req);
     if (!token) {
-      return res.status(401).json({ ok: false, error: 'Authentication required' });
+      return res.status(403).json({ ok: false, error: 'Authentication required' });
     }
 
     try {
@@ -23,7 +23,7 @@ export function authenticate({ requiredRole } = {}) {
       return next();
     } catch (error) {
       console.error('[auth] Token verification failed:', error);
-      return res.status(401).json({ ok: false, error: 'Invalid or expired token' });
+      return res.status(403).json({ ok: false, error: 'Invalid or expired token' });
     }
   };
 }

@@ -1,14 +1,14 @@
 import * as React from 'react';
 import { X, UserCircle, Settings as SettingsIcon, Shield, Key } from 'lucide-react';
 import { useLanguage, Language } from '../i18n/LanguageContext';
-import { UserRole, NotificationSettings } from '../types';
+import { NotificationSettings } from '../types';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 
 type SettingsTab = 'profile' | 'settings' | 'privacy';
 
 interface SettingsModalProps {
     isOpen: boolean;
-    userRole: UserRole | null;
     onClose: () => void;
     activeTab: SettingsTab;
     setActiveTab: (tab: SettingsTab) => void;
@@ -40,9 +40,10 @@ const FormField: React.FC<{ label: string; children: React.ReactNode }> = ({ lab
 );
 
 
-const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, userRole, onClose, activeTab, setActiveTab, notificationSettings, onSaveSettings, onChangePasswordClick, onViewAuditLog, onExportData, onDeleteAccount }) => {
+const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, activeTab, setActiveTab, notificationSettings, onSaveSettings, onChangePasswordClick, onViewAuditLog, onExportData, onDeleteAccount }) => {
     const { t, language, setLanguage } = useLanguage();
     const { theme, setTheme } = useTheme();
+    const { user, isAdmin } = useAuth();
     
     const [localNotifications, setLocalNotifications] = React.useState(notificationSettings);
     const [localTheme, setLocalTheme] = React.useState(theme);
@@ -104,10 +105,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, userRole, onClose
                         </div>
                         <div className="space-y-4">
                             <FormField label={t('settings.profile.name')}>
-                                <input type="text" defaultValue="Demo User" className={inputClass} />
+                                <input type="text" defaultValue={user?.name || ''} className={inputClass} readOnly />
                             </FormField>
                             <FormField label={t('settings.profile.email')}>
-                                <input type="email" defaultValue="demo@dripfy.com" className={inputClass} />
+                                <input type="email" defaultValue={user?.email || ''} className={inputClass} readOnly />
                             </FormField>
                             <FormField label={t('settings.profile.password')}>
                                 <button onClick={onChangePasswordClick} className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-slate-100 dark:bg-neutral-700 text-[var(--drip-text)] dark:text-white text-sm font-semibold rounded-lg hover:bg-slate-200 dark:hover:bg-neutral-600 transition-colors">
@@ -149,7 +150,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, userRole, onClose
                             <p className="text-sm text-[var(--drip-muted)] dark:text-neutral-400">{t('settings.privacy.subtitle')}</p>
                         </div>
                         <div className="space-y-3">
-                           {userRole === 'admin' && (
+                           {isAdmin && (
                                 <button onClick={onViewAuditLog} className="w-full text-left p-3 bg-slate-100 dark:bg-neutral-700/50 hover:bg-slate-200 dark:hover:bg-neutral-700 rounded-md transition-colors">{t('settings.privacy.auditLog')}</button>
                            )}
                            <button onClick={onExportData} className="w-full text-left p-3 bg-slate-100 dark:bg-neutral-700/50 hover:bg-slate-200 dark:hover:bg-neutral-700 rounded-md transition-colors">{t('settings.privacy.exportData')}</button>

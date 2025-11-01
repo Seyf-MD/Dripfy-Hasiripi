@@ -6,7 +6,11 @@
         "emailPlaceholder": "Email address",
         "passwordPlaceholder": "Password",
         "signInButton": "Sign In",
-        "forgotPassword": "Forgot password?"
+        "forgotPassword": "Forgot password?",
+        "errors": {
+            "invalidCredentials": "Email or password is incorrect.",
+            "generic": "We couldn't sign you in. Please try again."
+        }
     },
     "signup": {
         "prompt": "Don't have an account? Sign up",

@@ -1,0 +1,10 @@
+[
+  {
+    "id": "admin-1",
+    "email": "admin@dripfy.de",
+    "name": "Admin User",
+    "role": "admin",
+    "lastLogin": "2025-01-01T00:00:00.000Z",
+    "passwordHash": "$2b$10$aiF.e7qzax.4QtWYewOTxemUR35BpAb4Twdy8jZAYHVZXrwA.SL/K"
+  }
+]

@@ -1,7 +1,10 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import nodemailer from 'nodemailer';
+import authRouter from './auth/index.js';
+import { authenticate } from './auth/middleware.js';
 
 /**
  * Geliştirme sırasında çalışan mini API:
@@ -16,14 +19,23 @@ const port = Number(process.env.API_PORT || 4000);
 
 app.use(cors({
   origin: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',').map(v => v.trim()) : true,
-  credentials: false,
+  credentials: true,
 }));
 app.use(express.json());
+app.use(cookieParser());
+
+app.use('/api/auth', authRouter);
+
+const requireAdmin = authenticate({ requiredRole: 'admin' });
 
 const requiredEnv = ['SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS'];
 const missingEnv = requiredEnv.filter(key => !process.env[key]);
 if (missingEnv.length > 0) {
   console.warn(`[signup-mailer] Missing required environment variables: ${missingEnv.join(', ')}`);
+}
+
+if (!process.env.JWT_SECRET) {
+  console.warn('[auth] JWT_SECRET environment variable is not set. Authentication will fail.');
 }
 
 const transporter = nodemailer.createTransport({
@@ -279,14 +291,14 @@ app.post('/api/signup', async (req, res) => {
   }
 });
 
-app.get('/api/signup/requests', (req, res) => {
+app.get('/api/signup/requests', requireAdmin, (req, res) => {
   const sorted = [...signupRequestsStore].sort(
     (a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime(),
   );
   res.json({ ok: true, requests: sorted });
 });
 
-app.post('/api/signup/requests', (req, res) => {
+app.post('/api/signup/requests', requireAdmin, (req, res) => {
   const id = typeof req.body.id === 'string' ? req.body.id : '';
   if (!id) {
     return res.status(400).json({ ok: false, error: 'Kayıt talebi bulunamadı' });

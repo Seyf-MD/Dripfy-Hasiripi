@@ -6,9 +6,9 @@ import { LegalPageKey } from '../data/legalContent';
 import { requestSignupCode, SignupFinalizePayload } from '../services/signupService';
 import { useTheme } from '../context/ThemeContext';
 import { Sun, Moon } from 'lucide-react';
-type UserRole = 'admin' | 'user';
+import { useAuth } from '../context/AuthContext';
+
 interface LoginPageProps {
-    onLogin: (role: UserRole) => void;
     onSignupRequest: (payload: { email: string; code: string }) => Promise<SignupFinalizePayload>;
     onOpenLegal: (page: LegalPageKey) => void;
 }
@@ -49,9 +49,10 @@ const phoneCountries = [
  * Giriş ve kayıt akışını yönetir. Kayıt formu önce kod ister (`requestSignupCode`),
  * kullanıcı kodu girdikten sonra `onSignupRequest` ile üst komponenti bilgilendirir.
  */
-const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onSignupRequest, onOpenLegal }) => {
+const LoginPage: React.FC<LoginPageProps> = ({ onSignupRequest, onOpenLegal }) => {
     const { t } = useLanguage();
     const { theme, setTheme } = useTheme();
+    const { login } = useAuth();
     const [view, setView] = React.useState<'login' | 'signup' | 'verify'>('login');
     const handleThemeToggle = () => {
         setTheme(theme === 'dark' ? 'light' : 'dark');
@@ -60,6 +61,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onSignupRequest, onOpenL
     // Login state
     const [loginEmail, setLoginEmail] = React.useState('');
     const [loginPassword, setLoginPassword] = React.useState('');
+    const [isLoggingIn, setIsLoggingIn] = React.useState(false);
+    const [loginError, setLoginError] = React.useState<string | null>(null);
 
     // Signup state
     const [signupData, setSignupData] = React.useState<SignupFormData>({
@@ -121,12 +124,22 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onSignupRequest, onOpenL
         return errors;
     }, [sanitizePhone, t]);
 
-    const handleLoginSubmit = (e: React.FormEvent) => {
+    const handleLoginSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (loginEmail === 'admin@dripfy.de' && loginPassword === 'password123') {
-            onLogin('admin');
-        } else {
-            onLogin('user');
+        setLoginError(null);
+        setIsLoggingIn(true);
+        try {
+            await login(loginEmail.trim(), loginPassword);
+        } catch (error) {
+            console.error('Login failed:', error);
+            const enrichedError = error as Error & { code?: string };
+            if (enrichedError.code === 'INVALID_CREDENTIALS') {
+                setLoginError(t('login.errors.invalidCredentials'));
+            } else {
+                setLoginError(t('login.errors.generic'));
+            }
+        } finally {
+            setIsLoggingIn(false);
         }
     };
 
@@ -271,8 +284,15 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onSignupRequest, onOpenL
                                 <input id="password" name="password" type="password" required className={`${inputClass} rounded-b-md`} placeholder={t('login.passwordPlaceholder')} value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} />
                             </div>
                         </div>
-                        <button type="submit" className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[var(--drip-primary)] hover:bg-[var(--drip-primary-dark)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--drip-primary)] transition-colors">
-                            {t('login.signInButton')}
+                        {loginError && (
+                            <p className="text-sm text-red-500">{loginError}</p>
+                        )}
+                        <button
+                            type="submit"
+                            disabled={isLoggingIn}
+                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[var(--drip-primary)] hover:bg-[var(--drip-primary-dark)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--drip-primary)] transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+                        >
+                            {isLoggingIn ? `${t('login.signInButton')}...` : t('login.signInButton')}
                         </button>
                     </form>
                     <div className="text-sm text-center">

@@ -10,7 +10,7 @@ import {
 describe('signup verification codes', () => {
   const email = 'user@example.com';
   const code = '123456';
-  let store: ReturnType<typeof createSignupCodeStore>;
+  let store;
 
   beforeEach(() => {
     store = createSignupCodeStore();

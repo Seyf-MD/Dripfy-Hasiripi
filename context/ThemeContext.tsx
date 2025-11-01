@@ -7,23 +7,35 @@ interface ThemeContextType {
 }
 
 const ThemeContext = React.createContext<ThemeContextType | undefined>(undefined);
+const DEFAULT_THEME: Theme = 'light';
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setThemeState] = React.useState<Theme>('light');
+  const [theme, setThemeState] = React.useState<Theme>(DEFAULT_THEME);
 
   React.useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as Theme | null;
+    let savedTheme: Theme | null = null;
+    try {
+      savedTheme = localStorage.getItem('theme') as Theme | null;
+    } catch (error) {
+      console.warn('Unable to read theme preference from storage. Falling back to default theme.', error);
+    }
+
     if (savedTheme) {
       setThemeState(savedTheme);
       return;
     }
+
     const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    setThemeState(prefersDark ? 'dark' : 'light');
+    setThemeState(prefersDark ? 'dark' : DEFAULT_THEME);
   }, []);
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
-    localStorage.setItem('theme', newTheme);
+    try {
+      localStorage.setItem('theme', newTheme);
+    } catch (error) {
+      console.warn('Unable to persist theme preference. Continuing with in-memory value.', error);
+    }
   };
 
   React.useEffect(() => {

@@ -30,6 +30,14 @@ export default defineConfig(({ mode }) => {
         alias: {
           '@': path.resolve(__dirname, '.'),
         }
+      },
+      test: {
+        globals: true,
+        environment: 'jsdom',
+        setupFiles: './vitest.setup.ts',
+        css: true,
+        include: ['components/__tests__/**/*.test.{ts,tsx}'],
+        exclude: ['scripts/**/*', 'server/**/*']
       }
     };
 });

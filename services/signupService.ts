@@ -29,11 +29,62 @@ const SEND_CODE_ENDPOINT = API_BASE ? `${API_BASE}/api/signup/send-code` : '/api
 const FINALIZE_ENDPOINT = API_BASE ? `${API_BASE}/api/signup` : '/api/signup/index.php';
 const REQUESTS_ENDPOINT = API_BASE ? `${API_BASE}/api/signup/requests` : '/api/signup/requests.php';
 
+export type SignupErrorKey =
+  | 'signup.errors.badRequest'
+  | 'signup.errors.unauthorized'
+  | 'signup.errors.forbidden'
+  | 'signup.errors.notFound'
+  | 'signup.errors.conflict'
+  | 'signup.errors.validation'
+  | 'signup.errors.rateLimited'
+  | 'signup.errors.server'
+  | 'signup.errors.generic'
+  | 'signup.errors.network'
+  | 'signup.errors.sessionRequired'
+  | 'signup.errors.unexpectedResponse';
+
 export class SignupError extends Error {
-  constructor(message: string, public status?: number) {
-    super(message);
+  public status?: number;
+  public translationKey: SignupErrorKey;
+  public details?: Record<string, unknown>;
+
+  constructor(
+    translationKey: SignupErrorKey,
+    options: { status?: number; message?: string; details?: Record<string, unknown> } = {}
+  ) {
+    super(options.message ?? translationKey);
     this.name = 'SignupError';
+    this.translationKey = translationKey;
+    this.status = options.status;
+    this.details = options.details;
   }
+}
+
+const STATUS_ERROR_MAP: Record<number, SignupErrorKey> = {
+  400: 'signup.errors.badRequest',
+  401: 'signup.errors.unauthorized',
+  403: 'signup.errors.forbidden',
+  404: 'signup.errors.notFound',
+  409: 'signup.errors.conflict',
+  422: 'signup.errors.validation',
+  429: 'signup.errors.rateLimited',
+  500: 'signup.errors.server',
+  502: 'signup.errors.server',
+  503: 'signup.errors.server',
+  504: 'signup.errors.server',
+};
+
+function resolveErrorKey(status?: number, data?: any): SignupErrorKey {
+  if (data && typeof data.errorKey === 'string') {
+    return data.errorKey as SignupErrorKey;
+  }
+  if (typeof status === 'number' && STATUS_ERROR_MAP[status]) {
+    return STATUS_ERROR_MAP[status];
+  }
+  if (typeof status === 'number' && status >= 500) {
+    return 'signup.errors.server';
+  }
+  return 'signup.errors.generic';
 }
 
 /**
@@ -47,16 +98,14 @@ async function handleResponse(response: Response): Promise<any> {
     data = null;
   }
 
-  if (response.status === 401 || response.status === 403) {
-    const errorMessage =
-      (data && typeof data.error === 'string' && data.error) ||
-      'Yetkisiz erişim. Lütfen oturum açtığınızdan emin olun.';
-    throw new SignupError(errorMessage, response.status);
-  }
-
   if (!response.ok || (data && data.ok === false)) {
-    const errorMessage = (data && typeof data.error === 'string' && data.error) || 'Signup failed';
-    throw new SignupError(errorMessage, response.status);
+    const translationKey = resolveErrorKey(response.status, data);
+    const message =
+      (data && typeof data.error === 'string' && data.error) ||
+      (data && typeof data.message === 'string' && data.message) ||
+      translationKey;
+    const details = data && typeof data.details === 'object' ? data.details : undefined;
+    throw new SignupError(translationKey, { status: response.status, message, details });
   }
 
   return data;
@@ -64,7 +113,7 @@ async function handleResponse(response: Response): Promise<any> {
 
 function ensureAdminToken(token?: string): string {
   if (!token) {
-    throw new SignupError('Yönetici oturumu gerekli. Lütfen tekrar giriş yapın.', 401);
+    throw new SignupError('signup.errors.sessionRequired', { status: 401 });
   }
   return token;
 }
@@ -73,35 +122,51 @@ function ensureAdminToken(token?: string): string {
  * Kullanıcının girdiği form bilgileriyle doğrulama kodu ister.
  */
 export async function requestSignupCode(payload: SignupCodePayload): Promise<void> {
-  const response = await fetch(SEND_CODE_ENDPOINT, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ ...payload, mode: 'send-code' }),
-  });
+  try {
+    const response = await fetch(SEND_CODE_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ ...payload, mode: 'send-code' }),
+    });
 
-  await handleResponse(response);
+    await handleResponse(response);
+  } catch (error) {
+    if (error instanceof SignupError) {
+      throw error;
+    }
+    const message = error instanceof Error ? error.message : undefined;
+    throw new SignupError('signup.errors.network', { message });
+  }
 }
 
 /**
  * Kullanıcının kodunu doğrular ve backend'in döndürdüğü kayıt talebini geri verir.
  */
 export async function finalizeSignup(email: string, code: string): Promise<SignupFinalizePayload> {
-  const response = await fetch(FINALIZE_ENDPOINT, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email, code, mode: 'finalize' }),
-  });
+  try {
+    const response = await fetch(FINALIZE_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, code, mode: 'finalize' }),
+    });
 
-  const data = await handleResponse(response);
-  if (!data || !data.payload) {
-    throw new SignupError('Yanıt işlenemedi', response.status);
+    const data = await handleResponse(response);
+    if (!data || !data.payload) {
+      throw new SignupError('signup.errors.unexpectedResponse', { status: response.status });
+    }
+
+    return data.payload as SignupFinalizePayload;
+  } catch (error) {
+    if (error instanceof SignupError) {
+      throw error;
+    }
+    const message = error instanceof Error ? error.message : undefined;
+    throw new SignupError('signup.errors.network', { message });
   }
-
-  return data.payload as SignupFinalizePayload;
 }
 
 /** Dev ortamında admin paneli için mevcut talepleri listeler. */
@@ -112,14 +177,22 @@ export async function fetchSignupRequests(token?: string): Promise<SignupFinaliz
     Authorization: `Bearer ${authToken}`,
   };
 
-  const response = await fetch(REQUESTS_ENDPOINT, {
-    method: 'GET',
-    headers,
-    credentials: 'include',
-  });
+  try {
+    const response = await fetch(REQUESTS_ENDPOINT, {
+      method: 'GET',
+      headers,
+      credentials: 'include',
+    });
 
-  const data = await handleResponse(response);
-  return Array.isArray(data?.requests) ? (data.requests as SignupFinalizePayload[]) : [];
+    const data = await handleResponse(response);
+    return Array.isArray(data?.requests) ? (data.requests as SignupFinalizePayload[]) : [];
+  } catch (error) {
+    if (error instanceof SignupError) {
+      throw error;
+    }
+    const message = error instanceof Error ? error.message : undefined;
+    throw new SignupError('signup.errors.network', { message });
+  }
 }
 
 /** Dev ortamında onay/red sonrası hafızadaki talebi temizler. */
@@ -130,12 +203,20 @@ export async function resolveSignupRequest(id: string, token?: string): Promise<
     Authorization: `Bearer ${authToken}`,
   };
 
-  const response = await fetch(REQUESTS_ENDPOINT, {
-    method: 'POST',
-    headers,
-    credentials: 'include',
-    body: JSON.stringify({ id }),
-  });
+  try {
+    const response = await fetch(REQUESTS_ENDPOINT, {
+      method: 'POST',
+      headers,
+      credentials: 'include',
+      body: JSON.stringify({ id }),
+    });
 
-  await handleResponse(response);
+    await handleResponse(response);
+  } catch (error) {
+    if (error instanceof SignupError) {
+      throw error;
+    }
+    const message = error instanceof Error ? error.message : undefined;
+    throw new SignupError('signup.errors.network', { message });
+  }
 }

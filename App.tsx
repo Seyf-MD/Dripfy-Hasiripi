@@ -19,10 +19,11 @@ import LegalPage from './components/LegalPage';
 import { LegalPageKey } from './data/legalContent';
 
 import { mockData } from './data/mockData';
-import { DashboardData, UserRole, DataItem, SignupRequest, ScheduleEvent, FinancialRecord, Challenge, Advantage, Contact, Task, User, UserPermission, AdminSubTab, NotificationSettings } from './types';
+import { DashboardData, DataItem, SignupRequest, ScheduleEvent, FinancialRecord, Challenge, Advantage, Contact, Task, User, UserPermission, AdminSubTab, NotificationSettings } from './types';
 import { useLanguage } from './i18n/LanguageContext';
 import { useTheme } from './context/ThemeContext';
 import { finalizeSignup, fetchSignupRequests, resolveSignupRequest, SignupFinalizePayload } from './services/signupService';
+import { useAuth } from './context/AuthContext';
 
 type ModalType = 'schedule' | 'financials' | 'challenges' | 'advantages' | 'contacts' | 'tasks' | 'users';
 type SettingsPanelTab = 'profile' | 'settings' | 'privacy';
@@ -30,7 +31,7 @@ type SettingsPanelTab = 'profile' | 'settings' | 'privacy';
 function App() {
   const { t } = useLanguage();
   const { theme } = useTheme();
-  const [userRole, setUserRole] = React.useState<UserRole | null>(null);
+  const { user, isAuthenticated, isAdmin, token, logout } = useAuth();
   const [dashboardData, setDashboardData] = React.useState<DashboardData>(mockData);
   const [activeTab, setActiveTab] = React.useState<string>('Calendar');
   const [adminPanelSubTab, setAdminPanelSubTab] = React.useState<AdminSubTab>('permissions');
@@ -43,10 +44,14 @@ function App() {
   });
 
   React.useEffect(() => {
+    if (!isAdmin) {
+      return;
+    }
+
     let active = true;
     const loadRequests = async () => {
       try {
-        const requests = await fetchSignupRequests();
+        const requests = await fetchSignupRequests(token || undefined);
         if (!active || !Array.isArray(requests)) return;
         setDashboardData(prev => {
           const remoteIds = new Set(requests.map(req => req.id));
@@ -68,7 +73,7 @@ function App() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [isAdmin, token]);
 
   // Modal States
   const [detailModalItem, setDetailModalItem] = React.useState<{ item: DataItem, type: ModalType } | null>(null);
@@ -79,13 +84,29 @@ function App() {
   
   const [financialsDateFilter, setFinancialsDateFilter] = React.useState<'week' | 'month' | null>(null);
 
-  const currentUser = React.useMemo(() => dashboardData.users.find(u => u.role === userRole), [userRole, dashboardData.users]);
-  const currentUserPermissions = React.useMemo(() => dashboardData.userPermissions.find(p => p.userId === currentUser?.id)?.permissions, [currentUser, dashboardData.userPermissions]);
+  const currentUser = React.useMemo(() => {
+    if (!user) return null;
+    const match = dashboardData.users.find(u => u.email.toLowerCase() === user.email.toLowerCase());
+    if (match) {
+      return match;
+    }
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      lastLogin: user.lastLogin ?? new Date().toISOString(),
+    } as User;
+  }, [user, dashboardData.users]);
+  const currentUserPermissions = React.useMemo(
+    () => dashboardData.userPermissions.find(p => p.userId === currentUser?.id)?.permissions,
+    [currentUser, dashboardData.userPermissions],
+  );
 
   type PermissionableView = keyof NonNullable<UserPermission['permissions']>;
 
   const canEdit = (view: ModalType): boolean => {
-    if (userRole === 'admin') return true;
+    if (isAdmin) return true;
     if (!currentUserPermissions) return false;
     
     const permissionKey = view as PermissionableView;
@@ -96,15 +117,11 @@ function App() {
     return false;
   };
 
-  const handleLogin = (role: UserRole) => {
-    setUserRole(role);
-  };
-
-  const handleLogout = () => {
-    setUserRole(null);
+  const handleLogout = React.useCallback(() => {
+    logout().catch(error => console.error('Logout failed:', error));
     setActiveTab('Calendar');
     setActiveLegalPage(null);
-  };
+  }, [logout]);
 
   const handleOpenDetailModal = (item: DataItem, type: ModalType) => {
     setDetailModalItem({ item, type });
@@ -204,7 +221,7 @@ function App() {
 
       const newAuditLog = {
         id: `l${Date.now()}`,
-        user: 'Admin User',
+        user: user?.name || 'Admin',
         action: 'Approved' as const,
         targetType: 'SignupRequest',
         targetId: requestId,
@@ -223,7 +240,7 @@ function App() {
         country: request.country,
       };
 
-      resolveSignupRequest(requestId).catch(error => console.error('Signup request resolve failed:', error));
+      resolveSignupRequest(requestId, token || undefined).catch(error => console.error('Signup request resolve failed:', error));
 
       return {
         ...prev,
@@ -243,7 +260,7 @@ function App() {
 
       const newAuditLog = {
         id: `l${Date.now()}`,
-        user: 'Admin User',
+        user: user?.name || 'Admin',
         action: 'Denied' as const,
         targetType: 'SignupRequest',
         targetId: requestId,
@@ -251,7 +268,7 @@ function App() {
         details: `Denied signup request for ${request.name}.`,
       };
 
-      resolveSignupRequest(requestId).catch(error => console.error('Signup request resolve failed:', error));
+      resolveSignupRequest(requestId, token || undefined).catch(error => console.error('Signup request resolve failed:', error));
 
       return {
         ...prev,
@@ -301,7 +318,7 @@ function App() {
   };
 
   const handleViewAuditLog = () => {
-    if (userRole === 'admin') {
+    if (isAdmin) {
         setSettingsModalOpen(false);
         setActiveTab('Admin Panel');
         setAdminPanelSubTab('audit');
@@ -375,8 +392,8 @@ function App() {
                     onUpdateStatus={(taskId, newStatus) => handleQuickUpdate(taskId, 'tasks', 'status', newStatus)}
                 />;
       case 'Admin Panel':
-        if (userRole === 'admin') {
-            return <AdminPanelTab 
+        if (isAdmin) {
+            return <AdminPanelTab
                 users={dashboardData.users}
                 permissions={dashboardData.userPermissions}
                 auditLog={dashboardData.auditLog}
@@ -396,16 +413,15 @@ function App() {
   
   React.useEffect(() => {
     // If user is not admin and on Admin Panel tab, switch to Calendar
-    if (userRole !== 'admin' && activeTab === 'Admin Panel') {
+    if (!isAdmin && activeTab === 'Admin Panel') {
       setActiveTab('Calendar');
     }
-  }, [userRole, activeTab]);
+  }, [isAdmin, activeTab]);
 
-  if (!userRole) {
+  if (!isAuthenticated) {
     return (
       <>
         <LoginPage
-          onLogin={handleLogin}
           onSignupRequest={handleSignupRequest}
           onOpenLegal={handleOpenLegalPage}
         />
@@ -425,15 +441,14 @@ function App() {
   return (
     <div className={baseContainerClass}>
       <div className="isolate w-full">
-        <Header 
-          userRole={userRole} 
-          onLogout={handleLogout} 
+        <Header
+          onLogout={handleLogout}
           onOpenSettings={handleOpenSettings}
         />
         
         <main className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
           <StatCards schedule={dashboardData.schedule} contacts={dashboardData.contacts} tasks={dashboardData.tasks} financials={dashboardData.financials} setActiveTab={setActiveTab} onPendingPaymentsClick={() => { setActiveTab('Financials'); setFinancialsDateFilter('week'); }} />
-          <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} userRole={userRole} />
+          <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
           
           <div className="mt-8">
               {renderActiveTab()}
@@ -469,9 +484,8 @@ function App() {
           />
       )}
 
-      <SettingsModal 
+      <SettingsModal
         isOpen={settingsModalOpen}
-        userRole={userRole}
         onClose={() => setSettingsModalOpen(false)}
         activeTab={settingsActiveTab}
         setActiveTab={setSettingsActiveTab}

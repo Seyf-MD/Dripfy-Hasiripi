@@ -6,7 +6,11 @@
         "emailPlaceholder": "E-posta adresi",
         "passwordPlaceholder": "Şifre",
         "signInButton": "Giriş Yap",
-        "forgotPassword": "Şifremi unuttum"
+        "forgotPassword": "Şifremi unuttum",
+        "errors": {
+            "invalidCredentials": "E-posta veya parola hatalı.",
+            "generic": "Giriş işlemi tamamlanamadı. Lütfen tekrar deneyin."
+        }
     },
     "signup": {
         "prompt": "Hesabınız yok mu? Kayıt olun",

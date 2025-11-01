@@ -6,7 +6,11 @@
         "emailPlaceholder": "Адрес электронной почты",
         "passwordPlaceholder": "Пароль",
         "signInButton": "Войти",
-        "forgotPassword": "Забыли пароль?"
+        "forgotPassword": "Забыли пароль?",
+        "errors": {
+            "invalidCredentials": "Неверный адрес электронной почты или пароль.",
+            "generic": "Не удалось выполнить вход. Попробуйте ещё раз."
+        }
     },
     "signup": {
         "prompt": "Нет аккаунта? Зарегистрироваться",

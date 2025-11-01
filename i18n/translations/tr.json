@@ -6,7 +6,11 @@
         "emailPlaceholder": "E-posta adresi",
         "passwordPlaceholder": "Şifre",
         "signInButton": "Giriş Yap",
-        "forgotPassword": "Şifremi unuttum"
+        "forgotPassword": "Şifremi unuttum",
+        "errors": {
+            "invalidCredentials": "E-posta veya parola hatalı.",
+            "generic": "Giriş işlemi tamamlanamadı. Lütfen tekrar deneyin."
+        }
     },
     "signup": {
         "prompt": "Hesabınız yok mu? Kayıt olun",
@@ -27,7 +31,19 @@
             "email": "Geçerli bir e-posta adresi girin.",
             "phone": "Geçerli bir telefon numarası girin.",
             "countryCode": "Lütfen ülke kodu seçin.",
-            "position": "Lütfen pozisyon seçin."
+            "position": "Lütfen pozisyon seçin.",
+            "badRequest": "Bilgilerinizi işleyemedik. Lütfen formu gözden geçirip tekrar deneyin.",
+            "unauthorized": "Devam etmeden önce oturum açmanız gerekiyor.",
+            "forbidden": "Bu işlemi gerçekleştirme izniniz yok.",
+            "notFound": "Bilgilerinize uygun bir kayıt talebi bulunamadı.",
+            "conflict": "Bu e-posta ile kayıtlı bir hesap zaten var.",
+            "validation": "Bazı bilgiler hatalı görünüyor. Lütfen formu kontrol edip tekrar deneyin.",
+            "rateLimited": "Çok fazla deneme yaptınız. Lütfen biraz bekleyip tekrar deneyin.",
+            "server": "Sunucularımızda bir sorun var. Lütfen daha sonra tekrar deneyin.",
+            "generic": "Kaydınızı şu anda tamamlayamadık. Lütfen tekrar deneyin.",
+            "network": "Sunucuya ulaşılamadı. Bağlantınızı kontrol edip tekrar deneyin.",
+            "sessionRequired": "Yönetici oturumunuzun süresi doldu. Lütfen yeniden giriş yapın.",
+            "unexpectedResponse": "Sunucudan beklenmeyen bir yanıt alındı."
         },
         "notification": {
             "codeSentTitle": "Doğrulama kodu gönderildi",
@@ -220,7 +236,8 @@
         "delete": "Sil",
         "close": "Kapat",
         "save": "Kaydet",
-        "cancel": "İptal"
+        "cancel": "İptal",
+        "retry": "Tekrar dene"
     },
     "chatbot": {
         "toggle": "Chatbot'u Aç/Kapat",

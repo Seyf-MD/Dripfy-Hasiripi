@@ -6,7 +6,11 @@
         "emailPlaceholder": "البريد الإلكتروني",
         "passwordPlaceholder": "كلمة المرور",
         "signInButton": "تسجيل الدخول",
-        "forgotPassword": "هل نسيت كلمة المرور؟"
+        "forgotPassword": "هل نسيت كلمة المرور؟",
+        "errors": {
+            "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
+            "generic": "تعذّر إتمام تسجيل الدخول. يرجى المحاولة مرة أخرى."
+        }
     },
     "signup": {
         "prompt": "ليس لديك حساب؟ سجل الآن",

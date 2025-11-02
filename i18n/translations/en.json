@@ -87,7 +87,7 @@
         "subtitle": "We sent a verification code to {email}. Please enter it below.",
         "codePlaceholder": "Verification Code",
         "button": "Verify & Sign Up",
-        "backButton": "Back to sign up",
+        "backButton": "Back",
         "invalidCode": "Invalid verification code. Please try again."
     },
     "positions": {

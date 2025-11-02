@@ -15,6 +15,7 @@ import { ensureKnowledgeBase } from './services/knowledgeBase.js';
 import automationRouter from './routes/automation.js';
 import analyticsRouter from './routes/analytics.js';
 import okrRouter from './routes/okr.js';
+import financeForecastRouter from './routes/financeForecast.js';
 import {
   SIGNUP_CODE_TTL,
   createSignupCodeRecord,
@@ -61,6 +62,7 @@ app.use('/api/admin', adminRouter);
 app.use('/api/automation', authenticate(), automationRouter);
 app.use('/api/analytics', analyticsRouter);
 app.use('/api/okr', okrRouter);
+app.use('/api/finance/forecast', authenticate(), financeForecastRouter);
 
 const adminOnlyMiddleware = authenticate({ requiredRole: 'admin' });
 

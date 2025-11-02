@@ -216,6 +216,67 @@ export interface ChatbotPromptTemplate {
 
 export type ChatbotActionPermissionMap = Record<ChatbotAction, UserRole[]>;
 
+export type ForecastInsightSeverity = 'positive' | 'warning' | 'critical' | 'info';
+
+export interface ForecastPoint {
+  date: string;
+  value: number;
+  lower: number;
+  upper: number;
+  baseline?: number;
+}
+
+export interface ForecastScenarioSummary {
+  total: number;
+  averageDaily: number;
+  change: number;
+  lastValue: number;
+}
+
+export interface ForecastScenario {
+  name: string;
+  label: string;
+  series: ForecastPoint[];
+  summary: ForecastScenarioSummary;
+}
+
+export interface ForecastAnomaly {
+  date: string;
+  value: number;
+  score: number;
+  severity: 'info' | 'warning' | 'critical' | 'high' | 'positive';
+  description: string;
+}
+
+export interface ForecastInsightCard {
+  title: string;
+  description: string;
+  severity: ForecastInsightSeverity;
+}
+
+export interface FinanceForecastData {
+  generatedAt: string;
+  scenario: ForecastScenario;
+  baseline: ForecastPoint[];
+  history: { date: string; value: number }[];
+  stats: {
+    mean: number;
+    stdDeviation: number;
+    trendSlope: number;
+    volatilityIndex: number;
+    latestValue: number;
+  };
+  anomalies: ForecastAnomaly[];
+  recommendations: ForecastInsightCard[];
+  scenarios: Record<string, ForecastScenario>;
+}
+
+export interface FinanceForecastResponse {
+  ok: boolean;
+  data?: FinanceForecastData;
+  error?: { message: string };
+}
+
 export interface DashboardData {
   schedule: ScheduleEvent[];
   financials: FinancialRecord[];

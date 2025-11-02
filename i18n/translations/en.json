@@ -157,7 +157,16 @@
         "type": "Type",
         "newRecord": "New Record",
         "incoming": "Incoming",
-        "outgoing": "Outgoing"
+        "outgoing": "Outgoing",
+        "recordsTab": "Records",
+        "forecastInsights": "Forecast Insights",
+        "forecastRefreshing": "Updating forecasts...",
+        "forecastError": "Unable to load forecast data",
+        "retryForecast": "Retry",
+        "anomalyTracker": "Anomaly Watch",
+        "noAnomalies": "No unusual movement detected recently.",
+        "actionRecommendations": "Action Recommendations",
+        "noRecommendations": "No standout actions at this time."
     },
     "challenges": {
         "title": "Challenges",

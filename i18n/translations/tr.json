@@ -157,7 +157,16 @@
         "type": "Tür",
         "newRecord": "Yeni Kayıt",
         "incoming": "Gelen",
-        "outgoing": "Giden"
+        "outgoing": "Giden",
+        "recordsTab": "Kayıtlar",
+        "forecastInsights": "Tahmin İçgörüleri",
+        "forecastRefreshing": "Tahminler güncelleniyor...",
+        "forecastError": "Tahmin verileri yüklenemedi",
+        "retryForecast": "Tekrar dene",
+        "anomalyTracker": "Anomali Takibi",
+        "noAnomalies": "Son dönemde olağan dışı hareket bulunmuyor.",
+        "actionRecommendations": "Aksiyon Önerileri",
+        "noRecommendations": "Öne çıkan aksiyon önerisi bulunmuyor."
     },
     "challenges": {
         "title": "Zorluklar",

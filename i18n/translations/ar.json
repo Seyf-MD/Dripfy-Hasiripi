@@ -157,7 +157,16 @@
         "type": "النوع",
         "newRecord": "سجل جديد",
         "incoming": "وارد",
-        "outgoing": "صادر"
+        "outgoing": "صادر",
+        "recordsTab": "السجلات",
+        "forecastInsights": "رؤى التنبؤ",
+        "forecastRefreshing": "يتم تحديث التنبؤات...",
+        "forecastError": "تعذّر تحميل بيانات التنبؤ",
+        "retryForecast": "إعادة المحاولة",
+        "anomalyTracker": "مراقبة الشذوذ",
+        "noAnomalies": "لا توجد تحركات غير اعتيادية مؤخراً.",
+        "actionRecommendations": "توصيات بالإجراءات",
+        "noRecommendations": "لا توجد توصيات بارزة حالياً."
     },
     "challenges": {
         "title": "التحديات",

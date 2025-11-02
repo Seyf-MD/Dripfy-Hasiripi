@@ -43,3 +43,19 @@ This guide outlines manual checks to verify the new signup error messaging and r
 3. Toggle the theme and ensure a warning is logged but the UI still updates.
 
 Record any unexpected behaviour with screenshots and console logs for follow-up.
+
+## Automated Regression Suite
+
+Run the automated Node.js test suite after making changes to authentication or verification flows to confirm the middleware and verification code helpers still behave as expected:
+
+```
+npm test
+```
+
+For client-side regressions around the signup or reset screens, execute the Vitest UI checks when available:
+
+```
+npm run test:ui
+```
+
+Capture the command output in the pull request description so reviewers can quickly confirm coverage.

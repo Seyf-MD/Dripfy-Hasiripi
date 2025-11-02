@@ -75,7 +75,7 @@
         "subtitle": "{email} adresine bir doğrulama kodu gönderdik. Lütfen aşağıya girin.",
         "codePlaceholder": "Doğrulama Kodu",
         "button": "Doğrula ve Kaydol",
-        "backButton": "Kayda geri dön",
+        "backButton": "Geri dön",
         "invalidCode": "Geçersiz doğrulama kodu. Lütfen tekrar deneyin."
     },
     "positions": {

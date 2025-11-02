@@ -87,7 +87,7 @@
         "subtitle": "Wir haben einen Bestätigungscode an {email} gesendet. Bitte geben Sie ihn unten ein.",
         "codePlaceholder": "Bestätigungscode",
         "button": "Bestätigen & Registrieren",
-        "backButton": "Zurück zur Registrierung",
+        "backButton": "Zurück",
         "invalidCode": "Ungültiger Bestätigungscode. Bitte versuchen Sie es erneut."
     },
     "positions": {

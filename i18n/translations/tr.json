@@ -121,6 +121,7 @@
         "challenges": "Zorluklar & Avantajlar",
         "contacts": "Kişiler",
         "tasks": "Görevler",
+        "approvals": "Onaylar",
         "adminPanel": "Yönetici Paneli"
     },
     "calendar": {
@@ -232,8 +233,45 @@
         "by": "tarafından"
     },
     "userRoles": {
-        "admin": "Yönetici",
-        "user": "Kullanıcı"
+        "viewer": "İzleyici",
+        "user": "Kullanıcı",
+        "approver": "Onay Yetkilisi",
+        "finance": "Finans Kontrolörü",
+        "manager": "Yönetici",
+        "admin": "Sistem Yöneticisi"
+    },
+    "approvals": {
+        "title": "Onay İş Akışları",
+        "subtitle": "Kayıt talepleri, finans işlemleri ve görev eskalasyonlarındaki bekleyen kararları takip edin.",
+        "refresh": "Yenile",
+        "emptyState": "Şu an bekleyen onay bulunmuyor.",
+        "status": {
+            "pending": "Bekliyor",
+            "waiting": "Sırada",
+            "approved": "Onaylandı",
+            "rejected": "Reddedildi",
+            "skipped": "Atlandı"
+        },
+        "step": {
+            "escalation": "Eskalasyon",
+            "noAssignees": "Atanmış yetkili bulunmuyor.",
+            "noPermission": "Bu adımı tamamlamak için yetkiniz yok.",
+            "commentPlaceholder": "Kararınıza isteğe bağlı yorum ekleyin",
+            "commentShow": "Yorum ekle",
+            "commentHide": "Yorumu gizle",
+            "decisionFailed": "Onay işlemi tamamlanamadı. Lütfen tekrar deneyin.",
+            "actions": {
+                "approve": "Onayla",
+                "reject": "Reddet"
+            },
+            "sla": {
+                "remaining": "Kalan: {time}",
+                "overdue": "Gecikti: {time}",
+                "due": "Son tarih: {time}",
+                "none": "Son tarih tanımlanmadı."
+            },
+            "actor": "{name} • {timestamp}"
+        }
     },
     "dataTypes": {
         "schedule": "Takvim Etkinliği",

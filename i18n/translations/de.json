@@ -121,6 +121,7 @@
         "challenges": "Herausforderungen & Vorteile",
         "contacts": "Kontakte",
         "tasks": "Aufgaben",
+        "approvals": "Freigaben",
         "adminPanel": "Admin-Panel"
     },
     "calendar": {
@@ -232,8 +233,45 @@
         "by": "von"
     },
     "userRoles": {
-        "admin": "Administrator",
-        "user": "Benutzer"
+        "viewer": "Beobachter",
+        "user": "Benutzer",
+        "approver": "Genehmiger",
+        "finance": "Finanzkontrolleur",
+        "manager": "Manager",
+        "admin": "Administrator"
+    },
+    "approvals": {
+        "title": "Genehmigungs-Workflows",
+        "subtitle": "Überwachen Sie ausstehende Entscheidungen für Registrierungen, Finanzprozesse und Aufgaben.",
+        "refresh": "Aktualisieren",
+        "emptyState": "Derzeit sind keine Genehmigungen offen.",
+        "status": {
+            "pending": "Offen",
+            "waiting": "Wartet",
+            "approved": "Genehmigt",
+            "rejected": "Abgelehnt",
+            "skipped": "Übersprungen"
+        },
+        "step": {
+            "escalation": "Eskalation",
+            "noAssignees": "Keine berechtigten Benutzer zugewiesen.",
+            "noPermission": "Sie haben keine Berechtigung für diesen Schritt.",
+            "commentPlaceholder": "Optionalen Kommentar zur Entscheidung hinzufügen",
+            "commentShow": "Kommentar hinzufügen",
+            "commentHide": "Kommentar ausblenden",
+            "decisionFailed": "Die Genehmigung konnte nicht gespeichert werden. Bitte erneut versuchen.",
+            "actions": {
+                "approve": "Genehmigen",
+                "reject": "Ablehnen"
+            },
+            "sla": {
+                "remaining": "Verbleibend: {time}",
+                "overdue": "Überfällig: {time}",
+                "due": "Fällig: {time}",
+                "none": "Keine Frist definiert."
+            },
+            "actor": "{name} • {timestamp}"
+        }
     },
     "dataTypes": {
         "schedule": "Kalenderereignis",

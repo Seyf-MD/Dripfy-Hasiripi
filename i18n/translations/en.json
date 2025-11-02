@@ -121,6 +121,7 @@
         "challenges": "Challenges & Advantages",
         "contacts": "Contacts",
         "tasks": "Tasks",
+        "approvals": "Approvals",
         "adminPanel": "Admin Panel"
     },
     "calendar": {
@@ -232,8 +233,45 @@
         "by": "by"
     },
     "userRoles": {
-        "admin": "Admin",
-        "user": "User"
+        "viewer": "Viewer",
+        "user": "User",
+        "approver": "Approver",
+        "finance": "Finance Controller",
+        "manager": "Manager",
+        "admin": "Administrator"
+    },
+    "approvals": {
+        "title": "Approval Workflows",
+        "subtitle": "Monitor pending decisions across signup requests, finance operations and task escalations.",
+        "refresh": "Refresh",
+        "emptyState": "All workflows are clear. No approvals are pending right now.",
+        "status": {
+            "pending": "Pending",
+            "waiting": "Queued",
+            "approved": "Approved",
+            "rejected": "Rejected",
+            "skipped": "Skipped"
+        },
+        "step": {
+            "escalation": "Escalation",
+            "noAssignees": "No eligible users assigned.",
+            "noPermission": "You do not have permission to complete this step.",
+            "commentPlaceholder": "Add an optional comment for your decision",
+            "commentShow": "Add comment",
+            "commentHide": "Hide comment",
+            "decisionFailed": "The approval decision could not be completed. Please try again.",
+            "actions": {
+                "approve": "Approve",
+                "reject": "Reject"
+            },
+            "sla": {
+                "remaining": "Remaining: {time}",
+                "overdue": "Overdue: {time}",
+                "due": "Due: {time}",
+                "none": "No deadline defined."
+            },
+            "actor": "{name} • {timestamp}"
+        }
     },
     "dataTypes": {
         "schedule": "Schedule Event",

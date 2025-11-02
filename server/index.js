@@ -17,6 +17,7 @@ import analyticsRouter from './routes/analytics.js';
 import okrRouter from './routes/okr.js';
 import financeForecastRouter from './routes/financeForecast.js';
 import auditRouter from './routes/audit.js';
+import approvalsRouter from './routes/approvals.js';
 import { runMigrations } from './migrations/index.js';
 import {
   SIGNUP_CODE_TTL,
@@ -67,6 +68,7 @@ app.use('/api/audit', auditRouter);
 app.use('/api/analytics', analyticsRouter);
 app.use('/api/okr', okrRouter);
 app.use('/api/finance/forecast', authenticate(), financeForecastRouter);
+app.use('/api/approvals', approvalsRouter);
 
 const adminOnlyMiddleware = authenticate({ requiredRole: 'admin' });
 

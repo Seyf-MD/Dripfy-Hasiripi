@@ -1,4 +1,5 @@
 import { extractTokenFromRequest, verifyAuthToken } from './token.js';
+import { getAuthorisationProfile, userHasRequiredRole } from '../services/auth/authorizationService.js';
 
 export function authenticate({ requiredRole } = {}) {
   return (req, res, next) => {
@@ -9,14 +10,16 @@ export function authenticate({ requiredRole } = {}) {
 
     try {
       const payload = verifyAuthToken(token);
+      const profile = getAuthorisationProfile(payload.role);
       req.user = {
         id: payload.sub || payload.id,
         email: payload.email,
         name: payload.name,
-        role: payload.role,
+        role: profile.role,
+        capabilities: profile.capabilities,
       };
 
-      if (requiredRole && req.user.role !== requiredRole) {
+      if (requiredRole && !userHasRequiredRole(profile.role, requiredRole)) {
         return res.status(403).json({ ok: false, error: 'Insufficient permissions' });
       }
 

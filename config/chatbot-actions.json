@@ -1,5 +1,5 @@
 {
-  "createTask": ["admin", "user"],
-  "updateRecord": ["admin"],
-  "triggerReport": ["admin", "user"]
+  "createTask": ["admin", "manager", "approver", "user"],
+  "updateRecord": ["admin", "manager"],
+  "triggerReport": ["admin", "manager", "approver", "user"]
 }

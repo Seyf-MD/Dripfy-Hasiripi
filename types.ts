@@ -53,9 +53,47 @@ export interface Task {
   assignee: string;
 }
 
-export type UserRole = 'admin' | 'user';
+export type UserRole = 'viewer' | 'user' | 'approver' | 'finance' | 'manager' | 'admin';
 export type OperationalRole = 'admin' | 'finance' | 'operations' | 'product' | 'medical' | 'people';
 export type Department = 'Operations' | 'Expansion' | 'Revenue' | 'Medical' | 'Product' | 'People';
+
+export const ROLE_RANK: Record<UserRole, number> = {
+  viewer: 0,
+  user: 1,
+  approver: 2,
+  finance: 3,
+  manager: 3,
+  admin: 4,
+};
+
+export function isRoleAtLeast(role: UserRole | null | undefined, required: UserRole): boolean {
+  if (!required) {
+    return true;
+  }
+  if (!role) {
+    return false;
+  }
+  if (role === required) {
+    return true;
+  }
+  const roleRank = ROLE_RANK[role];
+  const requiredRank = ROLE_RANK[required];
+  if (typeof roleRank !== 'number' || typeof requiredRank !== 'number') {
+    return false;
+  }
+  if (roleRank >= requiredRank) {
+    return true;
+  }
+  const inheritance: Record<UserRole, UserRole[]> = {
+    viewer: [],
+    user: ['viewer'],
+    approver: ['user', 'viewer'],
+    finance: ['approver', 'user', 'viewer'],
+    manager: ['approver', 'user', 'viewer'],
+    admin: ['manager', 'finance', 'approver', 'user', 'viewer'],
+  };
+  return inheritance[role]?.includes(required) ?? false;
+}
 
 export interface User {
   id: string;
@@ -186,6 +224,52 @@ export interface NotificationSettings {
 
 export type Theme = 'light' | 'dark';
 export type AdminSubTab = 'permissions' | 'audit' | 'requests';
+
+export type ApprovalFlowType = 'signup' | 'finance' | 'task';
+export type ApprovalStepStatus = 'pending' | 'waiting' | 'approved' | 'rejected' | 'skipped';
+
+export interface ApprovalUserSummary {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+}
+
+export interface ApprovalStep {
+  id: string;
+  label: string;
+  requiredRole: UserRole;
+  slaHours: number;
+  escalatesTo: UserRole | null;
+  notifications: Array<'email' | 'push'>;
+  status: ApprovalStepStatus;
+  decidedAt: string | null;
+  decidedBy: string | null;
+  decidedByRole: UserRole | null;
+  comment: string | null;
+  slaDeadline: string | null;
+  slaSecondsRemaining: number | null;
+  pendingUsers: ApprovalUserSummary[];
+}
+
+export interface ApprovalFlowSummary {
+  id: string;
+  type: ApprovalFlowType;
+  entityId: string;
+  reference: string;
+  title: string;
+  status: 'pending' | 'approved' | 'rejected';
+  submittedAt: string;
+  submittedBy: { name?: string | null; email?: string | null } | null;
+  metadata: Record<string, unknown> | null;
+  steps: ApprovalStep[];
+  currentStepId: string | null;
+}
+
+export interface ApprovalDecisionPayload {
+  decision: 'approved' | 'rejected';
+  comment?: string;
+}
 
 export type DataItem = ScheduleEvent | FinancialRecord | Challenge | Advantage | Contact | Task | User | OKRRecord;
 

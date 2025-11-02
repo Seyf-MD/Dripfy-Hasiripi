@@ -121,6 +121,7 @@
         "challenges": "التحديات والمزايا",
         "contacts": "جهات الاتصال",
         "tasks": "المهام",
+        "approvals": "عمليات الموافقة",
         "adminPanel": "لوحة الإدارة"
     },
     "calendar": {
@@ -232,8 +233,45 @@
         "by": "بواسطة"
     },
     "userRoles": {
-        "admin": "مسؤول",
-        "user": "مستخدم"
+        "viewer": "مراقب",
+        "user": "مستخدم",
+        "approver": "مسؤول الموافقات",
+        "finance": "مراقب مالي",
+        "manager": "مدير",
+        "admin": "مسؤول النظام"
+    },
+    "approvals": {
+        "title": "مسارات الموافقة",
+        "subtitle": "تتبع القرارات المعلقة لطلبات التسجيل والعمليات المالية وسير المهام.",
+        "refresh": "تحديث",
+        "emptyState": "لا توجد موافقات قيد الانتظار حاليًا.",
+        "status": {
+            "pending": "قيد الانتظار",
+            "waiting": "قيد الدور",
+            "approved": "تمت الموافقة",
+            "rejected": "مرفوض",
+            "skipped": "تم التجاوز"
+        },
+        "step": {
+            "escalation": "تصعيد",
+            "noAssignees": "لا يوجد مستخدمون مخولون.",
+            "noPermission": "ليست لديك صلاحية لإتمام هذه الخطوة.",
+            "commentPlaceholder": "أضف تعليقًا اختياريًا على القرار",
+            "commentShow": "إضافة تعليق",
+            "commentHide": "إخفاء التعليق",
+            "decisionFailed": "تعذر حفظ قرار الموافقة. يرجى المحاولة مرة أخرى.",
+            "actions": {
+                "approve": "موافقة",
+                "reject": "رفض"
+            },
+            "sla": {
+                "remaining": "المتبقي: {time}",
+                "overdue": "متأخر: {time}",
+                "due": "تاريخ الاستحقاق: {time}",
+                "none": "لا يوجد موعد نهائي."
+            },
+            "actor": "{name} • {timestamp}"
+        }
     },
     "dataTypes": {
         "schedule": "حدث تقويم",

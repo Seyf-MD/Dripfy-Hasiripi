@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ChatbotAction, ChatbotActionPermissionMap, UserRole } from '../types';
+import { ChatbotAction, ChatbotActionPermissionMap, UserRole, isRoleAtLeast } from '../types';
 import chatbotActionPermissions from '../config/chatbot-actions.json';
 
 interface AuthUser {
@@ -8,6 +8,7 @@ interface AuthUser {
   name: string;
   role: UserRole;
   lastLogin?: string;
+  capabilities?: string[];
 }
 
 interface AuthContextValue {
@@ -98,7 +99,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user,
     token,
     isAuthenticated: Boolean(user),
-    isAdmin: user?.role === 'admin',
+    isAdmin: isRoleAtLeast(user?.role ?? null, 'admin'),
     login,
     logout,
     canUseChatbotAction,

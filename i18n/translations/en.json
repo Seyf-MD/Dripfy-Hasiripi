@@ -9,7 +9,35 @@
         "forgotPassword": "Forgot password?",
         "errors": {
             "invalidCredentials": "Email or password is incorrect.",
-            "generic": "We couldn't sign you in. Please try again."
+            "generic": "We couldn't sign you in. Please try again.",
+            "hint": "If you believe your credentials are correct, please reach out to the administrator for further assistance."
+        }
+    },
+    "passwordReset": {
+        "title": "Reset Password",
+        "subtitleEmail": "Enter your email address and we'll send you a verification code.",
+        "subtitleVerify": "Enter the verification code sent to {email} and choose a new password.",
+        "emailLabel": "Email address",
+        "sendCode": "Send reset code",
+        "sending": "Sending…",
+        "codeLabel": "Verification code",
+        "passwordLabel": "New password",
+        "confirmPasswordLabel": "Confirm new password",
+        "back": "Back",
+        "resetPassword": "Update password",
+        "submitting": "Updating…",
+        "successTitle": "Password updated",
+        "successBody": "Your password has been changed. You can now sign in with the new credentials.",
+        "messages": {
+            "codeSent": "We sent a verification code to {email}. Please check your inbox."
+        },
+        "errors": {
+            "emailRequired": "Please enter your email address.",
+            "requestFailed": "We couldn't start the reset process. Please try again.",
+            "codeAndPasswordRequired": "Verification code and new password are required.",
+            "passwordLength": "Your password must contain at least 8 characters.",
+            "passwordMismatch": "Passwords do not match.",
+            "resetFailed": "We couldn't update your password. Please verify the code and try again."
         }
     },
     "signup": {

@@ -1,9 +1,18 @@
 import { GoogleGenAI } from "@google/genai";
-import { DashboardData } from '../types';
+import { DashboardData } from "../types";
 
-// Per coding guidelines, the API key must be obtained exclusively from the environment variable `process.env.API_KEY`.
-// We must assume this variable is pre-configured and accessible.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
+const apiKey =
+  (process.env.API_KEY ?? process.env.GEMINI_API_KEY)?.trim() ?? "";
+
+let ai: GoogleGenAI | null = null;
+
+if (apiKey) {
+  ai = new GoogleGenAI({ apiKey });
+} else {
+  console.warn(
+    "[Gemini] No API key found in environment; AI assistant will be disabled."
+  );
+}
 
 export async function* streamDashboardInsights(query: string, dataContext: { activeView: string } & DashboardData) {
 
@@ -21,6 +30,12 @@ export async function* streamDashboardInsights(query: string, dataContext: { act
     - All monetary values are in Euros (€).`;
 
   try {
+    if (!ai) {
+      console.warn("[Gemini] streamDashboardInsights called without API key.");
+      yield "The AI assistant is currently unavailable because no API key is configured.";
+      return;
+    }
+
     const response = await ai.models.generateContentStream({
         model: model,
         contents: `CONTEXT: ${JSON.stringify(dataContext, null, 2)}\n\nQUESTION: ${query}`,

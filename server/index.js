@@ -185,6 +185,86 @@ function buildInfoLines(payload) {
   return lines;
 }
 
+// Mirrors the PHP helpers in public/api/signup/common.php so dev + prod mails match.
+function buildEmailTemplate(title, intro, contentHtml, footerNote = '') {
+  const year = new Date().getFullYear();
+  const footerBlock = footerNote
+    ? `<p style="margin:24px 0 0;font-size:12px;line-height:18px;color:rgba(47,74,59,0.7);">${footerNote}</p>`
+    : '';
+  return `<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dripfy MIS</title>
+  </head>
+  <body style="margin:0;padding:0;background-color:#edf6ed;font-family:'Montserrat','Segoe UI',sans-serif;">
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color:#edf6ed;padding:32px 16px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px;border-radius:28px;overflow:hidden;background-color:#faf9f6;border:1px solid #c8d9b9;box-shadow:0 22px 60px rgba(200,217,185,0.45);">
+            <tr>
+              <td style="padding:28px 32px;background:linear-gradient(135deg,#4ba586 0%,#84a084 70%,#94a073 100%);">
+                <table role="presentation" width="100%">
+                  <tr>
+                    <td align="left">
+                      <span style="display:inline-block;font-size:13px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(245,250,244,0.9);font-weight:600;">Dripfy MIS</span>
+                    </td>
+                    <td align="right">
+                      <img src="https://hasiripi.com/assets/logo-wordmark.png" alt="Dripfy" style="height:32px;border:0;">
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:36px 32px 42px;color:#1e332a;">
+                <h1 style="margin:0 0 12px;font-size:26px;color:#1e332a;line-height:32px;">${title}</h1>
+                <p style="margin:0 0 24px;font-size:15px;line-height:24px;color:rgba(47,74,59,0.85);">${intro}</p>
+                ${contentHtml}
+                ${footerBlock}
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:20px 32px;background-color:#f3f9f3;border-top:1px solid #c8d9b9;">
+                <p style="margin:0;font-size:12px;line-height:18px;color:rgba(47,74,59,0.7);">
+                  © ${year} Dripfy MIS. Tüm hakları saklıdır.<br>
+                  Bu mesajı <a href="mailto:dripfy@hasiripi.com" style="color:#4ba586;text-decoration:none;">dripfy@hasiripi.com</a> üzerinden yanıtlayabilirsiniz.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
+}
+
+function buildKeyValueList(pairs) {
+  const rows = Object.entries(pairs)
+    .filter(([, value]) => value !== undefined && value !== null && String(value).trim() !== '')
+    .map(([label, value]) => {
+      const safeLabel = String(label).trim();
+      const safeValue = String(value).trim();
+      return `<tr>
+        <td style="padding:10px 14px;font-size:13px;color:rgba(47,74,59,0.8);background:#f3f9f3;border-radius:14px 0 0 14px;border:1px solid #c8d9b9;border-right:0;">${safeLabel}</td>
+        <td style="padding:10px 14px;font-size:13px;color:#1e332a;background:#edf6ed;border-radius:0 14px 14px 0;border:1px solid #c8d9b9;border-left:0;">${safeValue}</td>
+      </tr>`;
+    })
+    .join('');
+
+  return `<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-spacing:0 8px;margin:0 0 12px;">${rows}</table>`;
+}
+
+function buildCodeBlock(code) {
+  return `<div style="margin:0 0 24px;">
+    <div style="display:inline-block;padding:18px 28px;border-radius:18px;background:linear-gradient(135deg,rgba(75,165,134,0.12),rgba(148,174,161,0.08));border:1px solid #c8d9b9;">
+      <span style="font-size:28px;letter-spacing:0.4em;color:#1e332a;font-weight:600;">${code}</span>
+    </div>
+  </div>`;
+}
+
 async function sendMailWithContent({ to, subject, text, html }) {
   await transporter.sendMail({
     from: process.env.MAIL_FROM || process.env.SMTP_USER,
@@ -214,12 +294,17 @@ app.post('/api/signup/send-code', signupRateLimiter, async (req, res) => {
   const code = generateVerificationCode();
   const ttlMinutes = Math.ceil(SIGNUP_CODE_TTL / (60 * 1000));
   const requestId = generateRequestId();
-  const subject = 'Dripfy doğrulama kodunuz';
-  const text = `Merhaba ${data.firstName || data.name},\n\nDripfy hesabınızı doğrulamak için bu kodu kullanın: ${code}\nKod ${ttlMinutes} dakika boyunca geçerlidir.`;
-  const html = `<p>Merhaba <strong>${data.firstName || data.name}</strong>,</p>
-    <p>Dripfy hesabınızı doğrulamak için aşağıdaki kodu kullanın:</p>
-    <p style="font-size:24px;font-weight:bold;letter-spacing:4px">${code}</p>
-    <p>Bu kod ${ttlMinutes} dakika boyunca geçerlidir.</p>`;
+  const subject = 'Dripfy Yönetim Paneli | Doğrulama Kodunuz';
+  const displayName = data.firstName || data.name;
+  const text = `Merhaba ${displayName},\n\nDripfy Yönetim Paneli doğrulama kodunuz: ${code}\nKod ${ttlMinutes} dakika boyunca geçerlidir. Talep size ait değilse bu mesajı yok sayabilirsiniz.\n\nDripfy Ekibi`;
+  const html = buildEmailTemplate(
+    'Doğrulama kodunuz',
+    'Dripfy Yönetim Paneli\'ne güvenle erişebilmeniz için doğrulama kodunuz hazır.',
+    `${buildCodeBlock(code)}
+      <p style="margin:0 0 18px;font-size:14px;line-height:22px;color:#2f4a3b;">Kod ${ttlMinutes} dakika boyunca geçerlidir. Talep size ait değilse lütfen bu mesajı görmezden gelin.</p>
+      <a href="https://hasiripi.com" style="display:inline-block;padding:14px 28px;border-radius:16px;background:linear-gradient(135deg,#4ba586,#84a084);color:#0b1612;font-weight:600;text-decoration:none;font-size:14px;">Paneli Aç</a>`,
+    'Sorularınız için <a href="mailto:dripfy@hasiripi.com" style="color:#84a084;text-decoration:none;">dripfy@hasiripi.com</a> adresinden bize ulaşabilirsiniz.'
+  );
 
   try {
     await sendMailWithContent({ to: data.email, subject, text, html });
@@ -278,32 +363,40 @@ app.post('/api/signup', signupRateLimiter, async (req, res) => {
 
   const infoLines = buildInfoLines(payload);
   const infoText = infoLines.join('\n');
+  const detailPairs = {
+    'Ad Soyad': payload.name,
+    'E-posta': payload.email,
+    'Telefon': formatPhone(payload),
+    Pozisyon: payload.position,
+    Firma: payload.company,
+    Ülke: payload.country,
+  };
+  const detailTable = buildKeyValueList(detailPairs);
 
   const adminRecipient = process.env.SIGNUP_NOTIFY_TO || process.env.SMTP_USER;
   const adminSubject = `[Dripfy] Yeni kayıt talebi - ${payload.name}`;
-  const adminHtml = `<p>Yeni bir kayıt talebi aldınız:</p><ul>${infoLines
-    .map((line) => {
-      const [label, value] = line.split(':');
-      return `<li><strong>${label.trim()}:</strong> ${value.trim()}</li>`;
-    })
-    .join('')}</ul><p>Gönderilme tarihi: ${new Date().toLocaleString()}</p>`;
+  const submittedAt = new Date().toLocaleString();
+  const adminHtml = buildEmailTemplate(
+    'Yeni kayıt talebi',
+    'Merhaba, Dripfy yönetim paneline yeni bir kayıt talebi ulaştı.',
+    `${detailTable}<p style="margin:8px 0 0;font-size:13px;line-height:20px;color:#2f4a3b;">Gönderilme tarihi: ${submittedAt}</p>`,
+    'Talebi panel üzerinden inceleyebilirsiniz.'
+  );
 
   const shouldSendWelcome = process.env.SEND_WELCOME_EMAIL !== 'false';
-  const welcomeSubject = 'Dripfy Kaydınız Alındı';
-  const welcomeHtml = `<p>Merhaba <strong>${payload.firstName || payload.name}</strong>,</p>
-    <p>Dripfy’ye gösterdiğiniz ilgi için teşekkür ederiz. Ekibimiz en kısa sürede sizinle iletişime geçecek.</p>
-    <p><strong>Bilgileriniz:</strong></p><ul>${infoLines
-      .map((line) => {
-        const [label, value] = line.split(':');
-        return `<li><strong>${label.trim()}:</strong> ${value.trim()}</li>`;
-      })
-      .join('')}</ul><p>Sevgiler,<br/>Dripfy Ekibi</p>`;
+  const welcomeSubject = 'Dripfy Yönetim Paneli | Talebiniz Alındı';
+  const welcomeHtml = buildEmailTemplate(
+    'Talebiniz bize ulaştı',
+    'Dripfy Yönetim Paneli kayıt talebiniz başarıyla kaydedildi. Ekibimiz bilgilerinizi inceleyerek kısa süre içerisinde dönüş yapacak.',
+    `<p style="margin:0 0 14px;font-size:14px;line-height:22px;color:#2f4a3b;"><strong>Bilgileriniz</strong></p>${detailTable}<p style="margin:12px 0 0;font-size:13px;line-height:20px;color:rgba(47,74,59,0.8);">Her türlü soru ve isteğiniz için bu e-postaya yanıt verebilirsiniz.</p>`,
+    'Saygılarımızla, Dripfy Ekibi'
+  );
 
   try {
     await sendMailWithContent({
       to: adminRecipient,
       subject: adminSubject,
-      text: `Yeni bir kayıt talebi aldınız:\n\n${infoText}`,
+      text: `Merhaba,\n\nDripfy yönetim paneline yeni bir kayıt talebi ulaştı:\n\n${infoText}\n\nGönderilme tarihi: ${submittedAt}\n\nPanel üzerinden talebi inceleyebilirsiniz.\n\nDripfy Otomasyon Hizmeti`,
       html: adminHtml,
     });
 
@@ -311,7 +404,7 @@ app.post('/api/signup', signupRateLimiter, async (req, res) => {
       await sendMailWithContent({
         to: payload.email,
         subject: welcomeSubject,
-        text: `Merhaba ${payload.firstName || payload.name},\n\nDripfy’ye gösterdiğiniz ilgi için teşekkür ederiz. Ekibimiz en kısa sürede sizinle iletişime geçecek.\n\nBilgileriniz:\n${infoText}`,
+        text: `Merhaba ${payload.firstName || payload.name},\n\nDripfy Yönetim Paneli kayıt talebiniz bize ulaştı. Ekibimiz bilgilerinizi inceleyerek en kısa sürede sizinle iletişime geçecek.\n\nBilgileriniz:\n${infoText}\n\nHer türlü sorunuz için bu e-postaya yanıt verebilirsiniz.\n\nSaygılarımızla,\nDripfy Ekibi`,
         html: welcomeHtml,
       });
     }

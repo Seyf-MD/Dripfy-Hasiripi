@@ -39,14 +39,21 @@ if ($mode === 'send-code' || !isset($input['code'])) {
     }
 
     $code = generateVerificationCode();
-    $userHtml = '<p>Merhaba <strong>' . htmlspecialchars($payload['firstName'] !== '' ? $payload['firstName'] : $payload['name'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</strong>,</p>' .
-        '<p>Dripfy hesabınızı doğrulamak için aşağıdaki kodu kullanın:</p>' .
-        '<p style="font-size:24px;font-weight:bold;letter-spacing:4px"><code>' . htmlspecialchars($code, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</code></p>' .
-        '<p>Bu kod 10 dakika boyunca geçerlidir.</p>';
+    $ttlMinutes = (int)ceil(SIGNUP_CODE_TTL / 60);
+    $displayName = $payload['firstName'] !== '' ? $payload['firstName'] : $payload['name'];
+    $intro = 'Dripfy Yönetim Paneli\'ne güvenle erişebilmeniz için doğrulama kodunuz hazır.';
+    $userHtml = buildEmailTemplate(
+        'Doğrulama kodunuz',
+        $intro,
+        buildCodeBlock($code) .
+            '<p style="margin:0 0 18px;font-size:14px;line-height:22px;color:#2f4a3b;">Kod ' . $ttlMinutes . ' dakika boyunca geçerlidir. Talep size ait değilse lütfen bu mesajı görmezden gelin.</p>' .
+            '<a href="https://hasiripi.com" style="display:inline-block;padding:14px 28px;border-radius:16px;background:linear-gradient(135deg,#4ba586,#84a084);color:#0b1612;font-weight:600;text-decoration:none;font-size:14px;">Paneli Aç</a>',
+        'Sorularınız için <a href="mailto:dripfy@hasiripi.com" style="color:#84a084;text-decoration:none;">dripfy@hasiripi.com</a> adresinden bize ulaşabilirsiniz.'
+    );
 
-    $userText = "Merhaba {$payload['firstName']} {$payload['lastName']}\n\nDripfy hesabınızı doğrulamak için bu kodu kullanın: {$code}\nKod 10 dakika boyunca geçerlidir.";
+    $userText = "Merhaba {$displayName},\n\nDripfy Yönetim Paneli doğrulama kodunuz: {$code}\nKod {$ttlMinutes} dakika boyunca geçerlidir. Talep size ait değilse bu mesajı yok sayabilirsiniz.\n\nDripfy Ekibi";
 
-    if (!sendSignupEmail($payload['email'], 'Dripfy doğrulama kodunuz', $userText, $userHtml)) {
+    if (!sendSignupEmail($payload['email'], 'Dripfy Yönetim Paneli | Doğrulama Kodunuz', $userText, $userHtml)) {
         http_response_code(500);
         echo json_encode(['ok' => false, 'error' => 'Kod gönderilemedi. Lütfen daha sonra tekrar deneyin.']);
         exit;
@@ -101,28 +108,40 @@ $payload['name'] = $payload['name'] ?? trim(($payload['firstName'] ?? '') . ' ' 
 
 $infoLines = buildInfoLines($payload);
 $infoBlock = implode("\n", $infoLines);
+$detailPairs = [
+    'Ad Soyad' => $payload['name'] ?? '',
+    'E-posta' => $payload['email'] ?? $email,
+    'Telefon' => formatPhone($payload),
+    'Pozisyon' => $payload['position'] ?? '',
+    'Firma' => $payload['company'] ?? '',
+    'Ülke' => $payload['country'] ?? '',
+];
+$detailPairs = array_filter($detailPairs, static fn($value) => $value !== null && $value !== '');
+$detailTable = buildKeyValueList($detailPairs);
 
-$adminBody = "Yeni bir kayıt talebi aldınız:\n\n{$infoBlock}\n\nGönderilme tarihi: " . date('d.m.Y H:i');
-$adminHtml = '<p>Yeni bir kayıt talebi aldınız:</p><ul>';
-foreach ($infoLines as $line) {
-    [$label, $value] = array_map('trim', explode(':', $line, 2));
-    $adminHtml .= '<li><strong>' . htmlspecialchars($label, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . ':</strong> ' . htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</li>';
-}
-$adminHtml .= '</ul><p>Gönderilme tarihi: ' . date('d.m.Y H:i') . '</p>';
+$submittedAt = date('d.m.Y H:i');
+$adminBody = "Merhaba,\n\nDripfy yönetim paneline yeni bir kayıt talebi ulaştı:\n\n{$infoBlock}\n\nGönderilme tarihi: {$submittedAt}\n\nPanel üzerinden talebi inceleyebilirsiniz.\n\nDripfy Otomasyon Hizmeti";
+$adminHtml = buildEmailTemplate(
+    'Yeni kayıt talebi',
+    'Merhaba, Dripfy yönetim paneline yeni bir kayıt talebi ulaştı.',
+    $detailTable . '<p style="margin:8px 0 0;font-size:13px;line-height:20px;color:#2f4a3b;">Gönderilme tarihi: ' . htmlspecialchars($submittedAt, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</p>',
+    'Talebi panel üzerinden inceleyebilirsiniz.'
+);
 
 $userGreeting = $payload['firstName'] !== '' ? $payload['firstName'] : ($payload['name'] ?? '');
-$userBody = "Merhaba {$userGreeting},\n\nDripfy’ye gösterdiğiniz ilgi için teşekkür ederiz. Ekibimiz en kısa sürede sizinle iletişime geçecek.\n\nBilgileriniz:\n{$infoBlock}\n\nSevgiler,\nDripfy Ekibi";
-$userHtml = '<p>Merhaba <strong>' . htmlspecialchars($userGreeting, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</strong>,</p>' .
-    '<p>Dripfy’ye gösterdiğiniz ilgi için teşekkür ederiz. Ekibimiz en kısa sürede sizinle iletişime geçecek.</p>' .
-    '<p><strong>Bilgileriniz:</strong></p><ul>';
-foreach ($infoLines as $line) {
-    [$label, $value] = array_map('trim', explode(':', $line, 2));
-    $userHtml .= '<li><strong>' . htmlspecialchars($label, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . ':</strong> ' . htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</li>';
-}
-$userHtml .= '</ul><p>Sevgiler,<br/>Dripfy Ekibi</p>';
+$safeGreeting = htmlspecialchars($userGreeting, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+$userBody = "Merhaba {$userGreeting},\n\nDripfy Yönetim Paneli kayıt talebiniz bize ulaştı. Ekibimiz bilgilerinizi inceleyerek en kısa sürede dönüş yapacak.\n\nBilgileriniz:\n{$infoBlock}\n\nBu e-postaya yanıt vererek bize ulaşabilirsiniz.\n\nSaygılarımızla,\nDripfy Ekibi";
+$userHtml = buildEmailTemplate(
+    'Talebiniz bize ulaştı',
+    'Dripfy Yönetim Paneli kayıt talebiniz başarıyla kaydedildi. Ekibimiz bilgilerinizi inceleyerek kısa süre içerisinde dönüş yapacak.',
+    '<p style="margin:0 0 14px;font-size:14px;line-height:22px;color:#2f4a3b;"><strong>Bilgileriniz</strong></p>' .
+        $detailTable .
+        '<p style="margin:12px 0 0;font-size:13px;line-height:20px;color:#2f4a3b;">Her türlü soru ve isteğiniz için bu e-postaya yanıt verebilirsiniz.</p>',
+    'Saygılarımızla, Dripfy Ekibi'
+);
 
 $adminSent = sendSignupEmail('dripfy@hasiripi.com', '[Dripfy] Yeni kayıt talebi - ' . ($payload['name'] ?? ''), $adminBody, $adminHtml);
-$userSent = sendSignupEmail($payload['email'] ?? $email, 'Dripfy Kaydınız Alındı', $userBody, $userHtml);
+$userSent = sendSignupEmail($payload['email'] ?? $email, 'Dripfy Yönetim Paneli | Talebiniz Alındı', $userBody, $userHtml);
 
 unset($store[$storeKey]);
 saveSignupStore($store);

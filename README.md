@@ -8,7 +8,7 @@ Dripfy yönetim paneli; çok dilli React/Vite arayüzü, e-posta doğrulamalı k
 
 ```bash
 git clone <repo>
-cd Dripfy-Gemini
+cd Dripfy-Hasiripi
 npm install
 cp .env.example .env    # Gerekli alanları doldurun
 npm run dev:full        # Vite + Express dev sunucusu birlikte açılır
@@ -93,6 +93,12 @@ Geliştirme süresince Express API `http://localhost:4000` üzerinden çalışı
 
 > Üretimde PHP scriptleri `.env` dosyasını okumaz; SMTP bilgilerini PHP dosyalarındaki `sendSignupEmail` fonksiyonunda güncellemeniz yeterlidir. Hosting ortamında `public/api/runtime/` dizininin yazma iznine sahip olduğundan emin olun.
 
+### Güvenlik ve rotasyon
+
+- **SMTP şifresi / servis hesabı**: Paylaşımlı hesap bilgilerini düzenli aralıklarla yenileyin ve `.env` ile `public/api/signup/common.php` içindeki değerleri güncelleyin. Eski şifreleri saklamayın.
+- **JWT/AUTH gizli anahtarları**: `JWT_SECRET` ve `AUTH_SECRET` değişkenlerini en az 32 karakterlik rastgele dizelerle doldurun. Ekip değişikliklerinde bu değerleri döndürüp yeniden deploy edin.
+- **Runtime dosyaları**: PHP tarafı güncel parolaları `public/api/runtime/auth_users.json` içine yazar. Şifre döndürdükten sonra bu dosyanın yalnızca yeni hash'i içerdiğinden emin olun veya backup'tan temizleyin.
+
 ### `.env` oluşturma
 ```bash
 cp .env.example .env
@@ -172,6 +178,13 @@ Python scriptleri:
 - React bileşenlerinde mümkün olduğunca fonksiyonları `useCallback` ile sarmalayın ve TypeScript tiplerini güncel tutun.
 - Yeni backend fonksiyonları eklerken PHP ve Express tarafındaki davranışın eşleşmesine dikkat edin.
 - `npm run build` komutunu çalıştırıp hata olmadığını doğrulamadan deployment yapmayın.
+
+## 11. Dokümantasyon ve Referanslar
+
+- `docs/email-branding.md` – E-posta şablon renkleri, yardımcı fonksiyonlar ve HTML/Text sürümlerini güncelleme adımları.
+- `docs/testing.md` – Kayıt ve hata yönetimi için manuel test senaryoları.
+- `public/api/signup/common.php` ve `public/api/auth/common.php` – Üretimde kullanılan PHP yardımcıları; Express (`server/index.js`) ile uyumlu tutulmalıdır.
+- `scripts/ftp_upload.py --help` – FTP dağıtım sürecini otomasyonla yapmak için kullanılabilir.
 
 ---
 

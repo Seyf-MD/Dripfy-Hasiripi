@@ -5,9 +5,10 @@ import BrandLogo from './BrandLogo';
 import { LegalPageKey } from '../data/legalContent';
 import { SignupFinalizePayload } from '../services/signupService';
 import { useTheme } from '../context/ThemeContext';
-import { Sun, Moon } from 'lucide-react';
+import { Sun, Moon, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import SignupForm from './SignupForm';
+import ForgotPasswordDialog from './ForgotPasswordDialog';
 
 interface LoginPageProps {
     onSignupRequest: (payload: { email: string; code: string }) => Promise<SignupFinalizePayload>;
@@ -31,15 +32,19 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSignupRequest, onOpenLegal }) =
     const [loginEmail, setLoginEmail] = React.useState('');
     const [loginPassword, setLoginPassword] = React.useState('');
     const [isLoggingIn, setIsLoggingIn] = React.useState(false);
-    const [loginError, setLoginError] = React.useState<string | null>(null);
+    const [loginErrorKey, setLoginErrorKey] = React.useState<string | null>(null);
 
     const [notification, setNotification] = React.useState<{ type: 'success' | 'error'; message: string; detail?: string } | null>(null);
+    const loginErrorHintKey = 'login.errors.hint';
+    const loginErrorHintRaw = t(loginErrorHintKey);
+    const loginErrorHint = loginErrorHintRaw !== loginErrorHintKey ? loginErrorHintRaw : '';
+    const [isForgotPasswordOpen, setIsForgotPasswordOpen] = React.useState(false);
 
     const dismissNotification = React.useCallback(() => setNotification(null), []);
 
     const handleLoginSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoginError(null);
+        setLoginErrorKey(null);
         setIsLoggingIn(true);
         try {
             await login(loginEmail.trim(), loginPassword);
@@ -47,9 +52,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSignupRequest, onOpenLegal }) =
             console.error('Login failed:', error);
             const enrichedError = error as Error & { code?: string };
             if (enrichedError.code === 'INVALID_CREDENTIALS') {
-                setLoginError(t('login.errors.invalidCredentials'));
+                setLoginErrorKey('login.errors.invalidCredentials');
             } else {
-                setLoginError(t('login.errors.generic'));
+                setLoginErrorKey('login.errors.generic');
             }
         } finally {
             setIsLoggingIn(false);
@@ -62,6 +67,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSignupRequest, onOpenLegal }) =
         setNotification({ type: 'success', message: t('signup.notification.successTitle'), detail: t('signup.notification.successBody') });
         setView('login');
     }, [t]);
+
+    const handlePasswordResetSuccess = React.useCallback((message: { title: string; detail?: string }) => {
+        setNotification({ type: 'success', message: message.title, detail: message.detail });
+    }, []);
 
     const renderContent = () => {
         if (view === 'login') {
@@ -87,9 +96,30 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSignupRequest, onOpenLegal }) =
                                 <input id="password" name="password" type="password" required className={`${inputClass} rounded-b-md`} placeholder={t('login.passwordPlaceholder')} value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} />
                             </div>
                         </div>
-                        {loginError && (
-                            <p className="text-sm text-red-500">{loginError}</p>
+                        {loginErrorKey && (
+                            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 shadow-sm dark:border-red-500/40 dark:bg-red-500/15 dark:text-red-100">
+                                <div className="flex items-start gap-3">
+                                    <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-500 dark:text-red-200" />
+                                    <div>
+                                        <p className="font-semibold tracking-wide">{t(loginErrorKey)}</p>
+                                        {loginErrorHint && (
+                                            <p className="mt-1 text-xs text-red-500/80 dark:text-red-100/80">
+                                                {loginErrorHint}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
                         )}
+                        <div className="flex justify-end text-xs">
+                            <button
+                                type="button"
+                                onClick={() => setIsForgotPasswordOpen(true)}
+                                className="font-medium text-[var(--drip-primary)] hover:text-[var(--drip-primary-dark)] dark:text-[var(--drip-primary)] dark:hover:text-[rgba(75,165,134,0.8)]"
+                            >
+                                {t('login.forgotPassword')}
+                            </button>
+                        </div>
                         <button
                             type="submit"
                             disabled={isLoggingIn}
@@ -147,6 +177,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSignupRequest, onOpenLegal }) =
     };
 
     return (
+        <>
         <div className="min-h-screen bg-slate-100 dark:bg-neutral-900 flex items-center justify-center animate-fade-in p-2 sm:p-4 w-full">
             {renderNotification()}
              <div className="absolute top-6 right-6 flex items-center gap-3">
@@ -206,6 +237,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSignupRequest, onOpenLegal }) =
 
             </div>
         </div>
+        <ForgotPasswordDialog
+            isOpen={isForgotPasswordOpen}
+            defaultEmail={loginEmail}
+            onClose={() => setIsForgotPasswordOpen(false)}
+            onCompleted={handlePasswordResetSuccess}
+        />
+        </>
     );
 };
 

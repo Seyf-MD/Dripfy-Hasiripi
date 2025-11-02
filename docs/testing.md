@@ -30,7 +30,14 @@ This guide outlines manual checks to verify the new signup error messaging and r
 3. Force a backend error during verification and ensure the error banner and retry button are displayed.
 4. Use the retry button to re-send the verification request and confirm success resets the form and returns to the login screen.
 
-### 4. Theme Persistence Fallback
+### 4. Password Reset E-mail Consistency
+1. Trigger the “Şifremi Unuttum” flow from the login page.
+2. Confirm the received HTML e-mail uses the light palette (`#EDF6ED` background, `#4BA586` accents) and matches the screenshots in `docs/email-branding.md`.
+3. Switch the mail client to “text view” and ensure the plain-text alternative is readable and contains the same information.
+4. Enter an expired code and verify the backend returns the correct validation error.
+5. Complete the flow with a valid code and confirm the success toast appears in the UI.
+
+### 5. Theme Persistence Fallback
 1. With the browser console open, simulate a `localStorage` access failure (e.g., set it to throw in dev tools).
 2. Reload the page and confirm the app defaults to the light theme without crashing.
 3. Toggle the theme and ensure a warning is logged but the UI still updates.

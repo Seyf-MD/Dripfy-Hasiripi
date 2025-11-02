@@ -9,7 +9,35 @@
         "forgotPassword": "Şifremi unuttum",
         "errors": {
             "invalidCredentials": "E-posta veya parola hatalı.",
-            "generic": "Giriş işlemi tamamlanamadı. Lütfen tekrar deneyin."
+            "generic": "Giriş işlemi tamamlanamadı. Lütfen tekrar deneyin.",
+            "hint": "Bilgilerinizin doğru olduğundan eminseniz, lütfen sistem yöneticisiyle iletişime geçin."
+        }
+    },
+    "passwordReset": {
+        "title": "Şifreyi Sıfırla",
+        "subtitleEmail": "E-posta adresinizi girin, size doğrulama kodu gönderelim.",
+        "subtitleVerify": "{email} adresine gönderilen doğrulama kodunu girip yeni parolanızı belirleyin.",
+        "emailLabel": "E-posta adresi",
+        "sendCode": "Kodu gönder",
+        "sending": "Gönderiliyor...",
+        "codeLabel": "Doğrulama kodu",
+        "passwordLabel": "Yeni parola",
+        "confirmPasswordLabel": "Yeni parolayı doğrula",
+        "back": "Geri dön",
+        "resetPassword": "Parolayı güncelle",
+        "submitting": "Güncelleniyor...",
+        "successTitle": "Parola güncellendi",
+        "successBody": "Parolanız değiştirildi. Artık yeni bilgilerinizle giriş yapabilirsiniz.",
+        "messages": {
+            "codeSent": "{email} adresine doğrulama kodu gönderdik. Lütfen gelen kutunuzu kontrol edin."
+        },
+        "errors": {
+            "emailRequired": "Lütfen e-posta adresinizi girin.",
+            "requestFailed": "Sıfırlama işlemi başlatılamadı. Lütfen tekrar deneyin.",
+            "codeAndPasswordRequired": "Doğrulama kodu ve yeni parola zorunludur.",
+            "passwordLength": "Parolanız en az 8 karakter olmalıdır.",
+            "passwordMismatch": "Parolalar birbiriyle eşleşmiyor.",
+            "resetFailed": "Parolanız güncellenemedi. Lütfen kodu kontrol edip tekrar deneyin."
         }
     },
     "signup": {

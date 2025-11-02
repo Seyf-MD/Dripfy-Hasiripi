@@ -23,6 +23,10 @@ async function readUsers() {
   }
 }
 
+async function writeUsers(users) {
+  await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2), 'utf-8');
+}
+
 export async function findUserByEmail(email) {
   const users = await readUsers();
   const normalised = typeof email === 'string' ? email.trim().toLowerCase() : '';
@@ -43,4 +47,22 @@ export function mapUserToPublic(user) {
   if (!user) return null;
   const { passwordHash, ...safeUser } = user;
   return safeUser;
+}
+
+export async function updateUserPassword(email, plainPassword) {
+  const normalised = typeof email === 'string' ? email.trim().toLowerCase() : '';
+  if (!normalised || typeof plainPassword !== 'string' || plainPassword.length === 0) {
+    return false;
+  }
+
+  const users = await readUsers();
+  const index = users.findIndex(user => user.email?.toLowerCase() === normalised);
+  if (index === -1) {
+    return false;
+  }
+
+  const hash = await bcrypt.hash(plainPassword, 10);
+  users[index].passwordHash = hash;
+  await writeUsers(users);
+  return true;
 }

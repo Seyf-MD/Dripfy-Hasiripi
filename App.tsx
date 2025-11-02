@@ -231,6 +231,9 @@ function App() {
         targetId: requestId,
         timestamp: new Date().toISOString(),
         details: `Approved signup for ${request.name} and created new user.`,
+        label: 'signup-approved',
+        sourceModule: 'admin',
+        criticality: 'medium' as const,
       };
 
       const newContact: Contact = {
@@ -270,6 +273,9 @@ function App() {
         targetId: requestId,
         timestamp: new Date().toISOString(),
         details: `Denied signup request for ${request.name}.`,
+        label: 'signup-denied',
+        sourceModule: 'admin',
+        criticality: 'high' as const,
       };
 
       resolveSignupRequest(requestId, token || undefined).catch(error => console.error('Signup request resolve failed:', error));
@@ -414,6 +420,7 @@ function App() {
                 onOpenModal={handleOpenDetailModal as any}
                 onApproveSignup={handleApproveSignup}
                 onDenySignup={handleDenySignup}
+                authToken={token}
             />;
         }
         return null;

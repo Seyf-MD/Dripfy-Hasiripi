@@ -16,6 +16,8 @@ import automationRouter from './routes/automation.js';
 import analyticsRouter from './routes/analytics.js';
 import okrRouter from './routes/okr.js';
 import financeForecastRouter from './routes/financeForecast.js';
+import auditRouter from './routes/audit.js';
+import { runMigrations } from './migrations/index.js';
 import {
   SIGNUP_CODE_TTL,
   createSignupCodeRecord,
@@ -35,7 +37,8 @@ const app = express();
 const port = Number(process.env.API_PORT || 4000);
 
 ensureDataEnvironment()
-  .then(() => {
+  .then(async () => {
+    await runMigrations();
     startDailyBackupScheduler();
   })
   .catch((error) => {
@@ -60,6 +63,7 @@ app.use(cookieParser());
 app.use('/api/auth', authRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/automation', authenticate(), automationRouter);
+app.use('/api/audit', auditRouter);
 app.use('/api/analytics', analyticsRouter);
 app.use('/api/okr', okrRouter);
 app.use('/api/finance/forecast', authenticate(), financeForecastRouter);

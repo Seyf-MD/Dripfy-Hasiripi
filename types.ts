@@ -67,6 +67,8 @@ export interface User {
   department?: Department;
 }
 
+export type AuditLogCriticality = 'low' | 'medium' | 'high' | 'critical';
+
 export interface AuditLogEntry {
     id: string;
     user: string;
@@ -75,6 +77,9 @@ export interface AuditLogEntry {
     targetId: string;
     timestamp: string;
     details: string;
+    label: string;
+    sourceModule: string;
+    criticality: AuditLogCriticality;
 }
 
 export type KeyResultStatus = 'onTrack' | 'atRisk' | 'offTrack' | 'completed';

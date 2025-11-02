@@ -90,6 +90,20 @@
         "JuniorSpecialist": "Младший специалист",
         "Intern": "Стажер"
     },
+    "common": {
+        "startDate": "Дата начала",
+        "endDate": "Дата окончания",
+        "user": "Пользователь",
+        "all": "Все",
+        "hideFilters": "Скрыть фильтры",
+        "showFilters": "Показать фильтры",
+        "exportCsv": "Экспорт CSV",
+        "save": "Сохранить",
+        "reset": "Сбросить",
+        "apply": "Применить",
+        "loading": "Загрузка...",
+        "delete": "Удалить"
+    },
     "dashboard": {
         "title": "Панель управления"
     },
@@ -213,11 +227,22 @@
     "admin": {
         "userPermissions": "Права пользователей",
         "auditLog": "Журнал аудита",
+        "auditLogDescription": "Фильтруйте, сохраняйте и экспортируйте историю действий.",
+        "auditLogSaveFilterPrompt": "Введите имя для этого набора фильтров",
+        "auditLogUserPlaceholder": "Имя пользователя или e-mail",
+        "auditLogEventType": "Тип события",
+        "auditLogLabel": "Метка",
+        "auditLogSourceModule": "Источник (модуль)",
+        "auditLogCriticality": "Критичность",
+        "auditLogSavedFilters": "Сохранённые фильтры",
+        "auditLogSavedFiltersHint": "При выборе набора фильтры применяются сразу.",
+        "auditLogTotalCount": "Найдено всего {count} записей",
+        "auditLogEmpty": "По заданным фильтрам записей не найдено.",
         "signupRequests": "Запросы на регистрацию",
         "approve": "Одобрить",
         "deny": "Отклонить",
         "noRequests": "Нет ожидающих запросов на регистрацию.",
-        "by": ""
+        "by": "от"
     },
     "userRoles": {
         "admin": "Администратор",

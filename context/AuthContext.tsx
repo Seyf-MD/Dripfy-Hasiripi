@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { UserRole } from '../types';
+import { ChatbotAction, ChatbotActionPermissionMap, UserRole } from '../types';
+import chatbotActionPermissions from '../config/chatbot-actions.json';
 
 interface AuthUser {
   id: string;
@@ -16,6 +17,8 @@ interface AuthContextValue {
   isAdmin: boolean;
   login: (email: string, password: string) => Promise<AuthUser>;
   logout: () => Promise<void>;
+  canUseChatbotAction: (action: ChatbotAction) => boolean;
+  allowedChatbotActions: ChatbotAction[];
 }
 
 const AuthContext = React.createContext<AuthContextValue | undefined>(undefined);
@@ -31,6 +34,7 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = React.useState<AuthUser | null>(null);
   const [token, setToken] = React.useState<string | null>(null);
+  const permissions = React.useRef<ChatbotActionPermissionMap>(chatbotActionPermissions);
 
   const login = React.useCallback(async (email: string, password: string) => {
     const response = await fetch(LOGIN_ENDPOINT, {
@@ -70,6 +74,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, []);
 
+  const canUseChatbotAction = React.useCallback((action: ChatbotAction) => {
+    const allowedRoles = permissions.current[action] || [];
+    if (!allowedRoles.length) {
+      return false;
+    }
+    if (!user) {
+      return false;
+    }
+    return allowedRoles.includes(user.role);
+  }, [user]);
+
+  const allowedChatbotActions = React.useMemo<ChatbotAction[]>(() => {
+    if (!user) {
+      return [];
+    }
+    return (Object.keys(permissions.current) as ChatbotAction[]).filter((action) =>
+      canUseChatbotAction(action),
+    );
+  }, [user, canUseChatbotAction]);
+
   const value = React.useMemo<AuthContextValue>(() => ({
     user,
     token,
@@ -77,7 +101,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isAdmin: user?.role === 'admin',
     login,
     logout,
-  }), [user, token, login, logout]);
+    canUseChatbotAction,
+    allowedChatbotActions,
+  }), [user, token, login, logout, canUseChatbotAction, allowedChatbotActions]);
 
   return (
     <AuthContext.Provider value={value}>

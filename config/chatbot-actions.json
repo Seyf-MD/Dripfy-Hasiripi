@@ -1,0 +1,5 @@
+{
+  "createTask": ["admin", "user"],
+  "updateRecord": ["admin"],
+  "triggerReport": ["admin", "user"]
+}

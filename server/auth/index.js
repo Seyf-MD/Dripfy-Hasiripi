@@ -1,5 +1,12 @@
 import express from 'express';
-import { findUserByEmail, mapUserToPublic, updateUserPassword, verifyPassword } from '../services/userService.js';
+import {
+  findUserByEmail,
+  mapUserToPublic,
+  setLastLogin,
+  updateUserPassword,
+  verifyPassword,
+} from '../services/userService.js';
+import { recordLoginEvent } from '../services/logService.js';
 import { createAuthToken, getAuthCookieName, getCookieOptions } from './token.js';
 
 const router = express.Router();
@@ -51,6 +58,26 @@ router.post('/login', async (req, res) => {
     const cookieOptions = getCookieOptions();
 
     res.cookie(cookieName, token, cookieOptions);
+
+    const loginTime = new Date();
+    try {
+      await setLastLogin(user.id, loginTime);
+      user.lastLogin = loginTime.toISOString();
+    } catch (error) {
+      console.error('[auth] Failed to update last login:', error);
+    }
+
+    try {
+      await recordLoginEvent({
+        userId: user.id,
+        email: user.email,
+        ip: req.ip,
+        userAgent: req.get('user-agent'),
+        timestamp: loginTime.toISOString(),
+      });
+    } catch (error) {
+      console.error('[auth] Failed to record login event:', error);
+    }
 
     return res.json({
       ok: true,

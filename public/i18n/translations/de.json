@@ -90,6 +90,20 @@
         "JuniorSpecialist": "Junior-Spezialist",
         "Intern": "Praktikant"
     },
+    "common": {
+        "startDate": "Startdatum",
+        "endDate": "Enddatum",
+        "user": "Benutzer",
+        "all": "Alle",
+        "hideFilters": "Filter ausblenden",
+        "showFilters": "Filter anzeigen",
+        "exportCsv": "CSV exportieren",
+        "save": "Speichern",
+        "reset": "Zurücksetzen",
+        "apply": "Anwenden",
+        "loading": "Wird geladen...",
+        "delete": "Löschen"
+    },
     "dashboard": {
         "title": "Dashboard"
     },
@@ -213,6 +227,17 @@
     "admin": {
         "userPermissions": "Benutzerberechtigungen",
         "auditLog": "Audit-Protokoll",
+        "auditLogDescription": "Filtern, speichern und exportieren Sie die Aktivitätsprotokolle.",
+        "auditLogSaveFilterPrompt": "Geben Sie einen Namen für dieses Filterset ein",
+        "auditLogUserPlaceholder": "Benutzername oder E-Mail",
+        "auditLogEventType": "Ereignistyp",
+        "auditLogLabel": "Label",
+        "auditLogSourceModule": "Quellmodul",
+        "auditLogCriticality": "Kritikalität",
+        "auditLogSavedFilters": "Gespeicherte Filter",
+        "auditLogSavedFiltersHint": "Beim Auswählen werden die Filter sofort angewendet.",
+        "auditLogTotalCount": "Insgesamt {count} Einträge gefunden",
+        "auditLogEmpty": "Keine Protokolle entsprechen den Filtern.",
         "signupRequests": "Registrierungsanfragen",
         "approve": "Genehmigen",
         "deny": "Ablehnen",

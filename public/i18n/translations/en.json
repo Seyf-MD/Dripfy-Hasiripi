@@ -90,6 +90,20 @@
         "JuniorSpecialist": "Junior Specialist",
         "Intern": "Intern"
     },
+    "common": {
+        "startDate": "Start date",
+        "endDate": "End date",
+        "user": "User",
+        "all": "All",
+        "hideFilters": "Hide filters",
+        "showFilters": "Show filters",
+        "exportCsv": "Export CSV",
+        "save": "Save",
+        "reset": "Reset",
+        "apply": "Apply",
+        "loading": "Loading...",
+        "delete": "Delete"
+    },
     "dashboard": {
         "title": "Dashboard"
     },
@@ -213,6 +227,17 @@
     "admin": {
         "userPermissions": "User Permissions",
         "auditLog": "Audit Log",
+        "auditLogDescription": "Filter, save, and export the audit trail.",
+        "auditLogSaveFilterPrompt": "Enter a name for this filter set",
+        "auditLogUserPlaceholder": "User name or email",
+        "auditLogEventType": "Event type",
+        "auditLogLabel": "Label",
+        "auditLogSourceModule": "Source module",
+        "auditLogCriticality": "Criticality",
+        "auditLogSavedFilters": "Saved filters",
+        "auditLogSavedFiltersHint": "Selecting a set will immediately apply its filters.",
+        "auditLogTotalCount": "Total {count} records found",
+        "auditLogEmpty": "No audit entries match your filters.",
         "signupRequests": "Signup Requests",
         "approve": "Approve",
         "deny": "Deny",

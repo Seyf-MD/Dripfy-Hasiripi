@@ -2,6 +2,7 @@ import * as React from 'react';
 import { User, UserPermission, AuditLogEntry, SignupRequest, AdminSubTab } from '../../types';
 import { ShieldCheck, Edit2, Clock, UserPlus, CheckCircle, XCircle } from 'lucide-react';
 import { useLanguage } from '../../i18n/LanguageContext';
+import AuditLogTable from '../admin/AuditLogTable';
 
 interface AdminPanelTabProps {
     users: User[];
@@ -13,9 +14,10 @@ interface AdminPanelTabProps {
     onOpenModal: (item: User, type: 'users') => void;
     onApproveSignup: (requestId: string) => void;
     onDenySignup: (requestId: string) => void;
+    authToken: string | null;
 }
 
-const AdminPanelTab: React.FC<AdminPanelTabProps> = ({ users, permissions, auditLog, signupRequests, activeSubTab, setActiveSubTab, onOpenModal, onApproveSignup, onDenySignup }) => {
+const AdminPanelTab: React.FC<AdminPanelTabProps> = ({ users, permissions, auditLog, signupRequests, activeSubTab, setActiveSubTab, onOpenModal, onApproveSignup, onDenySignup, authToken }) => {
     const { t } = useLanguage();
     
     const subTabs: { id: AdminSubTab, label: string, icon: React.ReactNode, count?: number }[] = [
@@ -46,24 +48,7 @@ const AdminPanelTab: React.FC<AdminPanelTabProps> = ({ users, permissions, audit
                 );
             case 'audit':
                 return (
-                    <div className="space-y-3 bg-slate-100 dark:bg-neutral-800/50 p-4 rounded-lg border border-slate-200 dark:border-neutral-700 max-h-[60vh] overflow-y-auto">
-                        {auditLog.map(log => (
-                            <div key={log.id} className="text-sm p-3 bg-white dark:bg-neutral-800 rounded-md">
-                                <div className="flex justify-between items-center">
-                                    <p className="font-semibold text-[var(--drip-text)] dark:text-white">
-                                        <span className={`font-bold ${
-                                            log.action === 'Created' || log.action === 'Approved' ? 'text-green-500 dark:text-green-400' :
-                                            log.action === 'Updated' ? 'text-yellow-500 dark:text-yellow-400' :
-                                            'text-red-500 dark:text-red-400'
-                                        }`}>{t(`auditLogActions.${log.action}`)}</span> {t(`dataTypes.${log.targetType}`)}
-                                    </p>
-                                    <p className="text-xs text-[var(--drip-muted)]/80 dark:text-neutral-500">{new Date(log.timestamp).toLocaleString()}</p>
-                                </div>
-                                <p className="text-[var(--drip-muted)] dark:text-neutral-400 mt-1 break-words">{log.details}</p>
-                                <p className="text-xs text-[var(--drip-muted)]/80 dark:text-neutral-500 mt-1">{t('admin.by')} {log.user}</p>
-                            </div>
-                        ))}
-                    </div>
+                    <AuditLogTable initialLogs={auditLog} authToken={authToken} />
                 );
             case 'requests':
                 return (

@@ -90,6 +90,20 @@
         "JuniorSpecialist": "Uzman",
         "Intern": "Stajyer"
     },
+    "common": {
+        "startDate": "Başlangıç tarihi",
+        "endDate": "Bitiş tarihi",
+        "user": "Kullanıcı",
+        "all": "Tümü",
+        "hideFilters": "Filtreleri gizle",
+        "showFilters": "Filtreleri göster",
+        "exportCsv": "CSV dışa aktar",
+        "save": "Kaydet",
+        "reset": "Sıfırla",
+        "apply": "Uygula",
+        "loading": "Yükleniyor...",
+        "delete": "Sil"
+    },
     "dashboard": {
         "title": "Kontrol Paneli"
     },
@@ -213,6 +227,17 @@
     "admin": {
         "userPermissions": "Kullanıcı İzinleri",
         "auditLog": "Denetim Kaydı",
+        "auditLogDescription": "İşlem geçmişini filtreleyin, kaydedin ve dışa aktarın.",
+        "auditLogSaveFilterPrompt": "Filtre seti için bir ad girin",
+        "auditLogUserPlaceholder": "Kullanıcı adı veya e-posta",
+        "auditLogEventType": "Olay türü",
+        "auditLogLabel": "Etiket",
+        "auditLogSourceModule": "Kaynak modül",
+        "auditLogCriticality": "Kritiklik",
+        "auditLogSavedFilters": "Kaydedilen filtreler",
+        "auditLogSavedFiltersHint": "Bir set seçildiğinde filtreler hemen uygulanır.",
+        "auditLogTotalCount": "Toplam {count} kayıt bulundu",
+        "auditLogEmpty": "Filtre kriterlerine uygun kayıt bulunamadı.",
         "signupRequests": "Kayıt Talepleri",
         "approve": "Onayla",
         "deny": "Reddet",

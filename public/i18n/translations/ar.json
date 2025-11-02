@@ -90,6 +90,20 @@
         "JuniorSpecialist": "أخصائي مبتدئ",
         "Intern": "متدرب"
     },
+    "common": {
+        "startDate": "تاريخ البدء",
+        "endDate": "تاريخ الانتهاء",
+        "user": "المستخدم",
+        "all": "الكل",
+        "hideFilters": "إخفاء الفلاتر",
+        "showFilters": "إظهار الفلاتر",
+        "exportCsv": "تصدير CSV",
+        "save": "حفظ",
+        "reset": "إعادة تعيين",
+        "apply": "تطبيق",
+        "loading": "جاري التحميل...",
+        "delete": "حذف"
+    },
     "dashboard": {
         "title": "لوحة التحكم"
     },
@@ -213,6 +227,17 @@
     "admin": {
         "userPermissions": "أذونات المستخدم",
         "auditLog": "سجل التدقيق",
+        "auditLogDescription": "قم بتصفية سجل التدقيق وحفظ الإعدادات وتصديرها.",
+        "auditLogSaveFilterPrompt": "أدخل اسماً لمجموعة الفلاتر",
+        "auditLogUserPlaceholder": "اسم المستخدم أو البريد الإلكتروني",
+        "auditLogEventType": "نوع الحدث",
+        "auditLogLabel": "الوسم",
+        "auditLogSourceModule": "الوحدة المصدر",
+        "auditLogCriticality": "مستوى الأهمية",
+        "auditLogSavedFilters": "الفلاتر المحفوظة",
+        "auditLogSavedFiltersHint": "تطبيق مجموعة سيطبّق فلاترها فوراً.",
+        "auditLogTotalCount": "تم العثور على {count} سجلًا",
+        "auditLogEmpty": "لا توجد سجلات تطابق معايير الفلترة.",
         "signupRequests": "طلبات التسجيل",
         "approve": "موافقة",
         "deny": "رفض",

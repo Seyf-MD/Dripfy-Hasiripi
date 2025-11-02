@@ -6,6 +6,9 @@
     "targetType": "OKR",
     "targetId": "okr-1",
     "timestamp": "2024-10-01T09:05:00.000Z",
-    "details": "Progress updated to 35%"
+    "details": "Progress updated to 35%",
+    "label": "okr-progress",
+    "sourceModule": "okr",
+    "criticality": "medium"
   }
 ]

@@ -6,6 +6,11 @@ import nodemailer from 'nodemailer';
 import rateLimit from 'express-rate-limit';
 import authRouter from './auth/index.js';
 import { authenticate } from './auth/middleware.js';
+import adminRouter from './admin/index.js';
+import { ensureDataEnvironment } from './services/storageService.js';
+import { startDailyBackupScheduler } from './services/backupService.js';
+import { addSignupRequest, listSignupRequests, removeSignupRequest } from './services/signupRequestService.js';
+import { recordErrorLog } from './services/logService.js';
 import {
   SIGNUP_CODE_TTL,
   createSignupCodeRecord,
@@ -24,6 +29,14 @@ import {
 const app = express();
 const port = Number(process.env.API_PORT || 4000);
 
+ensureDataEnvironment()
+  .then(() => {
+    startDailyBackupScheduler();
+  })
+  .catch((error) => {
+    console.error('[bootstrap] Failed to prepare data environment:', error);
+  });
+
 app.use(cors({
   origin: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',').map(v => v.trim()) : true,
   credentials: true,
@@ -32,6 +45,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use('/api/auth', authRouter);
+app.use('/api/admin', adminRouter);
 
 const adminOnlyMiddleware = authenticate({ requiredRole: 'admin' });
 
@@ -85,9 +99,6 @@ const transporter = nodemailer.createTransport({
     pass: process.env.SMTP_PASS,
   },
 });
-
-// Hafıza içinde tutulan pending talepler (yalnızca dev modunda gereklidir).
-const signupRequestsStore = [];
 
 async function verifyTransporter() {
   try {
@@ -426,7 +437,7 @@ app.post('/api/signup', signupRateLimiter, async (req, res) => {
       status: 'pending',
       timestamp: new Date(createdAt).toISOString(),
     };
-    signupRequestsStore.push(request);
+    await addSignupRequest(request);
 
     return res.json({
       ok: true,
@@ -440,28 +451,55 @@ app.post('/api/signup', signupRateLimiter, async (req, res) => {
 
 app.use('/api/signup', adminOnlyMiddleware);
 
-app.get('/api/signup/requests', (req, res) => {
-  const sorted = [...signupRequestsStore].sort(
-    (a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime(),
-  );
-  res.json({ ok: true, requests: sorted });
+app.get('/api/signup/requests', async (_req, res) => {
+  try {
+    const requests = await listSignupRequests();
+    res.json({ ok: true, requests });
+  } catch (error) {
+    console.error('[signup] Failed to list requests:', error);
+    res.status(500).json({ ok: false, error: 'Kayıt talepleri yüklenemedi' });
+  }
 });
 
-app.post('/api/signup/requests', (req, res) => {
+app.post('/api/signup/requests', async (req, res) => {
   const id = typeof req.body.id === 'string' ? req.body.id : '';
   if (!id) {
     return res.status(400).json({ ok: false, error: 'Kayıt talebi bulunamadı' });
   }
-  const index = signupRequestsStore.findIndex((item) => item.id === id);
-  if (index === -1) {
-    return res.status(404).json({ ok: false, error: 'Kayıt talebi bulunamadı' });
+  try {
+    const removed = await removeSignupRequest(id);
+    if (!removed) {
+      return res.status(404).json({ ok: false, error: 'Kayıt talebi bulunamadı' });
+    }
+    res.json({ ok: true });
+  } catch (error) {
+    console.error('[signup] Failed to remove request:', error);
+    res.status(500).json({ ok: false, error: 'Kayıt talebi silinemedi' });
   }
-  signupRequestsStore.splice(index, 1);
-  res.json({ ok: true });
 });
 
 app.get('/api/health', (_, res) => {
   res.json({ ok: true, uptime: process.uptime() });
+});
+
+app.use((err, req, res, next) => {
+  console.error('[api] Unhandled error:', err);
+  recordErrorLog({
+    message: err?.message || 'Unknown error',
+    stack: err?.stack,
+    context: {
+      path: req.originalUrl,
+      method: req.method,
+    },
+  }).catch((logError) => {
+    console.error('[api] Failed to record error log:', logError);
+  });
+
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  res.status(500).json({ ok: false, error: 'Beklenmeyen bir hata oluştu' });
 });
 
 app.listen(port, () => {

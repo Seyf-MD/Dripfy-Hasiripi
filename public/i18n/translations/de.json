@@ -145,7 +145,16 @@
         "type": "Typ",
         "newRecord": "Neuer Eintrag",
         "incoming": "Eingehend",
-        "outgoing": "Ausgehend"
+        "outgoing": "Ausgehend",
+        "recordsTab": "Einträge",
+        "forecastInsights": "Prognose-Einblicke",
+        "forecastRefreshing": "Prognosen werden aktualisiert...",
+        "forecastError": "Prognosedaten konnten nicht geladen werden",
+        "retryForecast": "Erneut versuchen",
+        "anomalyTracker": "Anomalie-Überwachung",
+        "noAnomalies": "Zuletzt wurden keine ungewöhnlichen Bewegungen erkannt.",
+        "actionRecommendations": "Handlungsempfehlungen",
+        "noRecommendations": "Derzeit keine herausragenden Maßnahmen."
     },
     "challenges": {
         "title": "Herausforderungen",

@@ -145,7 +145,16 @@
         "type": "Тип",
         "newRecord": "Новая запись",
         "incoming": "Входящий",
-        "outgoing": "Исходящий"
+        "outgoing": "Исходящий",
+        "recordsTab": "Записи",
+        "forecastInsights": "Прогнозные инсайты",
+        "forecastRefreshing": "Обновление прогнозов...",
+        "forecastError": "Не удалось загрузить данные прогноза",
+        "retryForecast": "Повторить",
+        "anomalyTracker": "Мониторинг аномалий",
+        "noAnomalies": "За последнее время отклонений не обнаружено.",
+        "actionRecommendations": "Рекомендации по действиям",
+        "noRecommendations": "Пока нет приоритетных рекомендаций."
     },
     "challenges": {
         "title": "Проблемы",

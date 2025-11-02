@@ -3,6 +3,7 @@ import { readCollection, writeCollection } from './storageService.js';
 
 const LOGIN_COLLECTION = 'loginLogs';
 const ERROR_COLLECTION = 'errorLogs';
+const AUDIT_COLLECTION = 'auditLog';
 
 async function appendToCollection(collection, entry) {
   const list = await readCollection(collection);
@@ -36,5 +37,27 @@ export async function recordErrorLog({ message, stack, context, timestamp = new 
     timestamp: new Date(timestamp).toISOString(),
   };
   await appendToCollection(ERROR_COLLECTION, entry);
+  return entry;
+}
+
+export async function recordAuditLog({
+  user,
+  action,
+  targetType,
+  targetId,
+  details,
+  timestamp = new Date().toISOString(),
+}) {
+  const entry = {
+    id: randomUUID(),
+    user,
+    action,
+    targetType,
+    targetId,
+    details,
+    timestamp: new Date(timestamp).toISOString(),
+  };
+
+  await appendToCollection(AUDIT_COLLECTION, entry);
   return entry;
 }

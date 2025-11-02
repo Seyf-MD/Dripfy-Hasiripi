@@ -3,6 +3,7 @@ import LoginPage from './components/LoginPage';
 import Header from './components/Header';
 import StatCards from './components/StatCards';
 import TabNavigation from './components/TabNavigation';
+import KPIBoard from './components/dashboard/KPIBoard';
 import CalendarTab from './components/tabs/WeeklyScheduleTab';
 import FinancialsTab from './components/tabs/FinancialsTab';
 import ChallengesTab from './components/tabs/ChallengesTab';
@@ -19,9 +20,10 @@ import LegalPage from './components/LegalPage';
 import { LegalPageKey } from './data/legalContent';
 
 import { mockData } from './data/mockData';
-import { DashboardData, DataItem, SignupRequest, ScheduleEvent, FinancialRecord, Challenge, Advantage, Contact, Task, User, UserPermission, AdminSubTab, NotificationSettings } from './types';
+import { DashboardData, DataItem, SignupRequest, ScheduleEvent, FinancialRecord, Challenge, Advantage, Contact, Task, User, UserPermission, AdminSubTab, NotificationSettings, OKRRecord } from './types';
 import { useLanguage } from './i18n/LanguageContext';
 import { useTheme } from './context/ThemeContext';
+import { UserProvider } from './context/UserContext';
 import { finalizeSignup, fetchSignupRequests, resolveSignupRequest, SignupFinalizePayload } from './services/signupService';
 import { useAuth } from './context/AuthContext';
 
@@ -96,6 +98,8 @@ function App() {
       email: user.email,
       role: user.role,
       lastLogin: user.lastLogin ?? new Date().toISOString(),
+      operationalRole: user.role === 'admin' ? 'admin' : 'operations',
+      department: user.role === 'admin' ? 'Expansion' : 'Operations',
     } as User;
   }, [user, dashboardData.users]);
   const currentUserPermissions = React.useMemo(
@@ -354,6 +358,13 @@ function App() {
     setActiveLegalPage(null);
   };
 
+  const handleSyncOkrs = React.useCallback((nextOkrs: OKRRecord[]) => {
+    setDashboardData(prev => ({
+      ...prev,
+      okrs: nextOkrs,
+    }));
+  }, []);
+
 
   const renderActiveTab = () => {
     switch (activeTab) {
@@ -439,77 +450,80 @@ function App() {
   }`;
 
   return (
-    <div className={baseContainerClass}>
-      <div className="isolate w-full">
-        <Header
-          onLogout={handleLogout}
-          onOpenSettings={handleOpenSettings}
-        />
-        
-        <main className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
-          <StatCards schedule={dashboardData.schedule} contacts={dashboardData.contacts} tasks={dashboardData.tasks} financials={dashboardData.financials} setActiveTab={setActiveTab} onPendingPaymentsClick={() => { setActiveTab('Financials'); setFinancialsDateFilter('week'); }} />
-          <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
-          
-          <div className="mt-8">
-              {renderActiveTab()}
-          </div>
-        </main>
-
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
-          <Footer onNavigateLegal={handleOpenLegalPage} />
-        </div>
-      </div>
-
-
-      <Chatbot dataContext={{ ...dashboardData, activeView: activeTab }} />
-      
-      {detailModalItem && (
-        <DetailModal 
-            item={detailModalItem.item} 
-            type={detailModalItem.type}
-            canEdit={canEdit(detailModalItem.type)}
-            onClose={() => setDetailModalItem(null)} 
-            onEdit={handleOpenEditModal as any}
-            onDelete={handleDeleteItem}
-        />
-      )}
-
-      {editModalItem && (
-          <EditModal
-              item={editModalItem.item}
-              type={editModalItem.type}
-              isNew={editModalItem.isNew}
-              onClose={() => setEditModalItem(null)}
-              onSave={editModalItem.isNew ? handleCreateItem as any : handleUpdateItem as any}
+    <UserProvider user={currentUser}>
+      <div className={baseContainerClass}>
+        <div className="isolate w-full">
+          <Header
+            onLogout={handleLogout}
+            onOpenSettings={handleOpenSettings}
           />
-      )}
 
-      <SettingsModal
-        isOpen={settingsModalOpen}
-        onClose={() => setSettingsModalOpen(false)}
-        activeTab={settingsActiveTab}
-        setActiveTab={setSettingsActiveTab}
-        notificationSettings={notificationSettings}
-        onSaveSettings={handleSaveSettings}
-        onChangePasswordClick={() => {
-            setSettingsModalOpen(false);
-            setPasswordChangeModalOpen(true);
-        }}
-        onViewAuditLog={handleViewAuditLog}
-        onExportData={handleExportData}
-        onDeleteAccount={handleDeleteAccount}
-      />
-      
-      <PasswordChangeModal
-        isOpen={passwordChangeModalOpen}
-        onClose={() => setPasswordChangeModalOpen(false)}
-      />
+          <main className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
+            <StatCards schedule={dashboardData.schedule} contacts={dashboardData.contacts} tasks={dashboardData.tasks} financials={dashboardData.financials} setActiveTab={setActiveTab} onPendingPaymentsClick={() => { setActiveTab('Financials'); setFinancialsDateFilter('week'); }} />
+            <KPIBoard initialOkrs={dashboardData.okrs} onOkrsChange={handleSyncOkrs} />
+            <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      {activeLegalPage && (
-        <LegalPage page={activeLegalPage} onClose={handleCloseLegalPage} />
-      )}
+            <div className="mt-8">
+                {renderActiveTab()}
+            </div>
+          </main>
 
-    </div>
+          <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+            <Footer onNavigateLegal={handleOpenLegalPage} />
+          </div>
+        </div>
+
+
+        <Chatbot dataContext={{ ...dashboardData, activeView: activeTab }} />
+
+        {detailModalItem && (
+          <DetailModal
+              item={detailModalItem.item}
+              type={detailModalItem.type}
+              canEdit={canEdit(detailModalItem.type)}
+              onClose={() => setDetailModalItem(null)}
+              onEdit={handleOpenEditModal as any}
+              onDelete={handleDeleteItem}
+          />
+        )}
+
+        {editModalItem && (
+            <EditModal
+                item={editModalItem.item}
+                type={editModalItem.type}
+                isNew={editModalItem.isNew}
+                onClose={() => setEditModalItem(null)}
+                onSave={editModalItem.isNew ? handleCreateItem as any : handleUpdateItem as any}
+            />
+        )}
+
+        <SettingsModal
+          isOpen={settingsModalOpen}
+          onClose={() => setSettingsModalOpen(false)}
+          activeTab={settingsActiveTab}
+          setActiveTab={setSettingsActiveTab}
+          notificationSettings={notificationSettings}
+          onSaveSettings={handleSaveSettings}
+          onChangePasswordClick={() => {
+              setSettingsModalOpen(false);
+              setPasswordChangeModalOpen(true);
+          }}
+          onViewAuditLog={handleViewAuditLog}
+          onExportData={handleExportData}
+          onDeleteAccount={handleDeleteAccount}
+        />
+
+        <PasswordChangeModal
+          isOpen={passwordChangeModalOpen}
+          onClose={() => setPasswordChangeModalOpen(false)}
+        />
+
+        {activeLegalPage && (
+          <LegalPage page={activeLegalPage} onClose={handleCloseLegalPage} />
+        )}
+
+      </div>
+    </UserProvider>
   );
 }
 

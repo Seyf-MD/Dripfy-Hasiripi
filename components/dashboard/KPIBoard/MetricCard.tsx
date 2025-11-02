@@ -1,0 +1,42 @@
+import * as React from 'react';
+import { KPITrendMetric } from '../../../types';
+
+interface MetricCardProps {
+  metric: KPITrendMetric;
+  isPrimary?: boolean;
+}
+
+const valueFormatter = new Intl.NumberFormat('de-DE', { maximumFractionDigits: 1 });
+
+const MetricCard: React.FC<MetricCardProps> = ({ metric, isPrimary }) => {
+  const { label, value, unit, description, trend } = metric;
+  const formattedValue = unit === '%' ? `${valueFormatter.format(value)}%` : `${unit}${valueFormatter.format(value)}`;
+
+  const badge = React.useMemo(() => {
+    if (trend === undefined) {
+      return null;
+    }
+    const formattedTrend = valueFormatter.format(trend);
+    if (trend === 0) {
+      return <span className="text-xs text-slate-500 dark:text-slate-400">Trend stabil</span>;
+    }
+    const trendLabel = trend > 0 ? '↑' : '↓';
+    const color = trend > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400';
+    return <span className={`text-xs font-semibold ${color}`}>{`${trendLabel} ${formattedTrend}`}</span>;
+  }, [trend]);
+
+  return (
+    <div className={`p-5 rounded-xl border transition-all duration-200 ${isPrimary ? 'bg-white/80 dark:bg-neutral-800 border-emerald-200/80 dark:border-emerald-700/50 shadow-lg' : 'bg-white/40 dark:bg-neutral-900 border-slate-200 dark:border-neutral-800'}`}>
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">{label}</p>
+          <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-slate-100">{formattedValue}</p>
+        </div>
+        {badge}
+      </div>
+      <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">{description}</p>
+    </div>
+  );
+};
+
+export default MetricCard;

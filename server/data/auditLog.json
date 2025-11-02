@@ -1,0 +1,11 @@
+[
+  {
+    "id": "audit-1",
+    "user": "Admin User",
+    "action": "Updated",
+    "targetType": "OKR",
+    "targetId": "okr-1",
+    "timestamp": "2024-10-01T09:05:00.000Z",
+    "details": "Progress updated to 35%"
+  }
+]

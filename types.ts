@@ -53,12 +53,18 @@ export interface Task {
   assignee: string;
 }
 
+export type UserRole = 'admin' | 'user';
+export type OperationalRole = 'admin' | 'finance' | 'operations' | 'product' | 'medical' | 'people';
+export type Department = 'Operations' | 'Expansion' | 'Revenue' | 'Medical' | 'Product' | 'People';
+
 export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'user';
+  role: UserRole;
   lastLogin: string;
+  operationalRole?: OperationalRole;
+  department?: Department;
 }
 
 export interface AuditLogEntry {
@@ -69,6 +75,77 @@ export interface AuditLogEntry {
     targetId: string;
     timestamp: string;
     details: string;
+}
+
+export type KeyResultStatus = 'onTrack' | 'atRisk' | 'offTrack' | 'completed';
+
+export interface OKRKeyResult {
+  id: string;
+  title: string;
+  metricUnit: string;
+  baseline: number;
+  target: number;
+  current: number;
+  status: KeyResultStatus;
+}
+
+export type OKRStatus = 'draft' | 'active' | 'completed' | 'onHold';
+
+export interface OKRMetricsSnapshot {
+  baseline: number;
+  target: number;
+  current: number;
+  unit: string;
+}
+
+export interface OKRRecord {
+  id: string;
+  objective: string;
+  ownerRole: OperationalRole;
+  department: Department;
+  startDate: string;
+  targetDate: string;
+  progress: number;
+  status: OKRStatus;
+  tags: string[];
+  keyResults: OKRKeyResult[];
+  metrics: OKRMetricsSnapshot;
+  lastUpdatedAt: string;
+  lastUpdatedBy?: string;
+  requiresValidation: boolean;
+  validatedAt?: string | null;
+  validatedBy?: string | null;
+}
+
+export interface KPITrendMetric {
+  id: string;
+  label: string;
+  value: number;
+  unit: string;
+  description: string;
+  trend?: number;
+  meta?: Record<string, unknown>;
+}
+
+export interface KpiOverview {
+  metrics: KPITrendMetric[];
+  taskMetrics: {
+    total: number;
+    completed: number;
+    inProgress: number;
+    completionRate: number;
+  };
+  financialMetrics: {
+    incoming: number;
+    outgoing: number;
+    netCashFlow: number;
+    pending: number;
+  };
+  okrMetrics: {
+    activeCount: number;
+    averageProgress: number;
+    requiresValidation: number;
+  };
 }
 
 export interface UserPermission {
@@ -103,10 +180,9 @@ export interface NotificationSettings {
 }
 
 export type Theme = 'light' | 'dark';
-export type UserRole = 'admin' | 'user';
 export type AdminSubTab = 'permissions' | 'audit' | 'requests';
 
-export type DataItem = ScheduleEvent | FinancialRecord | Challenge | Advantage | Contact | Task | User;
+export type DataItem = ScheduleEvent | FinancialRecord | Challenge | Advantage | Contact | Task | User | OKRRecord;
 
 export type ChatbotAction = 'createTask' | 'updateRecord' | 'triggerReport';
 
@@ -148,6 +224,7 @@ export interface DashboardData {
   contacts: Contact[];
   tasks: Task[];
   users: User[];
+  okrs: OKRRecord[];
   auditLog: AuditLogEntry[];
   userPermissions: UserPermission[];
   signupRequests: SignupRequest[];

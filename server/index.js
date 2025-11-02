@@ -13,6 +13,8 @@ import { addSignupRequest, listSignupRequests, removeSignupRequest } from './ser
 import { recordErrorLog } from './services/logService.js';
 import { ensureKnowledgeBase } from './services/knowledgeBase.js';
 import automationRouter from './routes/automation.js';
+import analyticsRouter from './routes/analytics.js';
+import okrRouter from './routes/okr.js';
 import {
   SIGNUP_CODE_TTL,
   createSignupCodeRecord,
@@ -57,6 +59,8 @@ app.use(cookieParser());
 app.use('/api/auth', authRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/automation', authenticate(), automationRouter);
+app.use('/api/analytics', analyticsRouter);
+app.use('/api/okr', okrRouter);
 
 const adminOnlyMiddleware = authenticate({ requiredRole: 'admin' });
 

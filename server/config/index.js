@@ -1,4 +1,13 @@
-import chatbotActionPermissions from '../../config/chatbot-actions.json' assert { type: 'json' };
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const chatbotActionPermissions = JSON.parse(
+  readFileSync(join(__dirname, '../../config/chatbot-actions.json'), 'utf-8')
+);
 
 const parseNumber = (value, fallback) => {
   if (value === undefined || value === null || value === '') {

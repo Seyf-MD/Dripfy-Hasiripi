@@ -123,6 +123,7 @@
         "challenges": "Zorluklar & Avantajlar",
         "contacts": "Kişiler",
         "tasks": "Görevler",
+        "approvals": "Onaylar",
         "adminPanel": "Yönetici Paneli"
     },
     "calendar": {
@@ -248,6 +249,39 @@
         "admin": "Yönetici",
         "user": "Kullanıcı"
     },
+    "approvals": {
+        "title": "Onay İş Akışları",
+        "subtitle": "Kayıt talepleri, finans işlemleri ve görev eskalasyonlarındaki bekleyen kararları takip edin.",
+        "refresh": "Yenile",
+        "emptyState": "Şu an bekleyen onay bulunmuyor.",
+        "status": {
+            "pending": "Bekliyor",
+            "waiting": "Sırada",
+            "approved": "Onaylandı",
+            "rejected": "Reddedildi",
+            "skipped": "Atlandı"
+        },
+        "step": {
+            "escalation": "Eskalasyon",
+            "noAssignees": "Atanmış yetkili bulunmuyor.",
+            "noPermission": "Bu adımı tamamlamak için yetkiniz yok.",
+            "commentPlaceholder": "Kararınıza isteğe bağlı yorum ekleyin",
+            "commentShow": "Yorum ekle",
+            "commentHide": "Yorumu gizle",
+            "decisionFailed": "Onay işlemi tamamlanamadı. Lütfen tekrar deneyin.",
+            "actions": {
+                "approve": "Onayla",
+                "reject": "Reddet"
+            },
+            "sla": {
+                "remaining": "Kalan: {time}",
+                "overdue": "Gecikti: {time}",
+                "due": "Son tarih: {time}",
+                "none": "Son tarih tanımlanmadı."
+            },
+            "actor": "{name} • {timestamp}"
+        }
+    },
     "dataTypes": {
         "schedule": "Takvim Etkinliği",
         "financials": "Finansal Kayıt",
@@ -281,12 +315,60 @@
         },
         "participantsPlaceholder": "Virgülle ayrılmış isimler"
     },
+    "filters": {
+        "all": "Tümü"
+    },
     "actions": {
         "edit": "Düzenle",
         "delete": "Sil",
         "save": "Kaydet",
         "cancel": "İptal",
-        "close": "Kapat"
+        "close": "Kapat",
+        "refresh": "Yenile"
+    },
+    "okr": {
+        "progress": "Hedef İlerlemesi",
+        "dashboardTitle": "KPI & Hedefler Panosu",
+        "dashboardSubtitle": "Finansal, operasyonel ve stratejik ilerlemeyi tek bir bakışta yönetin.",
+        "new": "Yeni Hedef",
+        "validationPending": "Hedefler onay bekliyor. Denetim akışını hızlandırmak için doğrulama işlemini başlatın.",
+        "notFound": "Seçilen filtreler için hedef kaydı bulunamadı.",
+        "pendingApproval": "Onay Bekliyor",
+        "validate": "Doğrula",
+        "progressLabel": "İlerleme",
+        "keyResults": "Anahtar Sonuçlar",
+        "addKeyResult": "Anahtar Sonuç Ekle",
+        "keyResultTitle": "Başlık",
+        "keyResultTitlePlaceholder": "Key result başlığı",
+        "metricUnit": "Birim",
+        "metricNumber": "Sayı",
+        "metricCurrency": "Para",
+        "noKeyResults": "Henüz anahtar sonuç eklenmedi",
+        "validation": "Hedef Doğrulaması",
+        "notesOptional": "Notlar (opsiyonel)",
+        "notesPlaceholder": "Denetim için kısa bir not bırakabilirsiniz",
+        "validationFailed": "Hedef doğrulanamadı.",
+        "validating": "Doğrulanıyor…",
+        "approve": "Onayla",
+        "update": "Hedefi Güncelle",
+        "create": "Yeni Hedef Oluştur",
+        "saveFailed": "Hedef kaydedilemedi.",
+        "objective": "Hedef",
+        "role": "Rol",
+        "department": "Departman",
+        "currentValue": "Mevcut Değer",
+        "targetValue": "Hedef Değer",
+        "requiresValidation": "Güncellemeler için onay gerektir",
+        "saving": "Kaydediliyor…",
+        "metrics": {
+            "netCashFlow": "Net Nakit Akışı",
+            "taskCompletion": "Görev Tamamlama",
+            "averageProgress": "Ortalama Hedef İlerlemesi",
+            "netCashFlowDesc": "Gelen eksi giden nakit akışı",
+            "taskCompletionDesc": "Tamamlanan görevler tüm görevlere karşı",
+            "averageProgressDesc": "Aktif hedeflerin ortalama ilerlemesi",
+            "trendStable": "Trend stabil"
+        }
     },
     "chatbot": {
         "toggle": "Chatbot'u Aç/Kapat",

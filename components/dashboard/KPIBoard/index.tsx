@@ -7,6 +7,7 @@ import OkrValidationModal from './OkrValidationModal';
 import { useUserContext } from '../../../context/UserContext';
 import { Department, KpiOverview, OKRRecord, OperationalRole } from '../../../types';
 import { fetchKpiOverview, fetchOkrs, saveOkr, validateOkr } from '../../../services/analytics';
+import { useLanguage } from '../../../i18n/LanguageContext';
 
 const ROLE_OPTIONS: OperationalRole[] = ['admin', 'finance', 'operations', 'product', 'medical', 'people'];
 const DEPARTMENT_OPTIONS: Department[] = ['Operations', 'Expansion', 'Revenue', 'Medical', 'Product', 'People'];
@@ -25,6 +26,7 @@ interface KPIBoardProps {
 }
 
 const KPIBoard: React.FC<KPIBoardProps> = ({ initialOkrs, onOkrsChange }) => {
+  const { t } = useLanguage();
   const { operationalRole, department } = useUserContext();
   const [selectedRole, setSelectedRole] = React.useState<OperationalRole | null>(operationalRole ?? null);
   const [selectedDepartment, setSelectedDepartment] = React.useState<Department | null>(department ?? null);
@@ -121,8 +123,8 @@ const KPIBoard: React.FC<KPIBoardProps> = ({ initialOkrs, onOkrsChange }) => {
     <section className="mt-8 space-y-6">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">KPI & OKR Panosu</h2>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Finansal, operasyonel ve stratejik ilerlemeyi tek bir bakışta yönetin.</p>
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">{t('okr.dashboardTitle')}</h2>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t('okr.dashboardSubtitle')}</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3">
           <RoleFilters
@@ -138,7 +140,7 @@ const KPIBoard: React.FC<KPIBoardProps> = ({ initialOkrs, onOkrsChange }) => {
             onClick={() => handleOpenForm()}
             className="rounded-lg bg-emerald-600 text-white px-4 py-2 text-sm font-semibold hover:bg-emerald-700"
           >
-            Yeni OKR
+            {t('okr.new')}
           </button>
         </div>
       </div>
@@ -163,19 +165,19 @@ const KPIBoard: React.FC<KPIBoardProps> = ({ initialOkrs, onOkrsChange }) => {
 
       {overview?.okrMetrics.requiresValidation ? (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
-          {overview.okrMetrics.requiresValidation} OKR onay bekliyor. Denetim akışını hızlandırmak için doğrulama işlemini başlatın.
+          {overview.okrMetrics.requiresValidation} {t('okr.validationPending')}
         </div>
       ) : null}
 
       <div className="rounded-2xl border border-slate-200 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900 px-5 py-6">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">OKR İlerlemesi</h3>
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{t('okr.progress')}</h3>
           <button
             type="button"
             onClick={loadData}
             className="text-sm text-emerald-600 hover:text-emerald-700"
           >
-            Yenile
+            {t('actions.refresh')}
           </button>
         </div>
         <div className="mt-5">

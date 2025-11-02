@@ -123,6 +123,7 @@
         "challenges": "Challenges & Advantages",
         "contacts": "Contacts",
         "tasks": "Tasks",
+        "approvals": "Approvals",
         "adminPanel": "Admin Panel"
     },
     "calendar": {
@@ -248,6 +249,39 @@
         "admin": "Admin",
         "user": "User"
     },
+    "approvals": {
+        "title": "Approval Workflows",
+        "subtitle": "Monitor pending decisions across signup requests, finance operations and task escalations.",
+        "refresh": "Refresh",
+        "emptyState": "All workflows are clear. No approvals are pending right now.",
+        "status": {
+            "pending": "Pending",
+            "waiting": "Queued",
+            "approved": "Approved",
+            "rejected": "Rejected",
+            "skipped": "Skipped"
+        },
+        "step": {
+            "escalation": "Escalation",
+            "noAssignees": "No eligible users assigned.",
+            "noPermission": "You do not have permission to complete this step.",
+            "commentPlaceholder": "Add an optional comment for your decision",
+            "commentShow": "Add comment",
+            "commentHide": "Hide comment",
+            "decisionFailed": "The approval decision could not be completed. Please try again.",
+            "actions": {
+                "approve": "Approve",
+                "reject": "Reject"
+            },
+            "sla": {
+                "remaining": "Remaining: {time}",
+                "overdue": "Overdue: {time}",
+                "due": "Due: {time}",
+                "none": "No deadline defined."
+            },
+            "actor": "{name} • {timestamp}"
+        }
+    },
     "dataTypes": {
         "schedule": "Schedule Event",
         "financials": "Financial Record",
@@ -281,12 +315,60 @@
         },
         "participantsPlaceholder": "Comma-separated names"
     },
+    "filters": {
+        "all": "All"
+    },
     "actions": {
         "edit": "Edit",
         "delete": "Delete",
         "save": "Save",
         "cancel": "Cancel",
-        "close": "Close"
+        "close": "Close",
+        "refresh": "Refresh"
+    },
+    "okr": {
+        "progress": "Objectives Progress",
+        "dashboardTitle": "KPI & Objectives Dashboard",
+        "dashboardSubtitle": "Manage financial, operational and strategic progress at a glance.",
+        "new": "New Objective",
+        "validationPending": "Objectives pending approval. Start the validation process to accelerate the audit flow.",
+        "notFound": "No objective records found for the selected filters.",
+        "pendingApproval": "Pending Approval",
+        "validate": "Validate",
+        "progressLabel": "Progress",
+        "keyResults": "Key Results",
+        "addKeyResult": "Add Key Result",
+        "keyResultTitle": "Title",
+        "keyResultTitlePlaceholder": "Key result title",
+        "metricUnit": "Unit",
+        "metricNumber": "Number",
+        "metricCurrency": "Currency",
+        "noKeyResults": "No key results added yet",
+        "validation": "Objective Validation",
+        "notesOptional": "Notes (optional)",
+        "notesPlaceholder": "You can leave a brief note for the audit",
+        "validationFailed": "Objective could not be validated.",
+        "validating": "Validating…",
+        "approve": "Approve",
+        "update": "Update Objective",
+        "create": "Create New Objective",
+        "saveFailed": "Objective could not be saved.",
+        "objective": "Objective",
+        "role": "Role",
+        "department": "Department",
+        "currentValue": "Current Value",
+        "targetValue": "Target Value",
+        "requiresValidation": "Require approval for updates",
+        "saving": "Saving…",
+        "metrics": {
+            "netCashFlow": "Net Cash Flow",
+            "taskCompletion": "Task Completion",
+            "averageProgress": "Average Objectives Progress",
+            "netCashFlowDesc": "Incoming minus outgoing cash flow",
+            "taskCompletionDesc": "Completed tasks versus all tasks",
+            "averageProgressDesc": "Average progress of active objectives",
+            "trendStable": "Trend stable"
+        }
     },
     "chatbot": {
         "toggle": "Toggle Chatbot",

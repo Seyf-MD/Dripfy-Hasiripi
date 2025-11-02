@@ -123,6 +123,7 @@
         "challenges": "التحديات والمزايا",
         "contacts": "جهات الاتصال",
         "tasks": "المهام",
+        "approvals": "عمليات الموافقة",
         "adminPanel": "لوحة الإدارة"
     },
     "calendar": {
@@ -248,6 +249,39 @@
         "admin": "مسؤول",
         "user": "مستخدم"
     },
+    "approvals": {
+        "title": "مسارات الموافقة",
+        "subtitle": "تتبع القرارات المعلقة لطلبات التسجيل والعمليات المالية وسير المهام.",
+        "refresh": "تحديث",
+        "emptyState": "لا توجد موافقات قيد الانتظار حاليًا.",
+        "status": {
+            "pending": "قيد الانتظار",
+            "waiting": "قيد الدور",
+            "approved": "تمت الموافقة",
+            "rejected": "مرفوض",
+            "skipped": "تم التجاوز"
+        },
+        "step": {
+            "escalation": "تصعيد",
+            "noAssignees": "لا يوجد مستخدمون مخولون.",
+            "noPermission": "ليست لديك صلاحية لإتمام هذه الخطوة.",
+            "commentPlaceholder": "أضف تعليقًا اختياريًا على القرار",
+            "commentShow": "إضافة تعليق",
+            "commentHide": "إخفاء التعليق",
+            "decisionFailed": "تعذر حفظ قرار الموافقة. يرجى المحاولة مرة أخرى.",
+            "actions": {
+                "approve": "موافقة",
+                "reject": "رفض"
+            },
+            "sla": {
+                "remaining": "المتبقي: {time}",
+                "overdue": "متأخر: {time}",
+                "due": "تاريخ الاستحقاق: {time}",
+                "none": "لا يوجد موعد نهائي."
+            },
+            "actor": "{name} • {timestamp}"
+        }
+    },
     "dataTypes": {
         "schedule": "حدث تقويم",
         "financials": "سجل مالي",
@@ -281,12 +315,60 @@
         },
         "participantsPlaceholder": "أسماء مفصولة بفواصل"
     },
+    "filters": {
+        "all": "الكل"
+    },
     "actions": {
         "edit": "تعديل",
         "delete": "حذف",
         "save": "حفظ",
         "cancel": "إلغاء",
-        "close": "إغلاق"
+        "close": "إغلاق",
+        "refresh": "تحديث"
+    },
+    "okr": {
+        "progress": "تقدم الأهداف",
+        "dashboardTitle": "لوحة KPI والأهداف",
+        "dashboardSubtitle": "إدارة التقدم المالي والتشغيلي والاستراتيجي بنظرة واحدة.",
+        "new": "هدف جديد",
+        "validationPending": "الأهداف في انتظار الموافقة. ابدأ عملية التحقق لتسريع سير التدقيق.",
+        "notFound": "لم يتم العثور على أهداف للفلاتر المحددة.",
+        "pendingApproval": "في انتظار الموافقة",
+        "validate": "التحقق",
+        "progressLabel": "التقدم",
+        "keyResults": "النتائج الرئيسية",
+        "addKeyResult": "إضافة نتيجة رئيسية",
+        "keyResultTitle": "العنوان",
+        "keyResultTitlePlaceholder": "عنوان النتيجة الرئيسية",
+        "metricUnit": "الوحدة",
+        "metricNumber": "رقم",
+        "metricCurrency": "عملة",
+        "noKeyResults": "لم يتم إضافة نتائج رئيسية بعد",
+        "validation": "التحقق من الهدف",
+        "notesOptional": "ملاحظات (اختياري)",
+        "notesPlaceholder": "يمكنك ترك ملاحظة موجزة للتدقيق",
+        "validationFailed": "تعذر التحقق من الهدف.",
+        "validating": "جارٍ التحقق…",
+        "approve": "موافقة",
+        "update": "تحديث الهدف",
+        "create": "إنشاء هدف جديد",
+        "saveFailed": "تعذر حفظ الهدف.",
+        "objective": "الهدف",
+        "role": "الدور",
+        "department": "القسم",
+        "currentValue": "القيمة الحالية",
+        "targetValue": "القيمة المستهدفة",
+        "requiresValidation": "يتطلب الموافقة للتحديثات",
+        "saving": "جارٍ الحفظ…",
+        "metrics": {
+            "netCashFlow": "صافي التدفق النقدي",
+            "taskCompletion": "إكمال المهام",
+            "averageProgress": "متوسط تقدم الأهداف",
+            "netCashFlowDesc": "التدفقات النقدية الداخلة ناقص الخارجة",
+            "taskCompletionDesc": "المهام المكتملة مقابل جميع المهام",
+            "averageProgressDesc": "متوسط تقدم الأهداف النشطة",
+            "trendStable": "الاتجاه مستقر"
+        }
     },
     "chatbot": {
         "toggle": "تبديل الشات بوت",

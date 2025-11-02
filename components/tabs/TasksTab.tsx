@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Task } from '../../types';
 import { Plus, CheckCircle, Clock, Loader } from 'lucide-react';
 import { useLanguage } from '../../i18n/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 
 interface TasksTabProps {
     data: Task[];
@@ -58,10 +59,27 @@ const TaskColumn: React.FC<{
     const { t } = useLanguage();
     const [isDragOver, setIsDragOver] = React.useState(false);
     
+    const { theme } = useTheme();
+    
     const statusInfo = {
-        'To Do': { icon: <Clock size={16} />, color: 'text-blue-500 dark:text-blue-400', label: t('status.todo') },
-        'In Progress': { icon: <Loader size={16} />, color: 'text-yellow-500 dark:text-yellow-400', label: t('status.inprogress') },
-        'Done': { icon: <CheckCircle size={16} />, color: 'text-green-500 dark:text-green-400', label: t('status.done') },
+        'To Do': { 
+            icon: <Clock size={16} />, 
+            color: theme === 'light' ? 'text-slate-600' : 'text-slate-300', 
+            bgColor: theme === 'light' ? 'bg-slate-100' : 'bg-slate-800/50',
+            label: t('status.todo') 
+        },
+        'In Progress': { 
+            icon: <Loader size={16} />, 
+            color: theme === 'light' ? 'text-amber-600' : 'text-amber-400', 
+            bgColor: theme === 'light' ? 'bg-amber-50' : 'bg-amber-500/10',
+            label: t('status.inprogress') 
+        },
+        'Done': { 
+            icon: <CheckCircle size={16} />, 
+            color: theme === 'light' ? 'text-emerald-600' : 'text-emerald-400', 
+            bgColor: theme === 'light' ? 'bg-emerald-50' : 'bg-emerald-500/10',
+            label: t('status.done') 
+        },
     }
 
     const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -90,12 +108,12 @@ const TaskColumn: React.FC<{
             onDrop={handleDrop}
             className={`flex-1 min-w-[300px] bg-slate-100 dark:bg-neutral-900/50 rounded-lg p-3 transition-colors ${isDragOver ? 'bg-slate-200 dark:bg-neutral-700/50' : ''}`}
         >
-            <div className={`flex items-center justify-between mb-4 px-2 py-1 rounded ${statusInfo[status].color.replace('text-', 'bg-')}/10`}>
+            <div className={`flex items-center justify-between mb-4 px-2 py-1 rounded ${statusInfo[status].bgColor} border ${theme === 'light' ? 'border-slate-200' : 'border-slate-700/50'}`}>
                 <div className={`flex items-center gap-2 font-semibold text-sm ${statusInfo[status].color}`}>
                     {statusInfo[status].icon}
                     <span>{statusInfo[status].label}</span>
                 </div>
-                <span className="text-sm font-bold text-[var(--drip-muted)]/80 dark:text-neutral-500">{tasks.length}</span>
+                <span className={`text-sm font-bold ${theme === 'light' ? 'text-slate-500' : 'text-neutral-400'}`}>{tasks.length}</span>
             </div>
             <div className="space-y-3 h-full overflow-y-auto max-h-[calc(100vh-350px)] p-1">
                 {tasks.map(task => (

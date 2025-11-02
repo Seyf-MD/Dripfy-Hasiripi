@@ -123,6 +123,7 @@
         "challenges": "Проблемы и преимущества",
         "contacts": "Контакты",
         "tasks": "Задачи",
+        "approvals": "Согласования",
         "adminPanel": "Панель администратора"
     },
     "calendar": {
@@ -248,6 +249,39 @@
         "admin": "Администратор",
         "user": "Пользователь"
     },
+    "approvals": {
+        "title": "Рабочие процессы согласования",
+        "subtitle": "Отслеживайте ожидающие решения по регистрациям, финансовым операциям и задачам.",
+        "refresh": "Обновить",
+        "emptyState": "Нет ожидающих согласований.",
+        "status": {
+            "pending": "В ожидании",
+            "waiting": "В очереди",
+            "approved": "Одобрено",
+            "rejected": "Отклонено",
+            "skipped": "Пропущено"
+        },
+        "step": {
+            "escalation": "Эскалация",
+            "noAssignees": "Нет назначенных пользователей.",
+            "noPermission": "У вас нет прав для этого шага.",
+            "commentPlaceholder": "Добавьте необязательный комментарий к решению",
+            "commentShow": "Добавить комментарий",
+            "commentHide": "Скрыть комментарий",
+            "decisionFailed": "Не удалось сохранить решение. Попробуйте ещё раз.",
+            "actions": {
+                "approve": "Одобрить",
+                "reject": "Отклонить"
+            },
+            "sla": {
+                "remaining": "Осталось: {time}",
+                "overdue": "Просрочено: {time}",
+                "due": "Срок: {time}",
+                "none": "Срок не задан."
+            },
+            "actor": "{name} • {timestamp}"
+        }
+    },
     "dataTypes": {
         "schedule": "Событие календаря",
         "financials": "Финансовая запись",
@@ -281,12 +315,60 @@
         },
         "participantsPlaceholder": "Имена через запятую"
     },
+    "filters": {
+        "all": "Все"
+    },
     "actions": {
         "edit": "Редактировать",
         "delete": "Удалить",
         "save": "Сохранить",
         "cancel": "Отмена",
-        "close": "Закрыть"
+        "close": "Закрыть",
+        "refresh": "Обновить"
+    },
+    "okr": {
+        "progress": "Прогресс Целей",
+        "dashboardTitle": "Панель KPI & Целей",
+        "dashboardSubtitle": "Управляйте финансовым, операционным и стратегическим прогрессом одним взглядом.",
+        "new": "Новая Цель",
+        "validationPending": "Цели ожидают одобрения. Запустите процесс проверки, чтобы ускорить аудит.",
+        "notFound": "Цели для выбранных фильтров не найдены.",
+        "pendingApproval": "Ожидает одобрения",
+        "validate": "Проверить",
+        "progressLabel": "Прогресс",
+        "keyResults": "Ключевые Результаты",
+        "addKeyResult": "Добавить Ключевой Результат",
+        "keyResultTitle": "Название",
+        "keyResultTitlePlaceholder": "Название ключевого результата",
+        "metricUnit": "Единица",
+        "metricNumber": "Число",
+        "metricCurrency": "Валюта",
+        "noKeyResults": "Ключевые результаты еще не добавлены",
+        "validation": "Проверка Цели",
+        "notesOptional": "Заметки (необязательно)",
+        "notesPlaceholder": "Вы можете оставить краткую заметку для аудита",
+        "validationFailed": "Цель не удалось проверить.",
+        "validating": "Проверяется…",
+        "approve": "Одобрить",
+        "update": "Обновить Цель",
+        "create": "Создать новую Цель",
+        "saveFailed": "Цель не удалось сохранить.",
+        "objective": "Цель",
+        "role": "Роль",
+        "department": "Отдел",
+        "currentValue": "Текущее значение",
+        "targetValue": "Целевое значение",
+        "requiresValidation": "Требовать одобрения для обновлений",
+        "saving": "Сохраняется…",
+        "metrics": {
+            "netCashFlow": "Чистый денежный поток",
+            "taskCompletion": "Выполнение задач",
+            "averageProgress": "Средний прогресс Целей",
+            "netCashFlowDesc": "Входящие минус исходящие денежные потоки",
+            "taskCompletionDesc": "Завершенные задачи по сравнению со всеми задачами",
+            "averageProgressDesc": "Средний прогресс активных целей",
+            "trendStable": "Тренд стабилен"
+        }
     },
     "chatbot": {
         "toggle": "Переключить чат-бота",

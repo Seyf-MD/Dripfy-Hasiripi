@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { OKRRecord } from '../../../types';
+import { useLanguage } from '../../../i18n/LanguageContext';
 
 interface OkrValidationModalProps {
   okr: OKRRecord | null;
@@ -9,6 +10,7 @@ interface OkrValidationModalProps {
 }
 
 const OkrValidationModal: React.FC<OkrValidationModalProps> = ({ okr, isOpen, onClose, onValidate }) => {
+  const { t } = useLanguage();
   const [notes, setNotes] = React.useState('');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -33,7 +35,7 @@ const OkrValidationModal: React.FC<OkrValidationModalProps> = ({ okr, isOpen, on
       await onValidate(notes.trim() ? notes.trim() : undefined);
       onClose();
     } catch (submitError) {
-      const message = submitError instanceof Error ? submitError.message : 'OKR doğrulanamadı.';
+      const message = submitError instanceof Error ? submitError.message : t('okr.validationFailed');
       setError(message);
     } finally {
       setIsSubmitting(false);
@@ -44,7 +46,7 @@ const OkrValidationModal: React.FC<OkrValidationModalProps> = ({ okr, isOpen, on
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
       <div className="w-full max-w-lg rounded-2xl bg-white dark:bg-neutral-900 shadow-xl border border-slate-200 dark:border-neutral-700">
         <div className="border-b border-slate-100 dark:border-neutral-800 px-6 py-4">
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">OKR Doğrulaması</h3>
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{t('okr.validation')}</h3>
           <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{okr.objective}</p>
         </div>
         <form onSubmit={handleSubmit} className="px-6 py-6 space-y-4">
@@ -55,13 +57,13 @@ const OkrValidationModal: React.FC<OkrValidationModalProps> = ({ okr, isOpen, on
           )}
 
           <label className="flex flex-col gap-2 text-sm text-slate-600 dark:text-slate-300">
-            <span>Notlar (opsiyonel)</span>
+            <span>{t('okr.notesOptional')}</span>
             <textarea
               value={notes}
               onChange={(event) => setNotes(event.target.value)}
               rows={4}
               className="rounded-lg border border-slate-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              placeholder="Denetim için kısa bir not bırakabilirsiniz"
+              placeholder={t('okr.notesPlaceholder')}
             />
           </label>
 
@@ -72,14 +74,14 @@ const OkrValidationModal: React.FC<OkrValidationModalProps> = ({ okr, isOpen, on
               disabled={isSubmitting}
               className="rounded-lg border border-slate-200 dark:border-neutral-700 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:border-emerald-500"
             >
-              Vazgeç
+              {t('actions.cancel')}
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
               className="rounded-lg bg-emerald-600 text-white px-4 py-2 text-sm font-semibold hover:bg-emerald-700 disabled:opacity-60"
             >
-              {isSubmitting ? 'Doğrulanıyor…' : 'Onayla'}
+              {isSubmitting ? t('okr.validating') : t('okr.approve')}
             </button>
           </div>
         </form>

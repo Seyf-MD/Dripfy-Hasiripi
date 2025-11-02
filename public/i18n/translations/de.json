@@ -123,6 +123,7 @@
         "challenges": "Herausforderungen & Vorteile",
         "contacts": "Kontakte",
         "tasks": "Aufgaben",
+        "approvals": "Genehmigungen",
         "adminPanel": "Admin-Panel"
     },
     "calendar": {
@@ -248,6 +249,39 @@
         "admin": "Administrator",
         "user": "Benutzer"
     },
+    "approvals": {
+        "title": "Genehmigungs-Workflows",
+        "subtitle": "Überwachen Sie ausstehende Entscheidungen für Registrierungen, Finanzprozesse und Aufgaben.",
+        "refresh": "Aktualisieren",
+        "emptyState": "Derzeit sind keine Genehmigungen offen.",
+        "status": {
+            "pending": "Offen",
+            "waiting": "Wartet",
+            "approved": "Genehmigt",
+            "rejected": "Abgelehnt",
+            "skipped": "Übersprungen"
+        },
+        "step": {
+            "escalation": "Eskalation",
+            "noAssignees": "Keine berechtigten Benutzer zugewiesen.",
+            "noPermission": "Sie haben keine Berechtigung für diesen Schritt.",
+            "commentPlaceholder": "Optionalen Kommentar zur Entscheidung hinzufügen",
+            "commentShow": "Kommentar hinzufügen",
+            "commentHide": "Kommentar ausblenden",
+            "decisionFailed": "Die Genehmigung konnte nicht gespeichert werden. Bitte erneut versuchen.",
+            "actions": {
+                "approve": "Genehmigen",
+                "reject": "Ablehnen"
+            },
+            "sla": {
+                "remaining": "Verbleibend: {time}",
+                "overdue": "Überfällig: {time}",
+                "due": "Fällig: {time}",
+                "none": "Keine Frist definiert."
+            },
+            "actor": "{name} • {timestamp}"
+        }
+    },
     "dataTypes": {
         "schedule": "Kalenderereignis",
         "financials": "Finanzdatensatz",
@@ -281,12 +315,60 @@
         },
         "participantsPlaceholder": "Namen durch Komma getrennt"
     },
+    "filters": {
+        "all": "Alle"
+    },
     "actions": {
         "edit": "Bearbeiten",
         "delete": "Löschen",
         "save": "Speichern",
         "cancel": "Abbrechen",
-        "close": "Schließen"
+        "close": "Schließen",
+        "refresh": "Aktualisieren"
+    },
+    "okr": {
+        "progress": "Ziele Fortschritt",
+        "dashboardTitle": "KPI & Ziele Dashboard",
+        "dashboardSubtitle": "Verwalten Sie finanzielle, operative und strategische Fortschritte auf einen Blick.",
+        "new": "Neues Ziel",
+        "validationPending": "Ziele warten auf Genehmigung. Starten Sie den Validierungsprozess, um den Prüfablauf zu beschleunigen.",
+        "notFound": "Keine Ziele für die ausgewählten Filter gefunden.",
+        "pendingApproval": "Genehmigung ausstehend",
+        "validate": "Validieren",
+        "progressLabel": "Fortschritt",
+        "keyResults": "Schlüsselergebnisse",
+        "addKeyResult": "Schlüsselergebnis hinzufügen",
+        "keyResultTitle": "Titel",
+        "keyResultTitlePlaceholder": "Schlüsselergebnis-Titel",
+        "metricUnit": "Einheit",
+        "metricNumber": "Zahl",
+        "metricCurrency": "Währung",
+        "noKeyResults": "Noch keine Schlüsselergebnisse hinzugefügt",
+        "validation": "Ziel Validierung",
+        "notesOptional": "Notizen (optional)",
+        "notesPlaceholder": "Sie können eine kurze Notiz für die Prüfung hinterlassen",
+        "validationFailed": "Ziel konnte nicht validiert werden.",
+        "validating": "Wird validiert…",
+        "approve": "Genehmigen",
+        "update": "Ziel aktualisieren",
+        "create": "Neues Ziel erstellen",
+        "saveFailed": "Ziel konnte nicht gespeichert werden.",
+        "objective": "Ziel",
+        "role": "Rolle",
+        "department": "Abteilung",
+        "currentValue": "Aktueller Wert",
+        "targetValue": "Zielwert",
+        "requiresValidation": "Genehmigung für Aktualisierungen erforderlich",
+        "saving": "Wird gespeichert…",
+        "metrics": {
+            "netCashFlow": "Netto-Cashflow",
+            "taskCompletion": "Aufgabenerfüllung",
+            "averageProgress": "Durchschnittlicher Ziele Fortschritt",
+            "netCashFlowDesc": "Eingehende minus ausgehende Cashflows",
+            "taskCompletionDesc": "Abgeschlossene Aufgaben im Verhältnis zu allen Aufgaben",
+            "averageProgressDesc": "Durchschnittlicher Fortschritt aktiver Ziele",
+            "trendStable": "Trend stabil"
+        }
     },
     "chatbot": {
         "toggle": "Chatbot umschalten",

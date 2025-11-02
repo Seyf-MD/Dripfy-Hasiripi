@@ -122,6 +122,7 @@ describe('admin authenticate middleware', () => {
       email: 'admin@example.com',
       role: 'admin',
       name: 'Admin User',
+      capabilities: ['read', 'create', 'update', 'approve', 'delegate', 'admin'],
     });
   });
 });

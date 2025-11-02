@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Calendar, Euro, ShieldAlert, Users, ListChecks, Shield } from 'lucide-react';
+import { Calendar, CheckCircle2, Euro, ShieldAlert, Users, ListChecks, Shield } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -12,18 +12,27 @@ interface TabNavigationProps {
 const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab }) => {
     const { t } = useLanguage();
     const { theme } = useTheme();
-    const { isAdmin } = useAuth();
-    
+    const { isAdmin, isAuthenticated } = useAuth();
+
     const allTabs = [
         { name: 'Calendar', icon: <Calendar size={18} />, label: t('tabs.calendar') },
         { name: 'Financials', icon: <Euro size={18} />, label: t('tabs.financials') },
         { name: 'Challenges', icon: <ShieldAlert size={18} />, label: t('tabs.challenges') },
         { name: 'Contacts', icon: <Users size={18} />, label: t('tabs.contacts') },
         { name: 'Tasks', icon: <ListChecks size={18} />, label: t('tabs.tasks') },
+        { name: 'Approvals', icon: <CheckCircle2 size={18} />, label: t('tabs.approvals') },
         { name: 'Admin Panel', icon: <Shield size={18} />, label: t('tabs.adminPanel') },
     ];
 
-    const visibleTabs = isAdmin ? allTabs : allTabs.filter(tab => tab.name !== 'Admin Panel');
+    const visibleTabs = allTabs.filter(tab => {
+        if (tab.name === 'Admin Panel') {
+            return isAdmin;
+        }
+        if (tab.name === 'Approvals') {
+            return isAuthenticated;
+        }
+        return true;
+    });
     
     return (
         <div className="mt-6 animate-slide-in-up" style={{ animationDelay: '600ms' }}>

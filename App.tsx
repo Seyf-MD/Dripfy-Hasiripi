@@ -10,6 +10,7 @@ import ChallengesTab from './components/tabs/ChallengesTab';
 import ContactsTab from './components/tabs/ContactsTab';
 import TasksTab from './components/tabs/TasksTab';
 import AdminPanelTab from './components/tabs/AdminPanelTab';
+import ApprovalsTab from './components/tabs/ApprovalsTab';
 import Chatbot from './components/Chatbot';
 import Footer from './components/Footer';
 import DetailModal from './components/DetailModal';
@@ -20,11 +21,29 @@ import LegalPage from './components/LegalPage';
 import { LegalPageKey } from './data/legalContent';
 
 import { mockData } from './data/mockData';
-import { DashboardData, DataItem, SignupRequest, ScheduleEvent, FinancialRecord, Challenge, Advantage, Contact, Task, User, UserPermission, AdminSubTab, NotificationSettings, OKRRecord } from './types';
+import {
+  DashboardData,
+  DataItem,
+  SignupRequest,
+  ScheduleEvent,
+  FinancialRecord,
+  Challenge,
+  Advantage,
+  Contact,
+  Task,
+  User,
+  UserPermission,
+  AdminSubTab,
+  NotificationSettings,
+  OKRRecord,
+  ApprovalFlowSummary,
+  ApprovalFlowType,
+} from './types';
 import { useLanguage } from './i18n/LanguageContext';
 import { useTheme } from './context/ThemeContext';
 import { UserProvider } from './context/UserContext';
 import { finalizeSignup, fetchSignupRequests, resolveSignupRequest, SignupFinalizePayload } from './services/signupService';
+import { fetchApprovalFlows, submitApprovalDecision } from './services/approvals';
 import { useAuth } from './context/AuthContext';
 
 type ModalType = 'schedule' | 'financials' | 'challenges' | 'advantages' | 'contacts' | 'tasks' | 'users';
@@ -86,6 +105,9 @@ function App() {
   
   const [financialsDateFilter, setFinancialsDateFilter] = React.useState<'week' | 'month' | null>(null);
 
+  const [approvalFlows, setApprovalFlows] = React.useState<ApprovalFlowSummary[]>([]);
+  const [isApprovalsLoading, setIsApprovalsLoading] = React.useState(false);
+
   const currentUser = React.useMemo(() => {
     if (!user) return null;
     const match = dashboardData.users.find(u => u.email.toLowerCase() === user.email.toLowerCase());
@@ -105,6 +127,71 @@ function App() {
   const currentUserPermissions = React.useMemo(
     () => dashboardData.userPermissions.find(p => p.userId === currentUser?.id)?.permissions,
     [currentUser, dashboardData.userPermissions],
+  );
+
+  const loadApprovalFlows = React.useCallback(
+    async (showSpinner = true) => {
+      if (!isAuthenticated) {
+        setApprovalFlows([]);
+        return;
+      }
+
+      if (showSpinner) {
+        setIsApprovalsLoading(true);
+      }
+      try {
+        const flows = await fetchApprovalFlows({ token: token || undefined });
+        setApprovalFlows(flows);
+      } catch (error) {
+        console.error('Approval flows fetch failed:', error);
+      } finally {
+        if (showSpinner) {
+          setIsApprovalsLoading(false);
+        }
+      }
+    },
+    [isAuthenticated, token],
+  );
+
+  React.useEffect(() => {
+    loadApprovalFlows().catch(error => console.error('Approval flow load failed:', error));
+  }, [loadApprovalFlows]);
+
+  const handleRefreshApprovals = React.useCallback(() => {
+    loadApprovalFlows().catch(error => console.error('Approval refresh failed:', error));
+  }, [loadApprovalFlows]);
+
+  const handleApprovalDecision = React.useCallback(
+    async (flowId: string, stepId: string, decision: 'approved' | 'rejected', comment?: string) => {
+      const [flowType, ...rest] = flowId.split(':');
+      const entityId = rest.join(':');
+      if (!flowType || !entityId) {
+        console.error('Approval decision failed: invalid flow identifier', flowId);
+        return;
+      }
+
+      setIsApprovalsLoading(true);
+      try {
+        const updatedFlow = await submitApprovalDecision({
+          flowType: flowType as ApprovalFlowType,
+          entityId,
+          stepId,
+          payload: { decision, comment },
+          token: token || undefined,
+        });
+        setApprovalFlows(prev => {
+          const remaining = prev.filter(item => item.id !== updatedFlow.id);
+          return [updatedFlow, ...remaining];
+        });
+        await loadApprovalFlows(false);
+      } catch (error) {
+        console.error('Approval decision failed:', error);
+        throw error;
+      } finally {
+        setIsApprovalsLoading(false);
+      }
+    },
+    [token, loadApprovalFlows],
   );
 
   type PermissionableView = keyof NonNullable<UserPermission['permissions']>;
@@ -402,12 +489,22 @@ function App() {
                     onUpdate={(id, field, value) => handleQuickUpdate(id, 'contacts', field, value)}
                 />;
       case 'Tasks':
-        return <TasksTab 
-                    data={dashboardData.tasks} 
+        return <TasksTab
+                    data={dashboardData.tasks}
                     canEdit={canEdit('tasks')}
                     onOpenModal={handleOpenDetailModal as any}
                     onUpdateStatus={(taskId, newStatus) => handleQuickUpdate(taskId, 'tasks', 'status', newStatus)}
                 />;
+      case 'Approvals':
+        return (
+          <ApprovalsTab
+            flows={approvalFlows}
+            onDecision={handleApprovalDecision}
+            onRefresh={handleRefreshApprovals}
+            currentUserRole={currentUser?.role ?? user?.role ?? null}
+            isLoading={isApprovalsLoading}
+          />
+        );
       case 'Admin Panel':
         if (isAdmin) {
             return <AdminPanelTab

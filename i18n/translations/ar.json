@@ -87,7 +87,7 @@
         "subtitle": "أرسلنا رمز التحقق إلى {email}. يرجى إدخاله أدناه.",
         "codePlaceholder": "رمز التحقق",
         "button": "تحقق وسجل",
-        "backButton": "العودة إلى التسجيل",
+        "backButton": "رجوع",
         "invalidCode": "رمز التحقق غير صالح. يرجى المحاولة مرة أخرى."
     },
     "positions": {

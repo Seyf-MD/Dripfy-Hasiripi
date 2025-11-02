@@ -108,6 +108,38 @@ export type AdminSubTab = 'permissions' | 'audit' | 'requests';
 
 export type DataItem = ScheduleEvent | FinancialRecord | Challenge | Advantage | Contact | Task | User;
 
+export type ChatbotAction = 'createTask' | 'updateRecord' | 'triggerReport';
+
+export interface ChatbotReference {
+  id: string;
+  title: string;
+  snippet: string;
+  source: string;
+  path?: string;
+  score?: number;
+}
+
+export interface ChatbotMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+export interface ChatbotResponsePayload {
+  answer: string;
+  references: ChatbotReference[];
+  provider: string;
+}
+
+export interface ChatbotPromptTemplate {
+  id: string;
+  name: string;
+  description: string;
+  prompt: string;
+  recommendedSources?: string[];
+}
+
+export type ChatbotActionPermissionMap = Record<ChatbotAction, UserRole[]>;
+
 export interface DashboardData {
   schedule: ScheduleEvent[];
   financials: FinancialRecord[];

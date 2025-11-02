@@ -11,6 +11,8 @@ import { ensureDataEnvironment } from './services/storageService.js';
 import { startDailyBackupScheduler } from './services/backupService.js';
 import { addSignupRequest, listSignupRequests, removeSignupRequest } from './services/signupRequestService.js';
 import { recordErrorLog } from './services/logService.js';
+import { ensureKnowledgeBase } from './services/knowledgeBase.js';
+import automationRouter from './routes/automation.js';
 import {
   SIGNUP_CODE_TTL,
   createSignupCodeRecord,
@@ -37,6 +39,14 @@ ensureDataEnvironment()
     console.error('[bootstrap] Failed to prepare data environment:', error);
   });
 
+ensureKnowledgeBase()
+  .then(() => {
+    console.log('[bootstrap] Knowledge base indexed');
+  })
+  .catch((error) => {
+    console.error('[bootstrap] Failed to build knowledge base:', error);
+  });
+
 app.use(cors({
   origin: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',').map(v => v.trim()) : true,
   credentials: true,
@@ -46,6 +56,7 @@ app.use(cookieParser());
 
 app.use('/api/auth', authRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/automation', authenticate(), automationRouter);
 
 const adminOnlyMiddleware = authenticate({ requiredRole: 'admin' });
 

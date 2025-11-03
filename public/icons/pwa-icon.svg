@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Dripfy Icon</title>
+  <desc id="desc">Minimal droplet emblem for the Dripfy MIS dashboard</desc>
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399" />
+      <stop offset="100%" stop-color="#0f766e" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="120" fill="#0f172a" />
+  <path
+    fill="url(#grad)"
+    d="M256 92c-86 120-130 182-130 234 0 74 58 134 130 134s130-60 130-134c0-52-44-114-130-234zm0 304c-38 0-70-31-70-70 0-20 12-47 70-132 58 85 70 112 70 132 0 39-32 70-70 70z"
+  />
+  <circle cx="256" cy="360" r="44" fill="rgba(15,23,42,0.2)" />
+</svg>

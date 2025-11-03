@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { OKRRecord } from '../../../types';
 import { useLanguage } from '../../../i18n/LanguageContext';
+import { OfflineQueueError } from '../../../services/offlineQueue';
+import { useNetworkStatus } from '../../../hooks/useNetworkStatus';
 
 interface OkrValidationModalProps {
   okr: OKRRecord | null;
@@ -10,10 +12,26 @@ interface OkrValidationModalProps {
 }
 
 const OkrValidationModal: React.FC<OkrValidationModalProps> = ({ okr, isOpen, onClose, onValidate }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { isOnline } = useNetworkStatus();
   const [notes, setNotes] = React.useState('');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [infoMessage, setInfoMessage] = React.useState<string | null>(null);
+  const validationOfflineNotice = React.useMemo(() => {
+    const translations: Record<string, string> = {
+      tr: 'Çevrimdışısınız. Doğrulama isteği kuyruğa alınacak ve bağlantı sağlandığında otomatik tamamlanacak.',
+      en: 'You are offline. The approval will be queued and completed once you reconnect.',
+      de: 'Sie sind offline. Die Freigabe wird in die Warteschlange gestellt und nach Wiederverbindung abgeschlossen.',
+      ru: 'Вы в офлайн-режиме. Подтверждение будет поставлено в очередь и завершено после восстановления связи.',
+      ar: 'أنت غير متصل. سيتم وضع طلب التحقق في قائمة الانتظار وسيكتمل تلقائيًا عند إعادة الاتصال.',
+    };
+    const translated = t('okr.validationOfflineNotice');
+    if (translated && translated !== 'okr.validationOfflineNotice') {
+      return translated;
+    }
+    return translations[language] ?? translations.tr;
+  }, [language, t]);
 
   React.useEffect(() => {
     if (!isOpen) {
@@ -21,6 +39,7 @@ const OkrValidationModal: React.FC<OkrValidationModalProps> = ({ okr, isOpen, on
     }
     setNotes('');
     setError(null);
+    setInfoMessage(null);
   }, [isOpen, okr?.id]);
 
   if (!isOpen || !okr) {
@@ -31,12 +50,17 @@ const OkrValidationModal: React.FC<OkrValidationModalProps> = ({ okr, isOpen, on
     event.preventDefault();
     setIsSubmitting(true);
     setError(null);
+    setInfoMessage(null);
     try {
       await onValidate(notes.trim() ? notes.trim() : undefined);
       onClose();
     } catch (submitError) {
-      const message = submitError instanceof Error ? submitError.message : t('okr.validationFailed');
-      setError(message);
+      if (submitError instanceof OfflineQueueError) {
+        setInfoMessage(submitError.message);
+      } else {
+        const message = submitError instanceof Error ? submitError.message : t('okr.validationFailed');
+        setError(message);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -50,6 +74,16 @@ const OkrValidationModal: React.FC<OkrValidationModalProps> = ({ okr, isOpen, on
           <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{okr.objective}</p>
         </div>
         <form onSubmit={handleSubmit} className="px-6 py-6 space-y-4">
+          {!isOnline ? (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+              {validationOfflineNotice}
+            </div>
+          ) : null}
+          {infoMessage ? (
+            <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+              {infoMessage}
+            </div>
+          ) : null}
           {error && (
             <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-600">
               {error}

@@ -7,6 +7,8 @@ import OkrValidationModal from './OkrValidationModal';
 import { useUserContext } from '../../../context/UserContext';
 import { Department, KpiOverview, OKRRecord, OperationalRole } from '../../../types';
 import { fetchKpiOverview, fetchOkrs, saveOkr, validateOkr } from '../../../services/analytics';
+import { OfflineQueueError, type OfflineQueueEntry } from '../../../services/offlineQueue';
+import { useNetworkStatus } from '../../../hooks/useNetworkStatus';
 import { useLanguage } from '../../../i18n/LanguageContext';
 
 const ROLE_OPTIONS: OperationalRole[] = ['admin', 'finance', 'operations', 'product', 'medical', 'people'];
@@ -28,6 +30,7 @@ interface KPIBoardProps {
 const KPIBoard: React.FC<KPIBoardProps> = ({ initialOkrs, onOkrsChange }) => {
   const { t } = useLanguage();
   const { operationalRole, department } = useUserContext();
+  const { isOnline } = useNetworkStatus();
   const [selectedRole, setSelectedRole] = React.useState<OperationalRole | null>(operationalRole ?? null);
   const [selectedDepartment, setSelectedDepartment] = React.useState<Department | null>(department ?? null);
   const [overview, setOverview] = React.useState<KpiOverview | null>(null);
@@ -37,6 +40,16 @@ const KPIBoard: React.FC<KPIBoardProps> = ({ initialOkrs, onOkrsChange }) => {
   const [formOpen, setFormOpen] = React.useState(false);
   const [formOkr, setFormOkr] = React.useState<OKRRecord | null>(null);
   const [validationOkr, setValidationOkr] = React.useState<OKRRecord | null>(null);
+  const [actionNotice, setActionNotice] = React.useState<{ message: string; tone: 'warning' | 'success' } | null>(null);
+  const noticeTimeout = React.useRef<number | null>(null);
+  const completedLabel = React.useMemo(() => {
+    const label = t('actions.completed');
+    return label === 'actions.completed' ? 'Tamamlandı' : label;
+  }, [t]);
+  const closeLabel = React.useMemo(() => {
+    const label = t('actions.close');
+    return label === 'actions.close' ? 'Kapat' : label;
+  }, [t]);
 
   const filters = React.useMemo(() => ({ role: selectedRole, department: selectedDepartment }), [selectedRole, selectedDepartment]);
 
@@ -94,30 +107,75 @@ const KPIBoard: React.FC<KPIBoardProps> = ({ initialOkrs, onOkrsChange }) => {
     setFormOpen(true);
   };
 
+  const clearNoticeLater = React.useCallback((delay = 6000) => {
+    if (noticeTimeout.current) {
+      window.clearTimeout(noticeTimeout.current);
+    }
+    noticeTimeout.current = window.setTimeout(() => {
+      setActionNotice(null);
+      noticeTimeout.current = null;
+    }, delay);
+  }, []);
+
   const handleSaveOkr = async (payload: Parameters<typeof saveOkr>[0]) => {
-    const saved = await saveOkr(payload);
-    setOkrs((prev) => {
-      const exists = prev.some((item) => item.id === saved.id);
-      const next = exists ? prev.map((item) => (item.id === saved.id ? saved : item)) : [saved, ...prev];
-      onOkrsChange?.(next);
-      return next;
-    });
-    await loadData();
+    try {
+      const saved = await saveOkr(payload);
+      setOkrs((prev) => {
+        const exists = prev.some((item) => item.id === saved.id);
+        const next = exists ? prev.map((item) => (item.id === saved.id ? saved : item)) : [saved, ...prev];
+        onOkrsChange?.(next);
+        return next;
+      });
+      await loadData();
+    } catch (submitError) {
+      if (submitError instanceof OfflineQueueError) {
+        setActionNotice({ message: submitError.message, tone: 'warning' });
+      }
+      throw submitError;
+    }
   };
 
   const handleValidateOkr = async (notes?: string) => {
     if (!validationOkr) {
       return;
     }
-    const updated = await validateOkr(validationOkr.id, notes);
-    setOkrs((prev) => {
-      const next = prev.map((item) => (item.id === updated.id ? updated : item));
-      onOkrsChange?.(next);
-      return next;
-    });
-    setValidationOkr(null);
-    await loadData();
+    try {
+      const updated = await validateOkr(validationOkr.id, notes);
+      setOkrs((prev) => {
+        const next = prev.map((item) => (item.id === updated.id ? updated : item));
+        onOkrsChange?.(next);
+        return next;
+      });
+      setValidationOkr(null);
+      await loadData();
+    } catch (submitError) {
+      if (submitError instanceof OfflineQueueError) {
+        setActionNotice({ message: submitError.message, tone: 'warning' });
+      }
+      throw submitError;
+    }
   };
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    const handleProcessed = (event: Event) => {
+      const detail = (event as CustomEvent<OfflineQueueEntry>).detail;
+      if (!detail) {
+        return;
+      }
+      setActionNotice({ message: 'Bekleyen gönderimler başarıyla senkronize edildi.', tone: 'success' });
+      clearNoticeLater();
+    };
+    window.addEventListener('offlinequeue:entry-processed', handleProcessed as EventListener);
+    return () => {
+      window.removeEventListener('offlinequeue:entry-processed', handleProcessed as EventListener);
+      if (noticeTimeout.current) {
+        window.clearTimeout(noticeTimeout.current);
+      }
+    };
+  }, [clearNoticeLater]);
 
   return (
     <section className="mt-8 space-y-6">
@@ -143,7 +201,34 @@ const KPIBoard: React.FC<KPIBoardProps> = ({ initialOkrs, onOkrsChange }) => {
             {t('okr.new')}
           </button>
         </div>
+        {!isOnline ? (
+          <p className="mt-2 text-xs font-medium text-amber-700 bg-amber-100/70 border border-amber-200 rounded-lg px-3 py-2 lg:mt-0 lg:ml-4 lg:self-start">
+            Çevrimdışı moddasınız. Kaydedilen değişiklikler bağlantı geldiğinde otomatik gönderilecek.
+          </p>
+        ) : null}
       </div>
+
+      {actionNotice ? (
+        <div
+          className={`flex items-start gap-3 rounded-xl border px-4 py-3 text-sm ${
+            actionNotice.tone === 'success'
+              ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
+              : 'border-amber-200 bg-amber-50 text-amber-800'
+          }`}
+        >
+          <span className="mt-0.5 font-semibold">
+            {actionNotice.tone === 'success' ? completedLabel : 'Çevrimdışı kuyruğa alındı'}
+          </span>
+          <span className="flex-1 leading-relaxed">{actionNotice.message}</span>
+          <button
+            type="button"
+            onClick={() => setActionNotice(null)}
+            className="ml-auto text-xs font-semibold uppercase tracking-wide text-current hover:opacity-70"
+          >
+            {closeLabel}
+          </button>
+        </div>
+      ) : null}
 
       {error && (
         <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-600">

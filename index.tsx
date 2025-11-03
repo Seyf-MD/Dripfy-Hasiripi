@@ -22,3 +22,22 @@ root.render(
     </LanguageProvider>
   </React.StrictMode>
 );
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    const swUrl = new URL('./service-worker.ts', import.meta.url);
+    navigator.serviceWorker
+      .register(swUrl, { type: 'module' })
+      .then((registration) => {
+        if ('Notification' in window && Notification.permission === 'default') {
+          Notification.requestPermission().catch((error) => {
+            console.warn('[sw] Push permission request failed', error);
+          });
+        }
+        return registration;
+      })
+      .catch((error) => {
+        console.error('[sw] Registration failed', error);
+      });
+  });
+}

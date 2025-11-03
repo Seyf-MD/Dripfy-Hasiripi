@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title-mask desc-mask">
+  <title id="title-mask">Dripfy Maskable Icon</title>
+  <desc id="desc-mask">Maskable icon variant with safe area for the Dripfy MIS dashboard</desc>
+  <defs>
+    <radialGradient id="maskGrad" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#14b8a6" />
+      <stop offset="60%" stop-color="#0f766e" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="#020617" />
+  <g transform="translate(256 256)">
+    <path
+      fill="url(#maskGrad)"
+      d="M0-176c-74 104-112 158-112 204 0 66 50 120 112 120s112-54 112-120c0-46-38-100-112-204zm0 262c-34 0-62-27-62-58 0-18 10-41 62-114 52 73 62 96 62 114 0 31-28 58-62 58z"
+    />
+    <circle cx="0" cy="80" r="42" fill="rgba(15,23,42,0.25)" />
+  </g>
+</svg>

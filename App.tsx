@@ -19,6 +19,7 @@ import SettingsModal from './components/SettingsModal';
 import PasswordChangeModal from './components/PasswordChangeModal';
 import LegalPage from './components/LegalPage';
 import { LegalPageKey } from './data/legalContent';
+import OfflineBanner from './components/layout/OfflineBanner';
 
 import { mockData } from './data/mockData';
 import {
@@ -45,6 +46,8 @@ import { UserProvider } from './context/UserContext';
 import { finalizeSignup, fetchSignupRequests, resolveSignupRequest, SignupFinalizePayload } from './services/signupService';
 import { fetchApprovalFlows, submitApprovalDecision } from './services/approvals';
 import { useAuth } from './context/AuthContext';
+import { useNetworkStatus } from './hooks/useNetworkStatus';
+import { useOfflineQueue } from './hooks/useOfflineQueue';
 
 type ModalType = 'schedule' | 'financials' | 'challenges' | 'advantages' | 'contacts' | 'tasks' | 'users';
 type SettingsPanelTab = 'profile' | 'settings' | 'privacy';
@@ -53,6 +56,8 @@ function App() {
   const { t } = useLanguage();
   const { theme } = useTheme();
   const { user, isAuthenticated, isAdmin, token, logout } = useAuth();
+  const { isOnline } = useNetworkStatus();
+  const [queueState, retryQueue] = useOfflineQueue();
   const [dashboardData, setDashboardData] = React.useState<DashboardData>(mockData);
   const [activeTab, setActiveTab] = React.useState<string>('Calendar');
   const [adminPanelSubTab, setAdminPanelSubTab] = React.useState<AdminSubTab>('permissions');
@@ -107,6 +112,13 @@ function App() {
 
   const [approvalFlows, setApprovalFlows] = React.useState<ApprovalFlowSummary[]>([]);
   const [isApprovalsLoading, setIsApprovalsLoading] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!isOnline) {
+      return;
+    }
+    retryQueue().catch((error) => console.error('[App] Offline queue flush failed', error));
+  }, [isOnline, retryQueue]);
 
   const currentUser = React.useMemo(() => {
     if (!user) return null;
@@ -547,14 +559,21 @@ function App() {
     );
   }
 
+  const shouldOffsetForBanner = !isOnline || queueState.queueLength > 0;
   const baseContainerClass = `min-h-screen min-h-[100svh] min-h-[100dvh] font-sans w-full ${
     theme === 'light'
       ? 'bg-[var(--drip-surface)] text-[var(--drip-text)]'
       : 'bg-[var(--drip-dark-surface)] text-[var(--drip-dark-text)]'
-  }`;
+  } ${shouldOffsetForBanner ? 'pt-24 md:pt-28' : ''}`;
 
   return (
     <UserProvider user={currentUser}>
+      <OfflineBanner
+        isOnline={isOnline}
+        queueLength={queueState.queueLength}
+        lastSyncedAt={queueState.lastSyncedAt}
+        onRetry={() => retryQueue().catch((error) => console.error('[App] Manual queue retry failed', error))}
+      />
       <div className={baseContainerClass}>
         <div className="isolate w-full">
           <Header

@@ -1,0 +1,47 @@
+{
+  "name": "Dripfy MIS Dashboard",
+  "short_name": "Dripfy",
+  "description": "Dripfy MIS ile saha operasyonlarını, onay süreçlerini ve finansal metrikleri çevrimdışı dahi takip edin.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#0f172a",
+  "dir": "ltr",
+  "lang": "tr",
+  "scope": "/",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/icons/pwa-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/pwa-icon-maskable.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/assets/logo-wordmark.png",
+      "sizes": "1200x630",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Onaylar",
+      "url": "/?view=approvals",
+      "description": "Bekleyen onay akışlarına hızlı erişim"
+    },
+    {
+      "name": "OKR Paneli",
+      "url": "/?view=okr",
+      "description": "Hedef ve anahtar sonuçlarınızı yönetim"
+    }
+  ]
+}

@@ -2,6 +2,8 @@ import * as React from 'react';
 import { Department, OperationalRole, OKRRecord, OKRKeyResult } from '../../../types';
 import type { SaveOkrPayload } from '../../../services/analytics';
 import { useLanguage } from '../../../i18n/LanguageContext';
+import { OfflineQueueError } from '../../../services/offlineQueue';
+import { useNetworkStatus } from '../../../hooks/useNetworkStatus';
 import { Plus, X } from 'lucide-react';
 
 interface OkrFormModalProps {
@@ -24,6 +26,7 @@ const OkrFormModal: React.FC<OkrFormModalProps> = ({
   onSubmit,
 }) => {
   const { t, language } = useLanguage();
+  const { isOnline } = useNetworkStatus();
   
   // Helper function to safely get translations with fallback
   const getTranslation = (key: string, fallback: Record<string, string>): string => {
@@ -43,6 +46,22 @@ const OkrFormModal: React.FC<OkrFormModalProps> = ({
   const [requiresValidation, setRequiresValidation] = React.useState<boolean>(okr?.requiresValidation ?? false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [infoMessage, setInfoMessage] = React.useState<string | null>(null);
+
+  const offlineNotice = React.useMemo(() => {
+    const translations: Record<string, string> = {
+      tr: 'Çevrimdışısınız. Gönderim kuyruğa alınacak ve bağlantı sağlandığında otomatik senkronize edilecek.',
+      en: 'You are offline. The submission will be queued and synced automatically when you reconnect.',
+      de: 'Sie sind offline. Die Eingabe wird in die Warteschlange gestellt und bei erneuter Verbindung synchronisiert.',
+      ru: 'Вы в офлайн-режиме. Данные будут поставлены в очередь и синхронизированы при подключении.',
+      ar: 'أنت غير متصل. سيتم وضع الإرسال في قائمة الانتظار ومزامنته تلقائيًا عند إعادة الاتصال.',
+    };
+    const translated = t('okr.offlineModeNotice');
+    if (translated && translated !== 'okr.offlineModeNotice') {
+      return translated;
+    }
+    return translations[language] ?? translations.tr;
+  }, [language, t]);
 
   React.useEffect(() => {
     if (!isOpen) {
@@ -57,6 +76,7 @@ const OkrFormModal: React.FC<OkrFormModalProps> = ({
     setKeyResults(okr?.keyResults ? [...okr.keyResults] : []);
     setRequiresValidation(okr?.requiresValidation ?? false);
     setError(null);
+    setInfoMessage(null);
   }, [isOpen, okr, availableRoles, availableDepartments]);
 
   if (!isOpen) {
@@ -67,6 +87,7 @@ const OkrFormModal: React.FC<OkrFormModalProps> = ({
     event.preventDefault();
     setIsSubmitting(true);
     setError(null);
+    setInfoMessage(null);
     try {
       await onSubmit({
         id: okr?.id,
@@ -84,8 +105,12 @@ const OkrFormModal: React.FC<OkrFormModalProps> = ({
       });
       onClose();
     } catch (submitError) {
-      const message = submitError instanceof Error ? submitError.message : t('okr.saveFailed');
-      setError(message);
+      if (submitError instanceof OfflineQueueError) {
+        setInfoMessage(submitError.message);
+      } else {
+        const message = submitError instanceof Error ? submitError.message : t('okr.saveFailed');
+        setError(message);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -100,6 +125,16 @@ const OkrFormModal: React.FC<OkrFormModalProps> = ({
           <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{title}</h3>
         </div>
         <form onSubmit={handleSubmit} className="px-6 py-6 space-y-5">
+          {!isOnline ? (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+              {offlineNotice}
+            </div>
+          ) : null}
+          {infoMessage ? (
+            <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+              {infoMessage}
+            </div>
+          ) : null}
           {error && (
             <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-600">
               {error}

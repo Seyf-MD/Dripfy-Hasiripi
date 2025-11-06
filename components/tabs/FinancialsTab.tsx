@@ -1,9 +1,12 @@
 import * as React from 'react';
-import { FinancialRecord, FinanceForecastData, ForecastInsightSeverity } from '../../types';
+import { FinancialRecord, FinanceForecastData, ForecastInsightSeverity, InvoiceDocument, InvoicePreviewReference } from '../../types';
 import { ArrowUp, ArrowDown, PlusCircle, TrendingUp, TrendingDown, AlertTriangle, Activity, Sparkles } from 'lucide-react';
 import { useLanguage } from '../../i18n/LanguageContext';
 import ForecastChart from '../finance/ForecastChart';
 import { fetchFinanceForecast } from '../../services/forecasting/client';
+import { fetchInvoices, fetchInvoicePreview } from '../../services/invoices/client';
+import InvoiceStatusPanel from '../finance/InvoiceStatusPanel';
+import InvoicePreviewPanel from '../finance/InvoicePreviewPanel';
 
 interface FinancialsTabProps {
     data: FinancialRecord[];
@@ -45,6 +48,13 @@ const FinancialsTab: React.FC<FinancialsTabProps> = ({ data, canEdit, onOpenModa
     const [forecastData, setForecastData] = React.useState<FinanceForecastData | null>(null);
     const [forecastLoading, setForecastLoading] = React.useState(false);
     const [forecastError, setForecastError] = React.useState<string | null>(null);
+    const [invoiceList, setInvoiceList] = React.useState<InvoiceDocument[]>([]);
+    const [invoiceLoading, setInvoiceLoading] = React.useState(false);
+    const [invoiceError, setInvoiceError] = React.useState<string | null>(null);
+    const [selectedInvoiceId, setSelectedInvoiceId] = React.useState<string | null>(null);
+    const [previewRef, setPreviewRef] = React.useState<InvoicePreviewReference | null>(null);
+    const [previewLoading, setPreviewLoading] = React.useState(false);
+    const [previewError, setPreviewError] = React.useState<string | null>(null);
 
     const formatCurrency = React.useCallback((value: number) => {
         return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value);
@@ -82,6 +92,96 @@ const FinancialsTab: React.FC<FinancialsTabProps> = ({ data, canEdit, onOpenModa
         loadForecast(controller.signal);
         return () => controller.abort();
     }, [loadForecast]);
+
+    React.useEffect(() => {
+        const controller = new AbortController();
+        setInvoiceLoading(true);
+        fetchInvoices(controller.signal)
+            .then((items) => {
+                setInvoiceList(items);
+                setInvoiceError(null);
+                setSelectedInvoiceId((current) => {
+                    if (current && items.some(item => item.id === current)) {
+                        return current;
+                    }
+                    return items[0]?.id ?? null;
+                });
+            })
+            .catch((error) => {
+                if ((error as any)?.name === 'AbortError') {
+                    return;
+                }
+                const message = error instanceof Error ? error.message : 'Faturalar alınamadı.';
+                setInvoiceError(message);
+                setInvoiceList([]);
+                setSelectedInvoiceId(null);
+            })
+            .finally(() => {
+                if (!controller.signal.aborted) {
+                    setInvoiceLoading(false);
+                }
+            });
+        return () => controller.abort();
+    }, []);
+
+    React.useEffect(() => {
+        if (!selectedInvoiceId) {
+            setPreviewRef(null);
+            return;
+        }
+        const controller = new AbortController();
+        setPreviewLoading(true);
+        setPreviewError(null);
+        fetchInvoicePreview(selectedInvoiceId, controller.signal)
+            .then((ref) => {
+                setPreviewRef(ref);
+            })
+            .catch((error) => {
+                if ((error as any)?.name === 'AbortError') {
+                    return;
+                }
+                const message = error instanceof Error ? error.message : 'Önizleme alınamadı.';
+                setPreviewError(message);
+                setPreviewRef(null);
+            })
+            .finally(() => {
+                if (!controller.signal.aborted) {
+                    setPreviewLoading(false);
+                }
+            });
+        return () => controller.abort();
+    }, [selectedInvoiceId]);
+
+    const selectedInvoice = React.useMemo(() => {
+        if (!selectedInvoiceId) {
+            return null;
+        }
+        return invoiceList.find((item) => item.id === selectedInvoiceId) || null;
+    }, [invoiceList, selectedInvoiceId]);
+
+    const handleSelectInvoice = React.useCallback((invoiceId: string) => {
+        setSelectedInvoiceId(invoiceId);
+    }, []);
+
+    const handleRefreshPreview = React.useCallback(() => {
+        if (!selectedInvoiceId) {
+            return;
+        }
+        setPreviewLoading(true);
+        setPreviewError(null);
+        fetchInvoicePreview(selectedInvoiceId)
+            .then((ref) => {
+                setPreviewRef(ref);
+            })
+            .catch((error) => {
+                const message = error instanceof Error ? error.message : 'Önizleme alınamadı.';
+                setPreviewError(message);
+                setPreviewRef(null);
+            })
+            .finally(() => {
+                setPreviewLoading(false);
+            });
+    }, [selectedInvoiceId]);
 
     const activeScenarioData = React.useMemo(() => {
         if (!forecastData) return null;
@@ -193,85 +293,122 @@ const FinancialsTab: React.FC<FinancialsTabProps> = ({ data, canEdit, onOpenModa
     const inputClasses = "w-full bg-slate-100 dark:bg-neutral-700 border-transparent focus:bg-slate-200 dark:focus:bg-neutral-600 rounded p-1.5 text-sm focus:ring-2 focus:ring-[var(--drip-primary)] focus:outline-none focus:border-[var(--drip-primary)] text-[var(--drip-text)] dark:text-white";
 
     const recordsContent = (
-        <div className="overflow-x-auto bg-white dark:bg-neutral-800/50 rounded-lg border border-slate-200 dark:border-neutral-700">
-            <table className="min-w-full divide-y divide-slate-200 dark:divide-neutral-700">
-                <thead className="bg-slate-50 dark:bg-neutral-800">
-                    <tr>
-                        {headers.map(header => (
-                            <th key={header.key} scope="col" className="py-3.5 px-3 text-left text-sm font-semibold text-neutral-800 dark:text-white first:pl-4 first:sm:pl-6">
-                                <button onClick={() => requestSort(header.key)} className="flex items-center gap-2 group text-neutral-800 dark:text-white hover:text-[var(--drip-primary)] transition-colors">
-                                    {header.label} {getSortIcon(header.key)}
-                                </button>
-                            </th>
-                        ))}
-                    </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-200 dark:divide-neutral-800 bg-white dark:bg-neutral-900/50">
-                    {filteredAndSortedData.map((record) => (
-                        <tr key={record.id} className="hover:bg-slate-50 dark:hover:bg-neutral-800/70 group">
-                            <td onClick={() => onOpenModal(record, 'financials')} className="w-1/3 py-4 pl-4 pr-3 text-sm font-medium text-[var(--drip-text)] dark:text-white sm:pl-6 cursor-pointer">{record.description}</td>
-
-                            <td onClick={() => handleCellClick(record.id, 'amount')} className="whitespace-nowrap px-3 py-2 text-sm text-[var(--drip-muted)] dark:text-neutral-400 cursor-pointer">
-                                {editingCell?.recordId === record.id && editingCell?.field === 'amount' ? (
-                                    <input
-                                        type="number"
-                                        defaultValue={record.amount}
-                                        onBlur={(e) => handleUpdate(record.id, 'amount', e.target.value)}
-                                        onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
-                                        autoFocus
-                                        className={inputClasses}
-                                    />
-                                ) : (
-                                    <span className={record.amount < 0 ? 'text-red-500 dark:text-red-400' : 'text-[var(--drip-primary)] dark:text-[var(--drip-primary)]'}>
-                                        {formatCurrency(record.amount)}
-                                    </span>
-                                )}
-                            </td>
-
-                            <td onClick={() => handleCellClick(record.id, 'status')} className="whitespace-nowrap px-3 py-2 text-sm cursor-pointer">
-                                {editingCell?.recordId === record.id && editingCell?.field === 'status' ? (
-                                    <select
-                                        defaultValue={record.status}
-                                        onChange={(e) => handleUpdate(record.id, 'status', e.target.value)}
-                                        onBlur={() => setEditingCell(null)}
-                                        autoFocus
-                                        className={inputClasses}
-                                    >
-                                        <option value="Paid">{t('status.paid')}</option>
-                                        <option value="Pending">{t('status.pending')}</option>
-                                        <option value="Overdue">{t('status.overdue')}</option>
-                                    </select>
-                                ) : (
-                                    <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${getStatusColor(record.status)}`}>{t(`status.${record.status.toLowerCase()}`)}</span>
-                                )}
-                            </td>
-
-                            <td onClick={() => handleCellClick(record.id, 'dueDate')} className="whitespace-nowrap px-3 py-2 text-sm text-[var(--drip-muted)] dark:text-neutral-400 cursor-pointer">
-                                {editingCell?.recordId === record.id && editingCell?.field === 'dueDate' ? (
-                                    <input
-                                        type="date"
-                                        defaultValue={record.dueDate}
-                                        onBlur={(e) => handleUpdate(record.id, 'dueDate', e.target.value)}
-                                        onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
-                                        autoFocus
-                                        className={inputClasses}
-                                    />
-                                ) : ( new Date(record.dueDate).toLocaleDateString() )}
-                            </td>
-
-                            <td className="whitespace-nowrap px-3 py-2 text-sm text-[var(--drip-muted)] dark:text-neutral-400">
-                                {record.type === 'Incoming' ?
-                                    <span className="flex items-center gap-1.5 text-green-600 dark:text-green-400"><TrendingUp size={16} /> {t('financials.incoming')}</span> :
-                                    <span className="flex items-center gap-1.5 text-red-500 dark:text-red-400"><TrendingDown size={16} /> {t('financials.outgoing')}</span>
-                                }
-                            </td>
+        <div className="space-y-6">
+            <div className="overflow-x-auto bg-white dark:bg-neutral-800/50 rounded-lg border border-slate-200 dark:border-neutral-700">
+                <table className="min-w-full divide-y divide-slate-200 dark:divide-neutral-700">
+                    <thead className="bg-slate-50 dark:bg-neutral-800">
+                        <tr>
+                            {headers.map(header => (
+                                <th key={header.key} scope="col" className="py-3.5 px-3 text-left text-sm font-semibold text-neutral-800 dark:text-white first:pl-4 first:sm:pl-6">
+                                    <button onClick={() => requestSort(header.key)} className="flex items-center gap-2 group text-neutral-800 dark:text-white hover:text-[var(--drip-primary)] transition-colors">
+                                        {header.label} {getSortIcon(header.key)}
+                                    </button>
+                                </th>
+                            ))}
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200 dark:divide-neutral-800 bg-white dark:bg-neutral-900/50">
+                        {filteredAndSortedData.map((record) => (
+                            <tr key={record.id} className="hover:bg-slate-50 dark:hover:bg-neutral-800/70 group">
+                                <td onClick={() => onOpenModal(record, 'financials')} className="w-1/3 py-4 pl-4 pr-3 text-sm font-medium text-[var(--drip-text)] dark:text-white sm:pl-6 cursor-pointer">{record.description}</td>
+
+                                <td onClick={() => handleCellClick(record.id, 'amount')} className="whitespace-nowrap px-3 py-2 text-sm text-[var(--drip-muted)] dark:text-neutral-400 cursor-pointer">
+                                    {editingCell?.recordId === record.id && editingCell?.field === 'amount' ? (
+                                        <input
+                                            type="number"
+                                            defaultValue={record.amount}
+                                            onBlur={(e) => handleUpdate(record.id, 'amount', e.target.value)}
+                                            onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
+                                            autoFocus
+                                            className={inputClasses}
+                                        />
+                                    ) : (
+                                        <span className={record.amount < 0 ? 'text-red-500 dark:text-red-400' : 'text-[var(--drip-primary)] dark:text-[var(--drip-primary)]'}>
+                                            {formatCurrency(record.amount)}
+                                        </span>
+                                    )}
+                                </td>
+
+                                <td onClick={() => handleCellClick(record.id, 'status')} className="whitespace-nowrap px-3 py-2 text-sm cursor-pointer">
+                                    {editingCell?.recordId === record.id && editingCell?.field === 'status' ? (
+                                        <select
+                                            defaultValue={record.status}
+                                            onChange={(e) => handleUpdate(record.id, 'status', e.target.value)}
+                                            onBlur={() => setEditingCell(null)}
+                                            autoFocus
+                                            className={inputClasses}
+                                        >
+                                            <option value="Paid">{t('status.paid')}</option>
+                                            <option value="Pending">{t('status.pending')}</option>
+                                            <option value="Overdue">{t('status.overdue')}</option>
+                                        </select>
+                                    ) : (
+                                        <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${getStatusColor(record.status)}`}>{t(`status.${record.status.toLowerCase()}`)}</span>
+                                    )}
+                                </td>
+
+                                <td onClick={() => handleCellClick(record.id, 'dueDate')} className="whitespace-nowrap px-3 py-2 text-sm text-[var(--drip-muted)] dark:text-neutral-400 cursor-pointer">
+                                    {editingCell?.recordId === record.id && editingCell?.field === 'dueDate' ? (
+                                        <input
+                                            type="date"
+                                            defaultValue={record.dueDate}
+                                            onBlur={(e) => handleUpdate(record.id, 'dueDate', e.target.value)}
+                                            onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }}
+                                            autoFocus
+                                            className={inputClasses}
+                                        />
+                                    ) : (
+                                        new Date(record.dueDate).toLocaleDateString()
+                                    )}
+                                </td>
+
+                                <td className="whitespace-nowrap px-3 py-2 text-sm text-[var(--drip-muted)] dark:text-neutral-400">
+                                    {record.type === 'Incoming'
+                                        ? <span className="flex items-center gap-1.5 text-green-600 dark:text-green-400"><TrendingUp size={16} /> {t('financials.incoming')}</span>
+                                        : <span className="flex items-center gap-1.5 text-red-500 dark:text-red-400"><TrendingDown size={16} /> {t('financials.outgoing')}</span>
+                                    }
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                    {invoiceError && (
+                        <div className="rounded-lg border border-amber-300 bg-amber-50 text-amber-700 px-4 py-3 text-sm">
+                            {invoiceError}
+                        </div>
+                    )}
+                    {invoiceLoading && invoiceList.length === 0 ? (
+                        <div className="bg-white dark:bg-neutral-900/40 border border-slate-200 dark:border-neutral-700 rounded-xl p-6 text-sm text-slate-500 dark:text-neutral-400">
+                            Fatura verileri yükleniyor...
+                        </div>
+                    ) : (
+                        <InvoiceStatusPanel
+                            invoices={invoiceList}
+                            selectedInvoiceId={selectedInvoiceId}
+                            onSelect={handleSelectInvoice}
+                        />
+                    )}
+                </div>
+                <div className="space-y-3">
+                    {previewError && (
+                        <div className="rounded-lg border border-amber-300 bg-amber-50 text-amber-700 px-4 py-3 text-sm">
+                            {previewError}
+                        </div>
+                    )}
+                    <InvoicePreviewPanel
+                        invoice={selectedInvoice}
+                        preview={previewRef}
+                        loading={previewLoading}
+                        onRefresh={handleRefreshPreview}
+                    />
+                </div>
+            </div>
         </div>
     );
-
     const forecastContent = (
         <div className="space-y-6">
             {forecastLoading && forecastData && (

@@ -23,6 +23,7 @@ import integrationsRouter from './routes/integrations.js';
 import tasksRouter from './routes/tasks.js';
 import importerRouter from './routes/importer.js';
 import usageRouter from './routes/usage.js';
+import invoicesRouter from './routes/invoices.js';
 import {
   SIGNUP_CODE_TTL,
   createSignupCodeRecord,
@@ -80,6 +81,7 @@ app.use('/api/integrations', integrationsRouter);
 app.use('/api/tasks', tasksRouter);
 app.use('/api/importer', importerRouter);
 app.use('/api/usage', usageRouter);
+app.use('/api/invoices', invoicesRouter);
 
 const adminOnlyMiddleware = authenticate({ requiredRole: 'admin' });
 

@@ -15,6 +15,8 @@
   },
   "dependencies": {
     "@google/genai": "^1.27.0",
+    "@aws-sdk/client-s3": "^3.744.0",
+    "@aws-sdk/s3-request-presigner": "^3.744.0",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.12.0",
     "cookie-parser": "^1.4.7",

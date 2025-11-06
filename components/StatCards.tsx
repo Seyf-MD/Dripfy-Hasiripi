@@ -72,7 +72,7 @@ const StatCards: React.FC<StatCardsProps> = ({ schedule, contacts, tasks, financ
   const pendingPaymentsValue = `€${formattedPendingPayments}`;
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-6" data-tour-target="dashboard-stat-cards">
       <StatCard
         delay={200}
         icon={<Briefcase size={20} />}

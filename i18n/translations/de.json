@@ -1,4 +1,3 @@
-
 {
     "login": {
         "welcome": "Willkommen bei",
@@ -122,7 +121,8 @@
         "contacts": "Kontakte",
         "tasks": "Aufgaben",
         "approvals": "Freigaben",
-        "adminPanel": "Admin-Panel"
+        "adminPanel": "Admin-Panel",
+        "helpCenter": "Hilfe-Center"
     },
     "calendar": {
         "today": "Heute",
@@ -327,7 +327,13 @@
         "prompt1": "Fassen Sie den Zeitplan der nächsten Woche zusammen.",
         "prompt2": "Gibt es bald fällige Aufgaben mit hoher Priorität?",
         "prompt3": "Listen Sie alle Kontakte aus Deutschland auf.",
-        "prompt4": "Was sind unsere größten Herausforderungen?"
+        "prompt4": "Was sind unsere größten Herausforderungen?",
+        "helpSuggestions": {
+            "title": "Empfohlene Hilfeartikel",
+            "subtitle": "Bereitgestellt vom Help Center",
+            "open": "Im Help Center öffnen",
+            "relevance": "Relevanzwert: {score}"
+        }
     },
     "footer": {
         "links": "Links",
@@ -409,5 +415,57 @@
         "lightMode": "Heller Modus",
         "darkMode": "Dunkler Modus",
         "backToDashboard": "Zurück zum Dashboard"
+    },
+    "help": {
+        "hero": {
+            "badge": "Wissensdatenbank",
+            "title": "Wie können wir heute helfen?",
+            "subtitle": "Durchsuchen Sie Artikel, starten Sie geführte Touren und erhalten Sie kontextbezogene Empfehlungen für Ihre Rolle.",
+            "startTour": "Geführte Tour starten",
+            "tourHint": "Touren passen sich Ihren Berechtigungen an, damit nur relevante Tipps erscheinen."
+        },
+        "search": {
+            "label": "Im Help Center suchen",
+            "placeholder": "Artikel suchen, z. B. Onboarding, Analytics…"
+        },
+        "categories": {
+            "all": "Alle Themen"
+        },
+        "results": {
+            "title": "Suchergebnisse",
+            "count": "{count} Treffer",
+            "empty": "Keine Artikel gefunden. Versuchen Sie andere Stichwörter oder wechseln Sie die Kategorie."
+        },
+        "suggested": {
+            "title": "Empfohlene Artikel",
+            "count": "{count} Empfehlungen"
+        },
+        "article": {
+            "readTime": "{minutes} Min. Lesezeit",
+            "relevance": "Relevanz: {score}",
+            "open": "Artikel öffnen"
+        },
+        "sidebar": {
+            "faqTitle": "Häufige Fragen",
+            "noFaqs": "Für diese Kategorie gibt es noch keine FAQs."
+        },
+        "feedback": {
+            "title": "Feedback geben",
+            "subtitle": "Sagen Sie uns, ob der Inhalt geholfen hat, damit wir Empfehlungen verbessern können.",
+            "articleLabel": "Artikel",
+            "articlePlaceholder": "Artikel auswählen (optional)",
+            "sentimentLabel": "Wie hilfreich war das?",
+            "sentiments": {
+                "positive": "Sehr hilfreich",
+                "neutral": "Teilweise hilfreich",
+                "negative": "Verbesserungswürdig"
+            },
+            "commentLabel": "Kommentar",
+            "commentPlaceholder": "Beschreiben Sie, was Sie erwartet haben…",
+            "supportHint": "Mehr Hilfe nötig? Chatten Sie mit dem Assistenten.",
+            "reset": "Zurücksetzen",
+            "submit": "Feedback senden",
+            "thankYou": "Vielen Dank! Wir nutzen Ihr Feedback für bessere Antworten."
+        }
     }
 }

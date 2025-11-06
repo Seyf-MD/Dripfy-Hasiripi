@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Calendar, CheckCircle2, Euro, ShieldAlert, Users, ListChecks, Shield, CalendarCheck } from 'lucide-react';
+import { Calendar, CheckCircle2, Euro, ShieldAlert, Users, ListChecks, Shield, CalendarCheck, LifeBuoy } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -27,6 +27,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab }
         { name: 'Tasks', icon: <ListChecks size={18} />, label: translate('tabs.tasks', 'Görevler') },
         { name: 'Personal Planner', icon: <CalendarCheck size={18} />, label: translate('tabs.personalPlanner', 'Kişisel Planlayıcı') },
         { name: 'Approvals', icon: <CheckCircle2 size={18} />, label: translate('tabs.approvals', 'Onaylar') },
+        { name: 'Help Center', icon: <LifeBuoy size={18} />, label: translate('tabs.helpCenter', 'Yardım Merkezi') },
         { name: 'Admin Panel', icon: <Shield size={18} />, label: translate('tabs.adminPanel', 'Yönetici Paneli') },
     ];
 
@@ -43,7 +44,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab }
     return (
         <div className="mt-6 animate-slide-in-up" style={{ animationDelay: '600ms' }}>
             <div className="border-b border-slate-200 dark:border-neutral-700">
-                <nav className="-mb-px flex space-x-6 overflow-x-auto pb-1" aria-label="Tabs">
+                <nav className="-mb-px flex space-x-6 overflow-x-auto pb-1" aria-label="Tabs" data-tour-target="dashboard-tab-navigation">
                     {visibleTabs.map((tab) => (
                         <button
                             key={tab.name}

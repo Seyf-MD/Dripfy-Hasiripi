@@ -4,6 +4,7 @@ import App from './App';
 import { LanguageProvider } from './i18n/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
+import { TourProvider } from './context/TourContext';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -16,7 +17,9 @@ root.render(
     <LanguageProvider>
       <ThemeProvider>
         <AuthProvider>
-          <App />
+          <TourProvider>
+            <App />
+          </TourProvider>
         </AuthProvider>
       </ThemeProvider>
     </LanguageProvider>

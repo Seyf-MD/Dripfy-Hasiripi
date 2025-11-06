@@ -3,6 +3,7 @@ import LoginPage from './components/LoginPage';
 import Header from './components/Header';
 import StatCards from './components/StatCards';
 import TabNavigation from './components/TabNavigation';
+import KnowledgeBase from './components/help/KnowledgeBase';
 import KPIBoard from './components/dashboard/KPIBoard';
 import CalendarTab from './components/tabs/WeeklyScheduleTab';
 import FinancialsTab from './components/tabs/FinancialsTab';
@@ -47,6 +48,7 @@ import { UserProvider } from './context/UserContext';
 import { finalizeSignup, fetchSignupRequests, resolveSignupRequest, SignupFinalizePayload } from './services/signupService';
 import { fetchApprovalFlows, submitApprovalDecision } from './services/approvals';
 import { useAuth } from './context/AuthContext';
+import { useTour } from './context/TourContext';
 import { useNetworkStatus } from './hooks/useNetworkStatus';
 import { useOfflineQueue } from './hooks/useOfflineQueue';
 
@@ -57,6 +59,7 @@ function App() {
   const { t } = useLanguage();
   const { theme } = useTheme();
   const { user, isAuthenticated, isAdmin, token, logout } = useAuth();
+  const { registerPage } = useTour();
   const { isOnline } = useNetworkStatus();
   const [queueState, retryQueue] = useOfflineQueue();
   const [dashboardData, setDashboardData] = React.useState<DashboardData>(mockData);
@@ -525,6 +528,8 @@ function App() {
             isLoading={isApprovalsLoading}
           />
         );
+      case 'Help Center':
+        return <KnowledgeBase />;
       case 'Admin Panel':
         if (isAdmin) {
             return <AdminPanelTab
@@ -546,6 +551,11 @@ function App() {
     }
   };
   
+  React.useEffect(() => {
+    const pageId = activeTab === 'Help Center' ? 'help-center' : 'dashboard';
+    registerPage(pageId);
+  }, [activeTab, registerPage]);
+
   React.useEffect(() => {
     // If user is not admin and on Admin Panel tab, switch to Calendar
     if (!isAdmin && activeTab === 'Admin Panel') {

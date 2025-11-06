@@ -10,6 +10,7 @@ import {
   FileBarChart2,
   X,
   RefreshCcw,
+  LifeBuoy,
 } from 'lucide-react';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
@@ -17,6 +18,8 @@ import {
   requestChatCompletion,
   fetchKnowledgeSources,
 } from '../../services/chatbot/api';
+import { searchHelpArticles, getSuggestedArticles } from '../../i18n/help';
+import type { ArticleSearchResult, HelpArticle } from '../../i18n/help/types';
 import { PROMPT_TEMPLATES, DEFAULT_TEMPLATE_ID } from '../../services/chatbot/templates';
 import { createTask } from '../../services/tasks';
 import { triggerReport } from '../../services/reports';
@@ -130,7 +133,7 @@ function withoutTrailingPlaceholder(messages: ChatMessage[]): ChatMessage[] {
 }
 
 export const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ onClose, dataContext }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { canUseChatbotAction } = useAuth();
 
   const [messages, setMessages] = React.useState<ChatMessage[]>(() => [
@@ -151,6 +154,7 @@ export const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ onClose, dataContext
   const [actionType, setActionType] = React.useState<ChatbotAction | null>(null);
   const [actionMessage, setActionMessage] = React.useState<string | null>(null);
   const [actionError, setActionError] = React.useState<string | null>(null);
+  const [helpSuggestions, setHelpSuggestions] = React.useState<ArticleSearchResult[]>([]);
   const [taskForm, setTaskForm] = React.useState({
     title: '',
     description: '',
@@ -170,6 +174,11 @@ export const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ onClose, dataContext
   });
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
+  const mapToResult = React.useCallback((article: HelpArticle, fallbackScore?: number): ArticleSearchResult => ({
+    ...article,
+    score: typeof fallbackScore === 'number' ? fallbackScore : article.popularityScore ?? 0,
+  }), []);
+
   React.useEffect(() => {
     setMessages([
       {
@@ -179,6 +188,11 @@ export const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ onClose, dataContext
       },
     ]);
   }, [t]);
+
+  React.useEffect(() => {
+    const defaults = getSuggestedArticles(language, { limit: 3 }).map((article) => mapToResult(article));
+    setHelpSuggestions(defaults);
+  }, [language, mapToResult]);
 
   React.useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -255,6 +269,13 @@ export const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ onClose, dataContext
     const previousMessages = withoutTrailingPlaceholder(messages);
 
     try {
+      const articleMatches = searchHelpArticles(language, userMessage.content, { limit: 3 });
+      if (articleMatches.length > 0) {
+        setHelpSuggestions(articleMatches);
+      } else {
+        setHelpSuggestions(getSuggestedArticles(language, { limit: 3 }).map((article) => mapToResult(article)));
+      }
+
       const response = await requestChatCompletion({
         prompt: userMessage.content,
         sources: Array.from(selectedSources),
@@ -511,6 +532,49 @@ export const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ onClose, dataContext
           <div ref={messagesEndRef} />
         </div>
       </div>
+
+      {helpSuggestions.length > 0 && (
+        <div className="px-4 py-4 border-b border-slate-200 dark:border-neutral-700 bg-slate-50/80 dark:bg-neutral-900/60">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-2 text-sm font-semibold text-[var(--drip-text)] dark:text-neutral-200">
+                <LifeBuoy size={16} className="text-[var(--drip-primary)]" />
+                <span>{t('chatbot.helpSuggestions.title')}</span>
+              </div>
+              <p className="text-xs text-[var(--drip-muted)] dark:text-neutral-400 mt-1">{t('chatbot.helpSuggestions.subtitle')}</p>
+            </div>
+          </div>
+          <ul className="mt-4 space-y-3">
+            {helpSuggestions.map((article) => (
+              <li
+                key={article.id}
+                className="p-3 rounded-lg border border-slate-200 dark:border-neutral-700 bg-white/90 dark:bg-neutral-900/80"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-semibold text-[var(--drip-text)] dark:text-white">{article.title}</p>
+                    <p className="text-xs text-[var(--drip-muted)] dark:text-neutral-300 mt-1 line-clamp-2">{article.summary}</p>
+                    <div className="mt-2 text-[10px] uppercase tracking-wide text-[var(--drip-muted)] dark:text-neutral-400">
+                      {t('help.article.readTime', { minutes: article.estimatedReadingMinutes })}
+                      {' • '}
+                      {t('chatbot.helpSuggestions.relevance', { score: Math.round(article.score) })}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      window.dispatchEvent(new CustomEvent('help-center:focus-article', { detail: { articleId: article.id } }));
+                    }}
+                    className="text-xs font-semibold text-[var(--drip-primary)] hover:underline"
+                  >
+                    {t('chatbot.helpSuggestions.open')}
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {error && (
         <div className="px-4 py-2 bg-red-50 text-red-700 text-sm border-t border-red-200">

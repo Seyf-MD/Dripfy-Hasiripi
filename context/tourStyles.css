@@ -1,0 +1,91 @@
+.dripfy-tour-popover {
+  border-radius: 16px;
+  padding: 18px 20px;
+  background: rgba(255, 255, 255, 0.98);
+  color: var(--drip-text, #0f172a);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  box-shadow: 0 30px 60px -28px rgba(15, 23, 42, 0.55);
+  max-width: 320px;
+}
+
+.dripfy-tour-popover .driver-popover-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 6px;
+  color: var(--drip-text, #0f172a);
+}
+
+.dripfy-tour-popover .driver-popover-description {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--drip-muted, #475569);
+}
+
+.dripfy-tour-popover .driver-popover-progress-text {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--drip-muted, #475569);
+}
+
+.dripfy-tour-popover .driver-popover-navigation-btns button {
+  background-color: rgba(75, 165, 134, 0.12);
+  border: none;
+  border-radius: 9999px;
+  color: var(--drip-primary, #4ba586);
+  font-weight: 600;
+  font-size: 0.75rem;
+  padding: 6px 14px;
+  text-shadow: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.dripfy-tour-popover .driver-popover-navigation-btns button:hover,
+.dripfy-tour-popover .driver-popover-navigation-btns button:focus {
+  background-color: rgba(75, 165, 134, 0.22);
+  color: var(--drip-primary-dark, #2f7c60);
+}
+
+.dripfy-tour-popover .driver-popover-close-btn {
+  color: rgba(15, 23, 42, 0.3);
+}
+
+.dripfy-tour-popover .driver-popover-close-btn:hover,
+.dripfy-tour-popover .driver-popover-close-btn:focus {
+  color: var(--drip-text, #0f172a);
+}
+
+.dark .dripfy-tour-popover {
+  background: rgba(15, 23, 42, 0.95);
+  color: rgba(248, 250, 252, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  box-shadow: 0 36px 70px -30px rgba(15, 23, 42, 0.85);
+}
+
+.dark .dripfy-tour-popover .driver-popover-title {
+  color: rgba(248, 250, 252, 0.98);
+}
+
+.dark .dripfy-tour-popover .driver-popover-description,
+.dark .dripfy-tour-popover .driver-popover-progress-text {
+  color: rgba(226, 232, 240, 0.72);
+}
+
+.dark .dripfy-tour-popover .driver-popover-navigation-btns button {
+  background-color: rgba(75, 165, 134, 0.2);
+  color: #f8fafc;
+}
+
+.dark .dripfy-tour-popover .driver-popover-navigation-btns button:hover,
+.dark .dripfy-tour-popover .driver-popover-navigation-btns button:focus {
+  background-color: rgba(75, 165, 134, 0.35);
+}
+
+.dark .dripfy-tour-popover .driver-popover-close-btn {
+  color: rgba(226, 232, 240, 0.4);
+}
+
+.dark .dripfy-tour-popover .driver-popover-close-btn:hover,
+.dark .dripfy-tour-popover .driver-popover-close-btn:focus {
+  color: rgba(248, 250, 252, 0.95);
+}

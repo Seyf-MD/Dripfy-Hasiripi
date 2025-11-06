@@ -15,6 +15,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ dataContext }) => {
   return (
     <>
       <button
+        data-tour-target="dashboard-chatbot-toggle"
         onClick={() => setIsOpen((prev) => !prev)}
         className="fixed bottom-6 right-6 bg-[var(--drip-primary)] text-white p-4 rounded-full shadow-lg shadow-[rgba(75,165,134,0.35)] hover:scale-105 transition-transform z-50"
         aria-label={t('chatbot.toggle')}

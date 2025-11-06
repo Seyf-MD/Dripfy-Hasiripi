@@ -1,4 +1,3 @@
-
 {
     "login": {
         "welcome": "Hoş geldiniz",
@@ -122,7 +121,8 @@
         "contacts": "Kişiler",
         "tasks": "Görevler",
         "approvals": "Onaylar",
-        "adminPanel": "Yönetici Paneli"
+        "adminPanel": "Yönetici Paneli",
+        "helpCenter": "Yardım Merkezi"
     },
     "calendar": {
         "today": "Bugün",
@@ -327,7 +327,13 @@
         "prompt1": "Gelecek haftanın takvimini özetle.",
         "prompt2": "Yakında teslim edilmesi gereken yüksek öncelikli görevler var mı?",
         "prompt3": "Almanya'daki tüm kişileri listele.",
-        "prompt4": "Karşılaştığımız en büyük zorluklar nelerdir?"
+        "prompt4": "Karşılaştığımız en büyük zorluklar nelerdir?",
+        "helpSuggestions": {
+            "title": "Önerilen yardım makaleleri",
+            "subtitle": "Yardım merkezi tarafından desteklenir",
+            "open": "Yardım merkezinde aç",
+            "relevance": "Alaka puanı: {score}"
+        }
     },
     "footer": {
         "links": "Bağlantılar",
@@ -409,5 +415,57 @@
         "lightMode": "Aydınlık mod",
         "darkMode": "Karanlık mod",
         "backToDashboard": "Kontrol paneline dön"
+    },
+    "help": {
+        "hero": {
+            "badge": "Bilgi bankası",
+            "title": "Bugün size nasıl yardımcı olabiliriz?",
+            "subtitle": "Rolünüze göre uyarlanmış makaleleri arayın, rehberli turları keşfedin ve bağlamsal öneriler alın.",
+            "startTour": "Rehberli turu başlat",
+            "tourHint": "Turlar izinlerinize göre şekillenir, böylece yalnızca ilgili ipuçlarını görürsünüz."
+        },
+        "search": {
+            "label": "Yardım merkezinde ara",
+            "placeholder": "Makalelerde arayın, örn. onboarding, analitik…"
+        },
+        "categories": {
+            "all": "Tüm konular"
+        },
+        "results": {
+            "title": "Arama sonuçları",
+            "count": "{count} sonuç",
+            "empty": "Makaleler bulunamadı. Farklı anahtar kelimeler deneyin veya kategoriyi değiştirin."
+        },
+        "suggested": {
+            "title": "Önerilen makaleler",
+            "count": "{count} öneri"
+        },
+        "article": {
+            "readTime": "{minutes} dk okuma",
+            "relevance": "Alaka puanı: {score}",
+            "open": "Makaleyi aç"
+        },
+        "sidebar": {
+            "faqTitle": "Popüler sorular",
+            "noFaqs": "Bu kategori için henüz SSS yok."
+        },
+        "feedback": {
+            "title": "Geri bildirim paylaşın",
+            "subtitle": "İçeriğin yardımcı olup olmadığını söyleyin, önerileri geliştirelim.",
+            "articleLabel": "Makale",
+            "articlePlaceholder": "Bir makale seçin (isteğe bağlı)",
+            "sentimentLabel": "Ne kadar faydalıydı?",
+            "sentiments": {
+                "positive": "Çok faydalı",
+                "neutral": "Kısmen faydalı",
+                "negative": "Geliştirilmesi gerekiyor"
+            },
+            "commentLabel": "Yorum",
+            "commentPlaceholder": "Beklentilerinizi bizimle paylaşın…",
+            "supportHint": "Daha fazla yardım mı lazım? Asistanla sohbet edin.",
+            "reset": "Sıfırla",
+            "submit": "Geri bildirim gönder",
+            "thankYou": "Geri bildiriminiz için teşekkürler! Gelecek yanıtları iyileştireceğiz."
+        }
     }
 }

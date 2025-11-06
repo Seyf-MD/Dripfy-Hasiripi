@@ -1,4 +1,3 @@
-
 {
     "login": {
         "welcome": "Welcome to",
@@ -122,7 +121,8 @@
         "contacts": "Contacts",
         "tasks": "Tasks",
         "approvals": "Approvals",
-        "adminPanel": "Admin Panel"
+        "adminPanel": "Admin Panel",
+        "helpCenter": "Help Center"
     },
     "calendar": {
         "today": "Today",
@@ -327,7 +327,13 @@
         "prompt1": "Summarize next week's schedule.",
         "prompt2": "Are there any high-priority tasks due soon?",
         "prompt3": "List all contacts from Germany.",
-        "prompt4": "What are the biggest challenges we're facing?"
+        "prompt4": "What are the biggest challenges we're facing?",
+        "helpSuggestions": {
+            "title": "Recommended help articles",
+            "subtitle": "Powered by the help center",
+            "open": "Open in help center",
+            "relevance": "Relevance score: {score}"
+        }
     },
     "footer": {
         "links": "Links",
@@ -409,5 +415,57 @@
         "lightMode": "Light mode",
         "darkMode": "Dark mode",
         "backToDashboard": "Back to dashboard"
+    },
+    "help": {
+        "hero": {
+            "badge": "Knowledge base",
+            "title": "How can we help you today?",
+            "subtitle": "Search articles, explore guided tours, and get contextual recommendations tailored to your role.",
+            "startTour": "Start guided tour",
+            "tourHint": "Tours adapt to your permissions so you only see relevant tips."
+        },
+        "search": {
+            "label": "Search help center",
+            "placeholder": "Search articles, e.g. onboarding, analytics…"
+        },
+        "categories": {
+            "all": "All topics"
+        },
+        "results": {
+            "title": "Search results",
+            "count": "{count} matches",
+            "empty": "No articles found. Try different keywords or switch categories."
+        },
+        "suggested": {
+            "title": "Suggested articles",
+            "count": "{count} recommendations"
+        },
+        "article": {
+            "readTime": "{minutes} min read",
+            "relevance": "Relevance score: {score}",
+            "open": "Open article"
+        },
+        "sidebar": {
+            "faqTitle": "Popular questions",
+            "noFaqs": "No FAQs for this category yet."
+        },
+        "feedback": {
+            "title": "Share feedback",
+            "subtitle": "Let us know if the content helped so we can improve recommendations.",
+            "articleLabel": "Article",
+            "articlePlaceholder": "Select an article (optional)",
+            "sentimentLabel": "How helpful was this?",
+            "sentiments": {
+                "positive": "Very helpful",
+                "neutral": "Somewhat helpful",
+                "negative": "Needs improvement"
+            },
+            "commentLabel": "Comment",
+            "commentPlaceholder": "Share more details about what you expected…",
+            "supportHint": "Need more help? Chat with the assistant.",
+            "reset": "Reset",
+            "submit": "Send feedback",
+            "thankYou": "Thanks for your feedback! We’ll use it to improve future answers."
+        }
     }
 }

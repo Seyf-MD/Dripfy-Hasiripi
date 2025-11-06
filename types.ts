@@ -44,6 +44,44 @@ export interface Contact {
   country?: string;
 }
 
+export type CalendarProvider = 'google' | 'outlook';
+
+export interface TaskReminder {
+  id: string;
+  type: 'email' | 'push' | 'popup';
+  minutesBefore: number;
+  scheduledAt?: string | null;
+  createdAt: string;
+}
+
+export interface TaskSchedulePlan {
+  start: string | null;
+  end: string | null;
+  allDay: boolean;
+  timezone: string | null;
+  lastPlannedAt?: string;
+}
+
+export interface TaskCalendarLink {
+  id: string;
+  provider: CalendarProvider;
+  integrationId: string | null;
+  calendarId: string;
+  eventId: string | null;
+  syncState: 'pending' | 'synced' | 'error';
+  lastSyncedAt?: string | null;
+  lastError?: string | null;
+}
+
+export interface TaskPersonalization {
+  ownerId: string;
+  ownerName?: string | null;
+  notes?: string;
+  focusTags: string[];
+  color?: string | null;
+  schedule: TaskSchedulePlan;
+}
+
 export interface Task {
   id: string;
   title: string;
@@ -51,6 +89,44 @@ export interface Task {
   status: 'To Do' | 'In Progress' | 'Done';
   dueDate: string;
   assignee: string;
+  description?: string;
+  reminders?: TaskReminder[];
+  calendarLinks?: TaskCalendarLink[];
+  personalization?: TaskPersonalization;
+  version?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface PlannerCalendarEvent {
+  id: string;
+  taskId?: string;
+  title: string;
+  provider?: CalendarProvider;
+  start?: string | null;
+  end?: string | null;
+  allDay?: boolean;
+  timezone?: string | null;
+  status?: string;
+}
+
+export interface CalendarIntegrationAccount {
+  id: string;
+  provider: CalendarProvider;
+  accountEmail: string;
+  accountName?: string;
+  createdAt: string;
+  updatedAt: string;
+  lastSyncedAt?: string | null;
+  syncStatus?: 'idle' | 'ok' | 'error';
+  expiresAt?: string | null;
+  hasRefreshToken?: boolean;
+  preferences: {
+    autoSync: boolean;
+    syncWindowDays: number;
+    reminderMinutesBefore: number;
+    allowWebhookFallback: boolean;
+  };
 }
 
 export type UserRole = 'viewer' | 'user' | 'approver' | 'finance' | 'manager' | 'admin';

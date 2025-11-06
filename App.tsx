@@ -11,6 +11,7 @@ import ContactsTab from './components/tabs/ContactsTab';
 import TasksTab from './components/tabs/TasksTab';
 import AdminPanelTab from './components/tabs/AdminPanelTab';
 import ApprovalsTab from './components/tabs/ApprovalsTab';
+import PersonalPlanner from './components/tasks/PersonalPlanner';
 import Chatbot from './components/Chatbot';
 import Footer from './components/Footer';
 import DetailModal from './components/DetailModal';
@@ -50,7 +51,7 @@ import { useNetworkStatus } from './hooks/useNetworkStatus';
 import { useOfflineQueue } from './hooks/useOfflineQueue';
 
 type ModalType = 'schedule' | 'financials' | 'challenges' | 'advantages' | 'contacts' | 'tasks' | 'users';
-type SettingsPanelTab = 'profile' | 'settings' | 'privacy';
+type SettingsPanelTab = 'profile' | 'settings' | 'integrations' | 'privacy';
 
 function App() {
   const { t } = useLanguage();
@@ -507,6 +508,13 @@ function App() {
                     onOpenModal={handleOpenDetailModal as any}
                     onUpdateStatus={(taskId, newStatus) => handleQuickUpdate(taskId, 'tasks', 'status', newStatus)}
                 />;
+      case 'Personal Planner':
+        return (
+          <PersonalPlanner
+            userId={currentUser?.id ?? user?.id ?? null}
+            timezone={undefined}
+          />
+        );
       case 'Approvals':
         return (
           <ApprovalsTab

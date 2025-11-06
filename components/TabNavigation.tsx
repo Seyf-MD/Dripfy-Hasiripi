@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Calendar, CheckCircle2, Euro, ShieldAlert, Users, ListChecks, Shield } from 'lucide-react';
+import { Calendar, CheckCircle2, Euro, ShieldAlert, Users, ListChecks, Shield, CalendarCheck } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -14,14 +14,20 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab }
     const { theme } = useTheme();
     const { isAdmin, isAuthenticated } = useAuth();
 
+    const translate = (key: string, fallback: string) => {
+        const value = t(key);
+        return value === key ? fallback : value;
+    };
+
     const allTabs = [
-        { name: 'Calendar', icon: <Calendar size={18} />, label: t('tabs.calendar') },
-        { name: 'Financials', icon: <Euro size={18} />, label: t('tabs.financials') },
-        { name: 'Challenges', icon: <ShieldAlert size={18} />, label: t('tabs.challenges') },
-        { name: 'Contacts', icon: <Users size={18} />, label: t('tabs.contacts') },
-        { name: 'Tasks', icon: <ListChecks size={18} />, label: t('tabs.tasks') },
-        { name: 'Approvals', icon: <CheckCircle2 size={18} />, label: t('tabs.approvals') },
-        { name: 'Admin Panel', icon: <Shield size={18} />, label: t('tabs.adminPanel') },
+        { name: 'Calendar', icon: <Calendar size={18} />, label: translate('tabs.calendar', 'Takvim') },
+        { name: 'Financials', icon: <Euro size={18} />, label: translate('tabs.financials', 'Finansal Durum') },
+        { name: 'Challenges', icon: <ShieldAlert size={18} />, label: translate('tabs.challenges', 'Zorluklar') },
+        { name: 'Contacts', icon: <Users size={18} />, label: translate('tabs.contacts', 'Kişiler') },
+        { name: 'Tasks', icon: <ListChecks size={18} />, label: translate('tabs.tasks', 'Görevler') },
+        { name: 'Personal Planner', icon: <CalendarCheck size={18} />, label: translate('tabs.personalPlanner', 'Kişisel Planlayıcı') },
+        { name: 'Approvals', icon: <CheckCircle2 size={18} />, label: translate('tabs.approvals', 'Onaylar') },
+        { name: 'Admin Panel', icon: <Shield size={18} />, label: translate('tabs.adminPanel', 'Yönetici Paneli') },
     ];
 
     const visibleTabs = allTabs.filter(tab => {

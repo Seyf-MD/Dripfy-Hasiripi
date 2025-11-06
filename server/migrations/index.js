@@ -2,11 +2,16 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { getDataDir } from '../services/storageService.js';
 import { addAuditMetadataFields } from './migrations_20250204_add_audit_metadata.js';
+import { enhanceTaskModel } from './migrations_20250301_enhance_task_model.js';
 
 const MIGRATIONS = [
   {
     id: '20250204_add_audit_metadata',
     run: addAuditMetadataFields,
+  },
+  {
+    id: '20250301_enhance_task_model',
+    run: enhanceTaskModel,
   },
 ];
 

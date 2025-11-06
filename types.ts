@@ -369,6 +369,12 @@ export interface ChatbotResponsePayload {
   answer: string;
   references: ChatbotReference[];
   provider: string;
+  usage?: {
+    inputTokens?: number;
+    outputTokens?: number;
+    totalTokens?: number;
+  };
+  language?: string;
 }
 
 export interface ChatbotPromptTemplate {

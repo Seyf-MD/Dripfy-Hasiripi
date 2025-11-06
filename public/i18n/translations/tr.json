@@ -383,7 +383,21 @@
         "prompt1": "Gelecek haftanın takvimini özetle.",
         "prompt2": "Yakında teslim edilmesi gereken yüksek öncelikli görevler var mı?",
         "prompt3": "Almanya'daki tüm kişileri listele.",
-        "prompt4": "Karşılaştığımız en büyük zorluklar nelerdir?"
+        "prompt4": "Karşılaştığımız en büyük zorluklar nelerdir?",
+        "helpSuggestions": {
+            "title": "Önerilen yardım makaleleri",
+            "subtitle": "Yardım merkezi tarafından desteklenir",
+            "open": "Yardım merkezinde aç",
+            "relevance": "Alaka puanı: {score}"
+        },
+        "fallback": {
+            "generic": "Üzgünüm, bir sorun oluştu. Lütfen kısa süre sonra tekrar dener misin?",
+            "apiDown": "Yapay zekâ servisimiz şu anda sorun yaşıyor. Birkaç dakika sonra tekrar dener misin?",
+            "limitReached": "Bu ayki kullanım kotamız doldu. Kota yenilendiğinde lütfen tekrar dene.",
+            "unavailable": "Yapay zekâ asistanı henüz yapılandırılmadığı için kullanılamıyor.",
+            "retryAfter": "Lütfen {relativeTime} tekrar dene.",
+            "dismiss": "Mesajı gizle"
+        }
     },
     "footer": {
         "links": "Bağlantılar",

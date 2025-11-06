@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt from '../lib/jwt.js';
 
 const DEFAULT_EXPIRY = '15m';
 const JWT_SECRET = process.env.JWT_SECRET;

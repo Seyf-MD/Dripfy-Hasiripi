@@ -37,6 +37,12 @@ export const chatbotConfig = {
     languages: (process.env.KNOWLEDGE_BASE_LANGUAGES || 'en').split(',').map((lang) => lang.trim()).filter(Boolean),
     maxContextDocuments: parseNumber(process.env.KNOWLEDGE_BASE_CONTEXT_DOCS, 4),
   },
+  usage: {
+    inputTokenPrice: parseFloatNumber(process.env.OPENAI_INPUT_TOKEN_PRICE, 0.00015),
+    outputTokenPrice: parseFloatNumber(process.env.OPENAI_OUTPUT_TOKEN_PRICE, 0.0006),
+    monthlyTokenQuota: parseNumber(process.env.OPENAI_MONTHLY_TOKEN_QUOTA, 0),
+    currency: (process.env.OPENAI_BILLING_CURRENCY || 'USD').trim() || 'USD',
+  },
 };
 
 export const automationConfig = {

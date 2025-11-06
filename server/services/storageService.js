@@ -24,6 +24,7 @@ export const COLLECTION_FILE_MAP = {
   okrs: 'okrs.json',
   auditLog: 'auditLog.json',
   approvalDecisions: 'approvalDecisions.json',
+  usageMetrics: 'usageMetrics.json',
 };
 
 const COLLECTION_DEFAULTS = {
@@ -42,6 +43,7 @@ const COLLECTION_DEFAULTS = {
   okrs: [],
   auditLog: [],
   approvalDecisions: [],
+  usageMetrics: [],
 };
 
 export const COLLECTION_NAMES = Object.keys(COLLECTION_FILE_MAP);

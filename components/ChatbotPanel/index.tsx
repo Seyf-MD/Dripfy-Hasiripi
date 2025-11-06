@@ -17,6 +17,7 @@ import { useAuth } from '../../context/AuthContext';
 import {
   requestChatCompletion,
   fetchKnowledgeSources,
+  ChatbotApiError,
 } from '../../services/chatbot/api';
 import { searchHelpArticles, getSuggestedArticles } from '../../i18n/help';
 import type { ArticleSearchResult, HelpArticle } from '../../i18n/help/types';
@@ -250,6 +251,50 @@ export const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ onClose, dataContext
     }
   };
 
+  const formatRetryAfter = React.useCallback((seconds: number | undefined) => {
+    if (typeof seconds !== 'number' || !Number.isFinite(seconds) || seconds <= 0) {
+      return null;
+    }
+
+    const locale = language || 'en';
+    const formatter = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
+
+    if (seconds >= 86400) {
+      const days = Math.ceil(seconds / 86400);
+      return formatter.format(days, 'day');
+    }
+
+    if (seconds >= 3600) {
+      const hours = Math.ceil(seconds / 3600);
+      return formatter.format(hours, 'hour');
+    }
+
+    const minutes = Math.max(1, Math.ceil(seconds / 60));
+    return formatter.format(minutes, 'minute');
+  }, [language]);
+
+  const resolveFriendlyError = React.useCallback((err: unknown) => {
+    if (err instanceof ChatbotApiError) {
+      if (err.code === 'USAGE_LIMIT_EXCEEDED') {
+        const retryHint = formatRetryAfter(err.retryAfterSeconds);
+        if (retryHint) {
+          return `${t('chatbot.fallback.limitReached')} ${t('chatbot.fallback.retryAfter', { relativeTime: retryHint })}`;
+        }
+        return t('chatbot.fallback.limitReached');
+      }
+      if (err.code === 'OPENAI_NOT_CONFIGURED') {
+        return t('chatbot.fallback.unavailable');
+      }
+      if (err.code === 'OPENAI_TIMEOUT') {
+        return t('chatbot.fallback.apiDown');
+      }
+      if (err.status >= 500) {
+        return t('chatbot.fallback.apiDown');
+      }
+    }
+    return t('chatbot.fallback.generic');
+  }, [formatRetryAfter, t]);
+
   const handleSend = async () => {
     if (!input.trim() || isLoading) {
       return;
@@ -294,13 +339,13 @@ export const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ onClose, dataContext
         return draft;
       });
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'İstek tamamlanamadı.';
-      setError(message);
+      const friendlyMessage = resolveFriendlyError(err);
+      setError(friendlyMessage);
       setMessages((prev) => {
         const draft = [...prev];
         const last = draft[draft.length - 1];
         if (last && last.role === 'assistant') {
-          last.content = message;
+          last.content = friendlyMessage;
         }
         return draft;
       });
@@ -577,8 +622,20 @@ export const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ onClose, dataContext
       )}
 
       {error && (
-        <div className="px-4 py-2 bg-red-50 text-red-700 text-sm border-t border-red-200">
-          {error}
+        <div className="px-4 pb-2 bg-white dark:bg-neutral-900" role="status" aria-live="polite">
+          <div className="flex gap-3 items-start border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/40 rounded-lg px-3 py-2 text-sm text-amber-900 dark:text-amber-100">
+            <LifeBuoy size={16} className="mt-0.5 flex-shrink-0" />
+            <div className="space-y-2">
+              <p>{error}</p>
+              <button
+                type="button"
+                onClick={() => setError(null)}
+                className="text-xs underline text-amber-900/80 dark:text-amber-100/80 hover:text-amber-900 dark:hover:text-amber-50"
+              >
+                {t('chatbot.fallback.dismiss')}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

@@ -1,8 +1,10 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import elasticlunr from 'elasticlunr';
 import { chatbotConfig } from '../config/index.js';
+import { chunkDocument } from '../../services/knowledgeBase/chunker.js';
+import { buildVectorIndex, searchVectorIndex } from '../../services/knowledgeBase/vectorIndex.js';
+import { tokenize } from '../../services/knowledgeBase/tokenize.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,25 +43,66 @@ async function readDirectoryFiles(dirPath) {
   }
 }
 
-function createIndex(documents) {
-  return elasticlunr(function () {
-    this.addField('title');
-    this.addField('body');
-    this.addField('tags');
-    this.setRef('id');
-
-    documents.forEach((doc) => {
-      this.addDoc(doc);
-    });
-  });
-}
-
 function normaliseDocuments(rawDocs) {
   return rawDocs.map((doc) => ({
     ...doc,
     title: doc.title || doc.id,
     tags: doc.tags || [],
   }));
+}
+
+function buildSnippet(content, query, maxLength = 420) {
+  if (!content || typeof content !== 'string') {
+    return '';
+  }
+
+  const normalised = content.replace(/\s+/g, ' ').trim();
+  if (!normalised) {
+    return '';
+  }
+
+  if (normalised.length <= maxLength) {
+    return normalised;
+  }
+
+  const tokens = tokenize(query);
+  let matchIndex = -1;
+
+  for (const token of tokens) {
+    const escaped = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`\\b${escaped}\\b`, 'i');
+    const index = normalised.search(regex);
+    if (index !== -1) {
+      matchIndex = index;
+      break;
+    }
+  }
+
+  if (matchIndex === -1) {
+    matchIndex = 0;
+  }
+
+  const half = Math.floor(maxLength / 2);
+  const start = Math.max(0, matchIndex - half);
+  const end = Math.min(normalised.length, start + maxLength);
+  const prefix = start > 0 ? '…' : '';
+  const suffix = end < normalised.length ? '…' : '';
+
+  return `${prefix}${normalised.slice(start, end).trim()}${suffix}`;
+}
+
+function prepareChunks(documents) {
+  return documents.flatMap((document) => {
+    const chunks = chunkDocument(document, {
+      chunkSize: chatbotConfig.knowledgeBase.chunkSize || 900,
+      overlap: chatbotConfig.knowledgeBase.chunkOverlap || 150,
+    });
+
+    return chunks.map((chunk) => ({
+      ...chunk,
+      title: `${chunk.documentTitle || document.title} · Bölüm ${chunk.chunkIndex + 1}`,
+    }));
+  });
 }
 
 async function buildKnowledgeBase() {
@@ -89,8 +132,17 @@ async function buildKnowledgeBase() {
       path: path.relative(PROJECT_ROOT, path.join(DATA_DIR, file.name)),
     }));
 
-    knowledgeBaseDocuments = normaliseDocuments([...docs, ...dataDocs]);
-    knowledgeBaseIndex = createIndex(knowledgeBaseDocuments);
+    const normalised = normaliseDocuments([...docs, ...dataDocs]);
+    const chunks = prepareChunks(normalised);
+
+    knowledgeBaseDocuments = chunks;
+    knowledgeBaseIndex = buildVectorIndex(
+      chunks.map((chunk) => ({
+        id: chunk.id,
+        content: chunk.content,
+        metadata: chunk,
+      })),
+    );
 
     return knowledgeBaseDocuments;
   })();
@@ -115,33 +167,34 @@ export async function searchKnowledgeBase(query, { sources = [], limit } = {}) {
   const allowedSources = new Set(sources.length ? sources : Object.keys(SOURCE_LABELS));
   const maxResults = limit ?? chatbotConfig.knowledgeBase.maxContextDocuments ?? 4;
 
-  const results = index.search(query, {
-    fields: {
-      title: { boost: 2 },
-      body: { boost: 1 },
-      tags: { boost: 1.5 },
-    },
-    bool: 'AND',
-    expand: true,
-  });
+  if (!index || !documents.length) {
+    return [];
+  }
 
-  const scored = results
-    .map((match) => ({
-      score: match.score,
-      document: documents.find((doc) => doc.id === match.ref),
-    }))
-    .filter((item) => item.document && allowedSources.has(item.document.source))
-    .slice(0, maxResults)
-    .map((item) => ({
-      id: item.document.id,
-      title: item.document.title,
-      snippet: item.document.body.substring(0, 500),
+  const vectorResults = searchVectorIndex(index, query, { limit: maxResults * 3 });
+
+  const filtered = [];
+  for (const item of vectorResults) {
+    const chunk = item.document;
+    if (!chunk || !allowedSources.has(chunk.source)) {
+      continue;
+    }
+    filtered.push({
+      id: chunk.id,
+      title: chunk.title,
+      snippet: buildSnippet(chunk.content, query),
       score: item.score,
-      source: item.document.source,
-      path: item.document.path,
-    }));
+      source: chunk.source,
+      path: chunk.path,
+      documentId: chunk.documentId,
+      chunkIndex: chunk.chunkIndex,
+    });
+    if (filtered.length >= maxResults) {
+      break;
+    }
+  }
 
-  return scored;
+  return filtered;
 }
 
 export function listKnowledgeSources() {

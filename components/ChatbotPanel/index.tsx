@@ -25,6 +25,13 @@ import { PROMPT_TEMPLATES, DEFAULT_TEMPLATE_ID } from '../../services/chatbot/te
 import { createTask } from '../../services/tasks';
 import { triggerReport } from '../../services/reports';
 import { updateRecord } from '../../services/records';
+import {
+  parseAutomationCommand,
+  CommandParseError,
+  formatCommandSummary,
+  type AutomationCommand,
+} from '../../services/automation/commandParser';
+import { executeAutomationCommand } from '../../services/automation/actions';
 import type {
   ChatbotAction,
   ChatbotReference,
@@ -173,7 +180,16 @@ export const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ onClose, dataContext
     notes: '',
     parameters: '{}',
   });
+  const [pendingCommand, setPendingCommand] = React.useState<AutomationCommand | null>(null);
+  const [pendingCommandSummary, setPendingCommandSummary] = React.useState<string | null>(null);
+  const [commandError, setCommandError] = React.useState<string | null>(null);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
+
+  const resetPendingCommand = React.useCallback(() => {
+    setPendingCommand(null);
+    setPendingCommandSummary(null);
+    setCommandError(null);
+  }, []);
 
   const mapToResult = React.useCallback((article: HelpArticle, fallbackScore?: number): ArticleSearchResult => ({
     ...article,
@@ -273,6 +289,62 @@ export const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ onClose, dataContext
     return formatter.format(minutes, 'minute');
   }, [language]);
 
+  const runPendingCommand = React.useCallback(async (command: AutomationCommand) => {
+    setIsLoading(true);
+    setCommandError(null);
+    try {
+      const result = await executeAutomationCommand(command);
+      if (!result.ok) {
+        throw new Error(result.message || 'İşlem tamamlanamadı.');
+      }
+      const auditNote = 'İşlem audit log\'a kaydedildi ve geri alma bilgileri detaylara eklendi.';
+      const content = result.message ? `${result.message}\n${auditNote}` : auditNote;
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `assistant-${Date.now()}`,
+          role: 'assistant',
+          content,
+        },
+      ]);
+      resetPendingCommand();
+    } catch (commandErrorValue) {
+      const message = commandErrorValue instanceof Error
+        ? commandErrorValue.message
+        : 'İşlem tamamlanamadı.';
+      setCommandError(message);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `assistant-${Date.now()}`,
+          role: 'assistant',
+          content: message,
+        },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [resetPendingCommand]);
+
+  const confirmPendingCommand = React.useCallback(() => {
+    if (!pendingCommand) {
+      return;
+    }
+    void runPendingCommand(pendingCommand);
+  }, [pendingCommand, runPendingCommand]);
+
+  const cancelPendingAutomation = React.useCallback((reason?: string) => {
+    resetPendingCommand();
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: `assistant-${Date.now()}`,
+        role: 'assistant',
+        content: reason?.trim() || 'İşlem iptal edildi.',
+      },
+    ]);
+  }, [resetPendingCommand]);
+
   const resolveFriendlyError = React.useCallback((err: unknown) => {
     if (err instanceof ChatbotApiError) {
       if (err.code === 'USAGE_LIMIT_EXCEEDED') {
@@ -296,15 +368,110 @@ export const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ onClose, dataContext
   }, [formatRetryAfter, t]);
 
   const handleSend = async () => {
-    if (!input.trim() || isLoading) {
+    const trimmed = input.trim();
+    if (!trimmed || isLoading) {
       return;
     }
 
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
       role: 'user',
-      content: input.trim(),
+      content: trimmed,
     };
+
+    if (pendingCommand) {
+      const normalised = trimmed.toLowerCase();
+      const confirmWords = ['evet', 'onay', 'onayla', 'yes', 'confirm'];
+      const cancelWords = ['hayır', 'hayir', 'iptal', 'cancel', 'no', 'vazgeç', 'vazgec'];
+
+      setMessages((prev) => [...prev, userMessage]);
+      setInput('');
+      setError(null);
+
+      if (confirmWords.includes(normalised)) {
+        confirmPendingCommand();
+        return;
+      }
+
+      if (cancelWords.includes(normalised)) {
+        cancelPendingAutomation('Kullanıcı işlemi iptal etti.');
+        return;
+      }
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `assistant-${Date.now()}`,
+          role: 'assistant',
+          content: 'Lütfen işlemi tamamlamak için "evet" ya da iptal etmek için "hayır" yazın.',
+        },
+      ]);
+      return;
+    }
+
+    let parsedCommand: AutomationCommand | null = null;
+    try {
+      const result = parseAutomationCommand(trimmed);
+      parsedCommand = result?.command ?? null;
+    } catch (parseError) {
+      if (parseError instanceof CommandParseError) {
+        if (parseError.code !== 'UNSUPPORTED_COMMAND') {
+          setMessages((prev) => [
+            ...prev,
+            userMessage,
+            {
+              id: `assistant-${Date.now()}`,
+              role: 'assistant',
+              content: parseError.message,
+            },
+          ]);
+          setInput('');
+          return;
+        }
+        // unsupported commands are forwarded to the assistant as normal text
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          userMessage,
+          {
+            id: `assistant-${Date.now()}`,
+            role: 'assistant',
+            content: t('chatbot.fallback.generic'),
+          },
+        ]);
+        setInput('');
+        return;
+      }
+    }
+
+    if (parsedCommand) {
+      if (!canUseChatbotAction(parsedCommand.type)) {
+        setMessages((prev) => [
+          ...prev,
+          userMessage,
+          {
+            id: `assistant-${Date.now()}`,
+            role: 'assistant',
+            content: 'Bu komutu çalıştırma izniniz bulunmuyor.',
+          },
+        ]);
+        setInput('');
+        return;
+      }
+
+      const summary = formatCommandSummary(parsedCommand);
+      setMessages((prev) => [
+        ...prev,
+        userMessage,
+        { id: `assistant-${Date.now()}`, role: 'assistant', content: summary },
+      ]);
+      setHelpSuggestions([]);
+      setPendingCommand(parsedCommand);
+      setPendingCommandSummary(summary);
+      setCommandError(null);
+      setInput('');
+      return;
+    }
 
     setMessages((prev) => [...prev, userMessage, { id: `assistant-${Date.now()}`, role: 'assistant', content: '' }]);
     setInput('');
@@ -618,6 +785,37 @@ export const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ onClose, dataContext
               </li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {pendingCommandSummary && (
+        <div className="px-4 py-4 border-b border-slate-200 dark:border-neutral-700 bg-slate-50 dark:bg-neutral-900/70">
+          <h4 className="text-sm font-semibold text-[var(--drip-text)] dark:text-neutral-100">Otomasyon komutu onayı</h4>
+          <p className="text-xs text-[var(--drip-muted)] dark:text-neutral-400 mt-1 whitespace-pre-line">{pendingCommandSummary}</p>
+          <p className="text-[11px] text-[var(--drip-muted)] dark:text-neutral-500 mt-2">
+            "evet" yazarak veya aşağıdaki onay düğmesini kullanarak işlemi tamamlayabilirsiniz. "hayır" yazmak komutu iptal eder.
+          </p>
+          {commandError && (
+            <p className="mt-2 text-xs text-red-600 dark:text-red-400">{commandError}</p>
+          )}
+          <div className="flex gap-2 mt-3">
+            <button
+              type="button"
+              onClick={confirmPendingCommand}
+              className="px-3 py-2 rounded-md bg-[var(--drip-primary)] text-white text-xs font-semibold disabled:opacity-60"
+              disabled={isLoading}
+            >
+              Onayla
+            </button>
+            <button
+              type="button"
+              onClick={() => cancelPendingAutomation()}
+              className="px-3 py-2 rounded-md border border-slate-300 dark:border-neutral-600 text-xs text-[var(--drip-text)] dark:text-neutral-100"
+              disabled={isLoading}
+            >
+              İptal Et
+            </button>
+          </div>
         </div>
       )}
 

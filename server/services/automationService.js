@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { readCollection, writeCollection, isValidCollection } from './storageService.js';
 import { queueTaskSync } from './calendar/index.js';
+import { recordAuditLog } from './logService.js';
 
 function normaliseReminder(reminder) {
   if (!reminder || typeof reminder !== 'object') {
@@ -54,6 +55,24 @@ function buildPersonalization({ ownerId, ownerName, personalNotes, focusTags, sc
   };
 }
 
+function resolveActorLabel(actor) {
+  if (!actor) {
+    return 'chatbot-automation';
+  }
+  if (typeof actor === 'string') {
+    return actor;
+  }
+  return actor.email || actor.name || actor.id || 'chatbot-automation';
+}
+
+async function logAutomationEvent(entry) {
+  try {
+    await recordAuditLog(entry);
+  } catch (error) {
+    console.error('[automationService] Failed to record audit log', error);
+  }
+}
+
 export async function createTask({
   title,
   description,
@@ -69,6 +88,7 @@ export async function createTask({
   schedule = {},
   color = null,
   timezone = null,
+  actor = null,
 }) {
   const tasks = await readCollection('tasks');
   const now = new Date();
@@ -104,10 +124,29 @@ export async function createTask({
     });
   }
 
+  const actorLabel = resolveActorLabel(actor);
+  const auditDetails = [
+    'Chatbot otomasyonu ile görev oluşturuldu.',
+    `Komutu tetikleyen: ${actorLabel}${actor?.role ? ` (${actor.role})` : ''}`,
+    `Görev özeti: ${JSON.stringify({ title: newTask.title, assignee: newTask.assignee, priority: newTask.priority, dueDate: newTask.dueDate })}`,
+    `Geri alma talimatı: Görevi silin (ID: ${newTask.id}).`,
+  ].join('\n');
+
+  await logAutomationEvent({
+    user: actorLabel,
+    action: 'Created',
+    targetType: 'task',
+    targetId: newTask.id,
+    details: auditDetails,
+    label: 'chatbot-automation',
+    sourceModule: 'chatbot',
+    criticality: 'medium',
+  });
+
   return newTask;
 }
 
-export async function updateRecord({ collection, recordId, changes }) {
+export async function updateRecord({ collection, recordId, changes, actor = null }) {
   if (!isValidCollection(collection)) {
     throw new Error(`Unknown collection: ${collection}`);
   }
@@ -119,18 +158,41 @@ export async function updateRecord({ collection, recordId, changes }) {
     throw new Error(`Record ${recordId} not found in ${collection}`);
   }
 
+  const previous = records[index];
   const updated = {
-    ...records[index],
+    ...previous,
     ...changes,
     updatedAt: new Date().toISOString(),
   };
 
   records[index] = updated;
   await writeCollection(collection, records);
+
+  const actorLabel = resolveActorLabel(actor);
+  const auditDetails = [
+    'Chatbot otomasyonu ile kayıt güncellendi.',
+    `Komutu tetikleyen: ${actorLabel}${actor?.role ? ` (${actor.role})` : ''}`,
+    `Koleksiyon: ${collection}`,
+    `Uygulanan değişiklikler: ${JSON.stringify(changes)}`,
+    `Önceki değerler: ${JSON.stringify(previous)}`,
+    `Geri alma talimatı: ${JSON.stringify({ collection, recordId, restore: previous })}`,
+  ].join('\n');
+
+  await logAutomationEvent({
+    user: actorLabel,
+    action: 'Updated',
+    targetType: collection,
+    targetId: recordId,
+    details: auditDetails,
+    label: 'chatbot-automation',
+    sourceModule: 'chatbot',
+    criticality: 'high',
+  });
+
   return updated;
 }
 
-export async function triggerReport({ reportType, parameters, notes }) {
+export async function triggerReport({ reportType, parameters, notes, actor = null }) {
   const reports = await readCollection('reports');
   const entry = {
     id: randomUUID(),
@@ -142,5 +204,25 @@ export async function triggerReport({ reportType, parameters, notes }) {
   };
   reports.push(entry);
   await writeCollection('reports', reports);
+  const actorLabel = resolveActorLabel(actor);
+  const auditDetails = [
+    'Chatbot otomasyonu ile rapor tetiklendi.',
+    `Komutu tetikleyen: ${actorLabel}${actor?.role ? ` (${actor.role})` : ''}`,
+    `Rapor tipi: ${entry.reportType}`,
+    `Parametreler: ${JSON.stringify(entry.parameters)}`,
+    `Notlar: ${entry.notes || '—'}`,
+    `Geri alma talimatı: Rapor kaydının durumunu güncelleyerek iptal edin (ID: ${entry.id}).`,
+  ].join('\n');
+
+  await logAutomationEvent({
+    user: actorLabel,
+    action: 'Created',
+    targetType: 'report',
+    targetId: entry.id,
+    details: auditDetails,
+    label: 'chatbot-automation',
+    sourceModule: 'chatbot',
+    criticality: 'medium',
+  });
   return entry;
 }

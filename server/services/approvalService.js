@@ -6,6 +6,7 @@ import { getAllUsers } from './userService.js';
 import { recordAuditLog } from './logService.js';
 import { notifyApprovalStepPending } from './notificationService.js';
 import { getAuthorisationProfile } from './auth/authorizationService.js';
+import { listInvoices as listInvoiceDocuments, updateInvoiceAfterFlow } from './invoiceProcessing/index.js';
 
 const DECISION_COLLECTION = 'approvalDecisions';
 
@@ -200,6 +201,47 @@ function buildFinanceFlows({ financials, decisions, users }) {
   });
 }
 
+function buildInvoiceFlows({ invoices, decisions, users }) {
+  return invoices.map((invoice) => {
+    const submittedAt = toIsoDate(invoice.uploadedAt, Date.now());
+    const blueprint = Array.isArray(invoice.approval?.blueprint) && invoice.approval.blueprint.length
+      ? invoice.approval.blueprint
+      : getApprovalTemplates('invoice');
+    const flowDecisions = decisions
+      .filter((entry) => entry.flowType === 'invoice' && entry.entityId === invoice.id)
+      .sort((a, b) => new Date(a.decidedAt).getTime() - new Date(b.decidedAt).getTime());
+
+    const { steps, pendingStepId } = buildFlowSteps({
+      templates: blueprint,
+      decisions: flowDecisions,
+      submittedAt,
+      users,
+    });
+
+    return {
+      id: `invoice:${invoice.id}`,
+      type: 'invoice',
+      entityId: invoice.id,
+      reference: invoice.extractedFields?.invoiceNumber || invoice.fileName,
+      title: invoice.extractedFields?.vendorName
+        ? `${invoice.extractedFields.vendorName} faturası`
+        : invoice.fileName,
+      status: determineFlowStatus(steps),
+      submittedAt,
+      submittedBy: invoice.uploadedBy || null,
+      metadata: {
+        amount: invoice.extractedFields?.totalAmount || null,
+        currency: invoice.extractedFields?.currency || null,
+        dueDate: invoice.extractedFields?.dueDate || null,
+        riskLevel: invoice.risk?.level || null,
+        route: invoice.approval?.route || null,
+      },
+      steps,
+      currentStepId: pendingStepId,
+    };
+  });
+}
+
 function buildTaskFlows({ tasks, decisions, users }) {
   return tasks.map((task) => {
     const submittedAt = toIsoDate(task.createdAt || task.dueDate || Date.now());
@@ -237,22 +279,25 @@ function buildTaskFlows({ tasks, decisions, users }) {
 }
 
 export async function listApprovalFlows({ type = null, entityId = null } = {}) {
-  const [requests, financials, tasks, decisions, users] = await Promise.all([
+  const [requests, financials, tasks, decisions, users, invoices] = await Promise.all([
     listSignupRequests(),
     readCollection('financials'),
     readCollection('tasks'),
     readDecisions(),
     getAllUsers(),
+    listInvoiceDocuments(),
   ]);
 
   const userDirectory = Array.isArray(users) ? users : [];
   const financeRecords = Array.isArray(financials) ? financials : [];
   const taskRecords = Array.isArray(tasks) ? tasks : [];
+  const invoiceRecords = Array.isArray(invoices) ? invoices : [];
 
   let flows = [
     ...buildSignupFlows({ requests, decisions, users: userDirectory }),
     ...buildFinanceFlows({ financials: financeRecords, decisions, users: userDirectory }),
     ...buildTaskFlows({ tasks: taskRecords, decisions, users: userDirectory }),
+    ...buildInvoiceFlows({ invoices: invoiceRecords, decisions, users: userDirectory }),
   ];
 
   if (type) {
@@ -349,6 +394,10 @@ export async function recordApprovalDecision({
     if (nextStep && nextStep.pendingUsers?.length) {
       await notifyApprovalStepPending({ flow: updatedFlow, step: nextStep });
     }
+  }
+
+  if (updatedFlow?.type === 'invoice') {
+    await updateInvoiceAfterFlow(updatedFlow);
   }
 
   return { decision: entry, flow: updatedFlow };

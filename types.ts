@@ -620,6 +620,87 @@ export type ChatbotActionPermissionMap = Record<ChatbotAction, UserRole[]>;
 
 export type ForecastInsightSeverity = 'positive' | 'warning' | 'critical' | 'info';
 
+export type InvoiceRiskLevel = 'low' | 'medium' | 'high';
+
+export interface InvoiceApprovalStep {
+  id: string;
+  label: string;
+  status: 'waiting' | 'pending' | 'approved' | 'rejected' | 'skipped';
+  requiredRole: string;
+  slaHours: number;
+  decidedAt?: string | null;
+  decidedBy?: string | null;
+  escalatesTo?: string | null;
+  notifications?: string[];
+}
+
+export interface InvoicePaymentPrediction {
+  riskScore: number;
+  level: InvoiceRiskLevel;
+  expectedDelayDays: number | null;
+}
+
+export interface InvoicePaymentInfo {
+  status: 'pending' | 'scheduled' | 'processing' | 'requires_confirmation' | 'completed' | 'failed' | 'simulated';
+  provider: 'stripe' | 'bank' | 'simulation' | string | null;
+  reference: string | null;
+  triggeredBy?: string | null;
+  triggeredAt?: string | null;
+  scheduledFor?: string | null;
+  failureReason?: string | null;
+  meta?: Record<string, any> | null;
+  predicted?: InvoicePaymentPrediction | null;
+}
+
+export interface InvoicePreviewReference {
+  url: string | null;
+  expiresAt: string | null;
+  type: 'signed-url' | 'data-url' | 'none';
+}
+
+export interface InvoiceDocument {
+  id: string;
+  fileName: string;
+  mimeType: string;
+  size: number;
+  sha256?: string;
+  uploadedAt: string;
+  uploadedBy?: {
+    id?: string | null;
+    email?: string | null;
+    name?: string | null;
+    role?: string | null;
+  } | null;
+  extractedFields: {
+    vendorName?: string | null;
+    vendorAddress?: string | null;
+    invoiceNumber?: string | null;
+    purchaseOrder?: string | null;
+    issueDate?: string | null;
+    dueDate?: string | null;
+    totalAmount?: number | null;
+    taxAmount?: number | null;
+    currency?: string | null;
+    lineItems?: Array<Record<string, any>>;
+  };
+  approval: {
+    status: 'pending' | 'approved' | 'rejected';
+    route?: string | null;
+    notes?: string[];
+    steps: InvoiceApprovalStep[];
+  };
+  risk: {
+    score: number;
+    level: InvoiceRiskLevel;
+    factors: string[];
+  };
+  payment: InvoicePaymentInfo;
+  preview?: {
+    lastGeneratedAt?: string | null;
+    reference?: InvoicePreviewReference | null;
+  };
+}
+
 export interface ForecastPoint {
   date: string;
   value: number;

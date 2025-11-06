@@ -5,6 +5,7 @@ import StatCards from './components/StatCards';
 import TabNavigation from './components/TabNavigation';
 import KnowledgeBase from './components/help/KnowledgeBase';
 import KPIBoard from './components/dashboard/KPIBoard';
+import SegmentPerformancePanel from './components/dashboard/SegmentPerformancePanel';
 import CalendarTab from './components/tabs/WeeklyScheduleTab';
 import FinancialsTab from './components/tabs/FinancialsTab';
 import ChallengesTab from './components/tabs/ChallengesTab';
@@ -24,6 +25,7 @@ import { LegalPageKey } from './data/legalContent';
 import OfflineBanner from './components/layout/OfflineBanner';
 import SignupFunnel from './components/analytics/SignupFunnel';
 import ReportsTab from './components/tabs/ReportsTab';
+import SegmentView from './components/relations/SegmentView';
 
 import { mockData } from './data/mockData';
 import {
@@ -563,12 +565,23 @@ function App() {
                     onUpdateAdvantage={(id, field, value) => handleQuickUpdate(id, 'advantages', field, value)}
                 />;
       case 'Contacts':
-        return <ContactsTab 
-                    data={dashboardData.contacts} 
+        return <ContactsTab
+                    data={dashboardData.contacts}
                     canEdit={canEdit('contacts')}
+                    segmentDefinitions={dashboardData.segmentDefinitions}
                     onOpenModal={handleOpenEditModal as any}
                     onUpdate={(id, field, value) => handleQuickUpdate(id, 'contacts', field, value)}
                 />;
+      case 'Segments':
+        return (
+          <SegmentView
+            contacts={dashboardData.contacts}
+            segments={dashboardData.segmentDefinitions}
+            performance={dashboardData.segmentPerformance}
+            timeline={dashboardData.relationshipTimeline}
+            recommendations={dashboardData.campaignRecommendations}
+          />
+        );
       case 'Tasks':
         return <TasksTab
                     data={dashboardData.tasks}
@@ -674,6 +687,11 @@ function App() {
 
           <main className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
             <StatCards schedule={dashboardData.schedule} contacts={dashboardData.contacts} tasks={dashboardData.tasks} financials={dashboardData.financials} setActiveTab={setActiveTab} onPendingPaymentsClick={() => { setActiveTab('Financials'); setFinancialsDateFilter('week'); }} />
+            <SegmentPerformancePanel
+              segments={dashboardData.segmentDefinitions}
+              performance={dashboardData.segmentPerformance}
+              drillDowns={dashboardData.segmentDrillDowns}
+            />
             <KPIBoard initialOkrs={dashboardData.okrs} onOkrsChange={handleSyncOkrs} />
             <div className="mt-8">
               <SignupFunnel dataset={dashboardData.signupFunnel} />
@@ -711,6 +729,7 @@ function App() {
                 isNew={editModalItem.isNew}
                 onClose={() => setEditModalItem(null)}
                 onSave={editModalItem.isNew ? handleCreateItem as any : handleUpdateItem as any}
+                segmentDefinitions={dashboardData.segmentDefinitions}
             />
         )}
 

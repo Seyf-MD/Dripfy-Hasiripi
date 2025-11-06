@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { DataItem, ScheduleEvent, FinancialRecord, Challenge, Advantage, Contact, Task, User } from '../types';
+import { DataItem, ScheduleEvent, FinancialRecord, Challenge, Advantage, Contact, Task, User, SegmentDefinition } from '../types';
 import { X, Save } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
 import { locationData } from '../data/locationData';
@@ -12,6 +12,7 @@ interface EditModalProps {
     isNew: boolean;
     onClose: () => void;
     onSave: (item: DataItem | Omit<DataItem, 'id'>, type: ModalType) => void;
+    segmentDefinitions?: SegmentDefinition[];
 }
 
 const FormField: React.FC<{ label: string; children: React.ReactNode; className?: string }> = ({ label, children, className }) => (
@@ -21,7 +22,7 @@ const FormField: React.FC<{ label: string; children: React.ReactNode; className?
     </div>
 );
 
-const EditModal: React.FC<EditModalProps> = ({ item, type, isNew, onClose, onSave }) => {
+const EditModal: React.FC<EditModalProps> = ({ item, type, isNew, onClose, onSave, segmentDefinitions = [] }) => {
     const { t } = useLanguage();
     const [formData, setFormData] = React.useState<Partial<DataItem>>(item);
     const [selectedCountry, setSelectedCountry] = React.useState<string>('');
@@ -50,14 +51,34 @@ const EditModal: React.FC<EditModalProps> = ({ item, type, isNew, onClose, onSav
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        if (name === 'revenueContribution') {
+            const numericValue = value === '' ? undefined : Number(value);
+            setFormData(prev => ({ ...prev, [name]: numericValue }));
+        } else {
+            setFormData(prev => ({ ...prev, [name]: value }));
+        }
         if (name === 'country') {
             setSelectedCountry(value);
             // Reset city if country changes
             setFormData(prev => ({ ...prev, city: locationData.countries.find(c => c.name === value)?.cities[0] || '' }));
         }
     };
-    
+
+    const handleSegmentToggle = (segmentId: string) => {
+        setFormData(prev => {
+            const current = new Set((prev as Contact)?.segmentIds ?? []);
+            if (current.has(segmentId)) {
+                current.delete(segmentId);
+            } else {
+                current.add(segmentId);
+            }
+            return {
+                ...prev,
+                segmentIds: Array.from(current),
+            } as Partial<Contact>;
+        });
+    };
+
     const handleParticipantsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = e.target;
         setFormData(prev => ({ ...prev, participants: value.split(',').map(p => p.trim()) }));
@@ -167,6 +188,43 @@ const EditModal: React.FC<EditModalProps> = ({ item, type, isNew, onClose, onSav
                                 </select>
                             </FormField>
                         </div>
+                        <FormField label={t('contacts.sector')}>
+                            <input name="sector" value={(contact.sector ?? '')} onChange={handleChange} className={inputClass} />
+                        </FormField>
+                        <div className="grid grid-cols-2 gap-4">
+                            <FormField label={t('contacts.revenueContribution')}>
+                                <input type="number" name="revenueContribution" value={contact.revenueContribution ?? ''} onChange={handleChange} className={inputClass} min={0} step={1000} />
+                            </FormField>
+                            <FormField label={t('contacts.touchFrequency')}>
+                                <select name="touchFrequency" value={contact.touchFrequency || 'monthly'} onChange={handleChange} className={inputClass}>
+                                    {['daily', 'weekly', 'biweekly', 'monthly', 'quarterly', 'adHoc'].map(option => {
+                                        const key = `contacts.touchFrequencyOptions.${option}`;
+                                        const label = t(key);
+                                        return <option key={option} value={option}>{label === key ? option : label}</option>;
+                                    })}
+                                </select>
+                            </FormField>
+                        </div>
+                        {segmentDefinitions.length > 0 && (
+                            <FormField label={t('contacts.segments')}>
+                                <div className="grid gap-2">
+                                    {segmentDefinitions.map((segment) => {
+                                        const checked = (contact.segmentIds ?? []).includes(segment.id);
+                                        return (
+                                            <label key={segment.id} className="flex items-center gap-2 text-sm">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={checked}
+                                                    onChange={() => handleSegmentToggle(segment.id)}
+                                                    className="h-4 w-4 rounded border-slate-300 text-[var(--drip-primary)] focus:ring-[var(--drip-primary)]"
+                                                />
+                                                <span>{segment.name}</span>
+                                            </label>
+                                        );
+                                    })}
+                                </div>
+                            </FormField>
+                        )}
                     </>
                 );
             case 'tasks':

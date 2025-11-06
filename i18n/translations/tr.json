@@ -122,7 +122,8 @@
         "tasks": "Görevler",
         "approvals": "Onaylar",
         "adminPanel": "Yönetici Paneli",
-        "helpCenter": "Yardım Merkezi"
+        "helpCenter": "Yardım Merkezi",
+        "segments": "Segmentler"
     },
     "calendar": {
         "today": "Bugün",
@@ -205,7 +206,19 @@
         "country": "Ülke",
         "city": "Şehir",
         "phone": "Telefon",
-        "address": "Adres"
+        "address": "Adres",
+        "sector": "Sektör",
+        "revenueContribution": "Gelir katkısı",
+        "touchFrequency": "Temas sıklığı",
+        "segments": "Segmentler",
+        "touchFrequencyOptions": {
+            "daily": "Günlük",
+            "weekly": "Haftalık",
+            "biweekly": "İki haftada bir",
+            "monthly": "Aylık",
+            "quarterly": "Üç ayda bir",
+            "adHoc": "İhtiyaca göre"
+        }
     },
     "tasks": {
         "newTask": "Yeni Görev",
@@ -474,6 +487,46 @@
             "reset": "Sıfırla",
             "submit": "Geri bildirim gönder",
             "thankYou": "Geri bildiriminiz için teşekkürler! Gelecek yanıtları iyileştireceğiz."
+        }
+    },
+    "common": {
+        "notAvailable": "Yok"
+    },
+    "segments": {
+        "tabLabel": "Segment zekâsı",
+        "overviewSubtitle": "Segment sağlığını, ilişkileri ve kampanya fırsatlarını inceleyin.",
+        "selectPlaceholder": "Segment seçin",
+        "performanceTitle": "Segment performans görünümü",
+        "performanceSubtitle": "Katkı, etkileşim ve büyüme hızını takip edin.",
+        "members": "{count} üye",
+        "revenueContribution": "Gelir katkısı",
+        "engagement": "Etkileşim puanı",
+        "expansion": "Büyüme potansiyeli",
+        "expectedGrowth": "Gelir büyümesi",
+        "drilldownTitle": "Drill-down metrikleri",
+        "drilldownSubtitle": "Öne çıkan operasyonel sinyallerin özeti.",
+        "noDrilldown": "Bu segment için detaylı analiz bulunmuyor.",
+        "emailExport": "E-posta listesini indir",
+        "notificationExport": "Bildirim listesini indir",
+        "360Title": "360° ilişki grafiği",
+        "360Subtitle": "Öne çıkan bağlantılar ve temas yoğunluğu",
+        "noContacts": "Bu segmente henüz kişi atanmadı.",
+        "timelineTitle": "Temas zaman çizelgesi",
+        "timelineSubtitle": "En güncel etkileşimlerin kronolojisi",
+        "noTimeline": "Son dönemde kaydedilmiş temas bulunmuyor.",
+        "recommendationsTitle": "Kampanya önerileri",
+        "recommendationsSubtitle": "Bu kitle için önerilen aksiyonlar",
+        "noRecommendations": "Bu segment için aktif öneri bulunmuyor.",
+        "audienceSize": "Hedef kitle",
+        "nextAction": "Sonraki adım",
+        "ownerLabel": "Sorumlu",
+        "channel": {
+            "meeting": "Toplantı",
+            "call": "Arama",
+            "email": "E-posta",
+            "event": "Etkinlik",
+            "deal": "Anlaşma",
+            "note": "Not"
         }
     }
 }

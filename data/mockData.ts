@@ -1,4 +1,4 @@
-import { DashboardData } from '../types';
+import { Contact, DashboardData } from '../types';
 
 export const mockData: DashboardData = {
   schedule: [
@@ -28,7 +28,8 @@ export const mockData: DashboardData = {
     { id: 'a2', title: 'Güçlü Takım ve İşbirliği', description: 'LR x Dripfy işbirliğindeki ekibin uyumu, özverili ve profesyonel yaklaşımı.' },
     { id: 'a3', title: 'Süregelen Networking Fırsatları', description: 'Mevcut networklerin hız kazanmaya yardımcı olması.' },
   ],
-  contacts: [
+  contacts: (() => {
+    const base: Contact[] = [
     { id: 'ct1', firstName: 'Ali', lastName: 'Tınazlı', role: 'Lifespin GTM Partner', type: 'Individual', email: 'ali.tinazli@lifespin.health', address: 'Mauerstraße 10', country: 'Germany', city: 'Berlin' },
     { id: 'ct2', firstName: 'Bülent', lastName: 'Ugurlu', role: 'Medical Board', type: 'Individual', email: 'b.ugurlu@medical.dripfy', address: 'Barbaros Blv. No:1', country: 'Turkey', city: 'Istanbul' },
     { id: 'ct3', firstName: 'Ali', lastName: 'Assar', role: 'Medical Board', type: 'Individual', email: 'a.assar@medical.dripfy', address: 'Zeil 111', country: 'Germany', city: 'Frankfurt' },
@@ -54,7 +55,93 @@ export const mockData: DashboardData = {
     { id: 'ct23', firstName: 'Worknwerk', lastName: '', role: 'Istanbul Partner', type: 'Company', email: 'info@worknwerk.com', address: 'Kolektif House, Maslak', country: 'Turkey', city: 'Istanbul' },
     { id: 'ct24', firstName: 'Onlyhealth.co', lastName: '', role: 'Türkiye Lansman Partneri', type: 'Company', email: 'contact@onlyhealth.co', address: 'Zorlu Center', country: 'Turkey', city: 'Istanbul' },
     { id: 'ct25', firstName: 'Hair Chefs', lastName: '', role: 'Saç Ekim Kliniği Partneri', type: 'Company', email: 'info@hairchiefs.com', address: 'Fulya, Şişli', country: 'Turkey', city: 'Istanbul' }
-  ],
+  ];
+
+    const getSector = (contact: Contact): string => {
+      const role = (contact.role || '').toLowerCase();
+      if (role.includes('clinic') || role.includes('health') || role.includes('medical')) {
+        return 'Longevity & Healthcare';
+      }
+      if (role.includes('partner') || role.includes('office')) {
+        return 'Strategic Partnerships';
+      }
+      if (role.includes('ceo') || role.includes('board')) {
+        return 'Executive Network';
+      }
+      return contact.type === 'Company' ? 'Wellness & Lifestyle' : 'Advisory & Innovation';
+    };
+
+    const getFrequency = (contact: Contact): TouchFrequency => {
+      switch (contact.country) {
+        case 'Turkey':
+          return 'weekly';
+        case 'Germany':
+        case 'Switzerland':
+          return 'biweekly';
+        case 'Canada':
+        case 'USA':
+        case 'UAE':
+          return 'monthly';
+        default:
+          return contact.type === 'Company' ? 'monthly' : 'quarterly';
+      }
+    };
+
+    const computeRevenue = (contact: Contact, index: number): number => {
+      const baseValue = contact.type === 'Company' ? 90000 : 26000;
+      const geographyBonus = contact.country === 'Germany' ? 12000
+        : contact.country === 'Turkey' ? 8000
+        : contact.country === 'Canada' ? 6000
+        : contact.country === 'UAE' ? 7000
+        : 4000;
+      const cadenceAdjustment = (index % 5) * (contact.type === 'Company' ? 5500 : 2500);
+      const value = baseValue + geographyBonus - cadenceAdjustment;
+      return Math.max(12000, Math.round(value / 100) * 100);
+    };
+
+    return base.map((contact, index) => {
+      const role = (contact.role || '').toLowerCase();
+      const segments = new Set<string>(contact.segmentIds ?? []);
+
+      if (contact.type === 'Company') {
+        segments.add('seg-strategic-partners');
+      }
+      if (role.includes('medical') || role.includes('clinic') || role.includes('board')) {
+        segments.add('seg-medical-network');
+      }
+      if (['Germany', 'Switzerland', 'Austria'].includes(contact.country ?? '')) {
+        segments.add('seg-dach-market');
+      }
+      if ((contact.country ?? '').toLowerCase() === 'turkey') {
+        segments.add('seg-turkey-launch');
+      }
+      if (role.includes('gtm') || role.includes('flagship') || role.includes('partner')) {
+        segments.add('seg-revenue-drivers');
+      }
+      if (['UAE', 'USA', 'Canada', 'Singapore'].includes(contact.country ?? '')) {
+        segments.add('seg-growth-frontier');
+      }
+      if (contact.type === 'Individual' && (role.includes('ceo') || role.includes('innovation') || role.includes('advisory'))) {
+        segments.add('seg-innovation-leaders');
+      }
+
+      const segmentIds = Array.from(segments);
+      segmentIds.sort();
+
+      const sector = getSector(contact);
+      const revenueContribution = computeRevenue(contact, index);
+      const touchFrequency = getFrequency(contact);
+
+      return {
+        ...contact,
+        sector,
+        revenueContribution,
+        touchFrequency,
+        segmentIds,
+      };
+    });
+  })(),
+
   tasks: [
     { id: 't1', title: 'Livion Clinic Ziyareti & İlk Toplu Satış (50 adet NAD+)', priority: 'High', status: 'To Do', dueDate: '2024-10-07', assignee: 'Sales Team' },
     { id: 't2', title: 'Myoact Cihazı Onboarding', priority: 'High', status: 'To Do', dueDate: '2024-10-07', assignee: 'Tech Team' },
@@ -323,6 +410,359 @@ export const mockData: DashboardData = {
       title: 'Dubai reklamlarında maliyet optimizasyonu fırsatı',
       detail: 'CPC %18 artarken dönüşüm oranı sabit kaldı. Yeni kreatiflerle yeniden test önerilir.',
       severity: 'warning',
+    },
+  ],
+  segmentDefinitions: [
+    {
+      id: 'seg-strategic-partners',
+      name: 'Stratejik Partnerler',
+      description: 'Kurumsal iş ortakları ve gelir odaklı ilişkiler.',
+      color: '#0f766e',
+      tags: ['partner', 'enterprise'],
+      rules: [
+        {
+          id: 'seg-strategic-partners-core',
+          matcher: 'all',
+          conditions: [
+            { field: 'type', operator: 'equals', value: 'Company' },
+            { field: 'revenueContribution', operator: 'gte', value: 60000 },
+            { field: 'touchFrequency', operator: 'in', value: ['weekly', 'biweekly', 'monthly'] },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'seg-medical-network',
+      name: 'Medikal Ağ',
+      description: 'Tıbbi danışmanlar, klinikler ve sağlık inovasyonu paydaşları.',
+      color: '#1d4ed8',
+      tags: ['medical', 'clinic'],
+      rules: [
+        {
+          id: 'seg-medical-network-expertise',
+          matcher: 'any',
+          conditions: [
+            { field: 'role', operator: 'contains', value: 'medical' },
+            { field: 'role', operator: 'contains', value: 'clinic' },
+            { field: 'sector', operator: 'contains', value: 'Healthcare' },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'seg-dach-market',
+      name: 'DACH Pazarı',
+      description: 'Almanya, Avusturya ve İsviçre bölgesindeki ilişkiler.',
+      color: '#fb923c',
+      tags: ['geo', 'dach'],
+      rules: [
+        {
+          id: 'seg-dach-market-geo',
+          matcher: 'all',
+          conditions: [
+            { field: 'country', operator: 'in', value: ['Germany', 'Switzerland', 'Austria'] },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'seg-turkey-launch',
+      name: 'Türkiye Lansmanı',
+      description: 'İstanbul ve Türkiye merkezli büyüme ilişkileri.',
+      color: '#be123c',
+      tags: ['geo', 'launch'],
+      rules: [
+        {
+          id: 'seg-turkey-launch-core',
+          matcher: 'all',
+          conditions: [
+            { field: 'country', operator: 'equals', value: 'Turkey' },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'seg-growth-frontier',
+      name: 'Yeni Pazar Öncüleri',
+      description: 'Kuzey Amerika ve Körfez açılımları için yüksek potansiyelli ilişkiler.',
+      color: '#7c3aed',
+      tags: ['expansion'],
+      rules: [
+        {
+          id: 'seg-growth-frontier-geo',
+          matcher: 'any',
+          conditions: [
+            { field: 'country', operator: 'in', value: ['USA', 'Canada', 'UAE', 'Singapore'] },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'seg-revenue-drivers',
+      name: 'Gelir Hızlandırıcılar',
+      description: 'GTM, flagship ve yüksek gelir katkılı temaslar.',
+      color: '#16a34a',
+      tags: ['revenue'],
+      rules: [
+        {
+          id: 'seg-revenue-drivers-core',
+          matcher: 'all',
+          conditions: [
+            { field: 'revenueContribution', operator: 'gte', value: 50000 },
+            { field: 'role', operator: 'contains', value: 'partner' },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'seg-innovation-leaders',
+      name: 'İnovasyon Liderleri',
+      description: 'Yönetici düzeyindeki vizyonerler ve ürün inovasyonu destekçileri.',
+      color: '#0ea5e9',
+      tags: ['innovation'],
+      rules: [
+        {
+          id: 'seg-innovation-leaders-core',
+          matcher: 'any',
+          conditions: [
+            { field: 'role', operator: 'contains', value: 'CEO' },
+            { field: 'role', operator: 'contains', value: 'innovation' },
+            { field: 'role', operator: 'contains', value: 'board' },
+          ],
+        },
+      ],
+    },
+  ],
+  segmentPerformance: [
+    {
+      segmentId: 'seg-strategic-partners',
+      segmentName: 'Stratejik Partnerler',
+      memberCount: 9,
+      revenueContribution: 540000,
+      revenueGrowth: 18,
+      engagementScore: 86,
+      expansionPotential: 32,
+    },
+    {
+      segmentId: 'seg-medical-network',
+      segmentName: 'Medikal Ağ',
+      memberCount: 11,
+      revenueContribution: 210000,
+      revenueGrowth: 12,
+      engagementScore: 91,
+      expansionPotential: 24,
+    },
+    {
+      segmentId: 'seg-dach-market',
+      segmentName: 'DACH Pazarı',
+      memberCount: 10,
+      revenueContribution: 320000,
+      revenueGrowth: 15,
+      engagementScore: 78,
+      expansionPotential: 28,
+    },
+    {
+      segmentId: 'seg-turkey-launch',
+      segmentName: 'Türkiye Lansmanı',
+      memberCount: 13,
+      revenueContribution: 260000,
+      revenueGrowth: 22,
+      engagementScore: 83,
+      expansionPotential: 35,
+    },
+    {
+      segmentId: 'seg-growth-frontier',
+      segmentName: 'Yeni Pazar Öncüleri',
+      memberCount: 8,
+      revenueContribution: 190000,
+      revenueGrowth: 27,
+      engagementScore: 74,
+      expansionPotential: 41,
+    },
+    {
+      segmentId: 'seg-innovation-leaders',
+      segmentName: 'İnovasyon Liderleri',
+      memberCount: 7,
+      revenueContribution: 150000,
+      revenueGrowth: 10,
+      engagementScore: 88,
+      expansionPotential: 18,
+    },
+  ],
+  segmentDrillDowns: [
+    {
+      id: 'drill-sp-1',
+      segmentId: 'seg-strategic-partners',
+      title: 'Pipeline Değeri',
+      metric: 'pipelineValue',
+      value: 620000,
+      delta: 14,
+      period: 'Son 90 gün',
+      narrative: 'Livion Clinic ve Kliwla Family Office anlaşmaları pipeline üzerinde.',
+    },
+    {
+      id: 'drill-sp-2',
+      segmentId: 'seg-strategic-partners',
+      title: 'Yenileme Oranı',
+      metric: 'retention',
+      value: 94,
+      delta: 6,
+      period: 'Son 30 gün',
+      narrative: 'Kurumsal partnerlerde yenileme oranı hedefin üzerinde seyretti.',
+    },
+    {
+      id: 'drill-med-1',
+      segmentId: 'seg-medical-network',
+      title: 'Randevu Sayısı',
+      metric: 'touches',
+      value: 37,
+      delta: 9,
+      period: 'Aylık',
+      narrative: 'Medical board üyeleri ile ortalama 3.4 temas gerçekleştirildi.',
+    },
+    {
+      id: 'drill-turkey-1',
+      segmentId: 'seg-turkey-launch',
+      title: 'Lead Akışı',
+      metric: 'leads',
+      value: 128,
+      delta: 18,
+      period: 'Son 6 hafta',
+      narrative: 'İstanbul merkezli kampanyalar yeni klinik partner taleplerini artırdı.',
+    },
+    {
+      id: 'drill-frontier-1',
+      segmentId: 'seg-growth-frontier',
+      title: 'Pipeline Hacmi',
+      metric: 'pipelineValue',
+      value: 210000,
+      delta: 21,
+      period: 'Son 45 gün',
+      narrative: 'Dubai ve Toronto görüşmeleri ölçeklenebilir gelir fırsatları yaratıyor.',
+    },
+    {
+      id: 'drill-innovation-1',
+      segmentId: 'seg-innovation-leaders',
+      title: 'Mentorluk Saatleri',
+      metric: 'advisoryHours',
+      value: 64,
+      delta: 11,
+      period: 'Çeyreklik',
+      narrative: 'İnovasyon liderleri ürün yol haritasına aktif katkı veriyor.',
+    },
+  ],
+  relationshipTimeline: [
+    {
+      id: 'rel-1',
+      contactId: 'ct17',
+      segmentIds: ['seg-strategic-partners', 'seg-dach-market'],
+      occurredAt: '2024-10-03T09:30:00.000Z',
+      channel: 'meeting',
+      summary: 'Livion Clinic ile flagship açılışı planlama toplantısı gerçekleştirildi.',
+      sentiment: 'positive',
+      followUp: 'Hukuk ekibiyle sözleşme revizyonu paylaşıldı.',
+      owner: 'Operations',
+    },
+    {
+      id: 'rel-2',
+      contactId: 'ct22',
+      segmentIds: ['seg-strategic-partners', 'seg-revenue-drivers', 'seg-dach-market'],
+      occurredAt: '2024-10-01T15:00:00.000Z',
+      channel: 'call',
+      summary: 'Kliwla Family Office ile gelir paylaşımı modeli gözden geçirildi.',
+      sentiment: 'positive',
+      followUp: 'Finans ekibi KPI kartlarını güncelliyor.',
+      owner: 'Finance',
+    },
+    {
+      id: 'rel-3',
+      contactId: 'ct7',
+      segmentIds: ['seg-medical-network', 'seg-turkey-launch'],
+      occurredAt: '2024-09-29T08:00:00.000Z',
+      channel: 'meeting',
+      summary: 'Nanolive entegrasyonu için teknik değerlendirme oturumu yapıldı.',
+      sentiment: 'neutral',
+      followUp: 'Ekim ayı demo planı gönderildi.',
+      owner: 'Product',
+    },
+    {
+      id: 'rel-4',
+      contactId: 'ct8',
+      segmentIds: ['seg-growth-frontier'],
+      occurredAt: '2024-09-27T17:30:00.000Z',
+      channel: 'event',
+      summary: 'Dubai Longevity Circle etkinliğinde Lifespan Dubai ile tanıtım sunumu yapıldı.',
+      sentiment: 'positive',
+      followUp: 'Özel paket teklifinin e-posta ile paylaşılması planlandı.',
+      owner: 'Expansion',
+    },
+    {
+      id: 'rel-5',
+      contactId: 'ct14',
+      segmentIds: ['seg-medical-network', 'seg-growth-frontier'],
+      occurredAt: '2024-10-04T12:15:00.000Z',
+      channel: 'call',
+      summary: 'Dr. Adeel Khan ile kombine protokol validasyonu görüşmesi.',
+      sentiment: 'positive',
+      followUp: 'Klinik pilot protokolü 10 Ekim\'de başlatılacak.',
+      owner: 'Medical',
+    },
+    {
+      id: 'rel-6',
+      contactId: 'ct23',
+      segmentIds: ['seg-turkey-launch', 'seg-revenue-drivers'],
+      occurredAt: '2024-09-30T13:45:00.000Z',
+      channel: 'email',
+      summary: 'Worknwerk ile İstanbul lansmanında ortak içerik takvimi paylaşıldı.',
+      sentiment: 'neutral',
+      followUp: 'Ekim kampanyası için içerik onayı bekleniyor.',
+      owner: 'Marketing',
+    },
+  ],
+  campaignRecommendations: [
+    {
+      id: 'rec-1',
+      segmentId: 'seg-strategic-partners',
+      title: 'Partner Başarı Hikayeleri Serisi',
+      description: 'Kurumsal partnerlerde genişleme için referans vaka e-postaları ve webinar dizisi.',
+      suggestedChannels: ['email', 'webinar'],
+      expectedLift: 0.18,
+      audienceSize: 9,
+      cta: 'Özel partner demo randevusu planla',
+      recommendedSendDate: '2024-10-12',
+    },
+    {
+      id: 'rec-2',
+      segmentId: 'seg-medical-network',
+      title: 'Medikal Advisory Bülteni',
+      description: 'Board üyeleri için aylık protokol güncellemeleri ve klinik araştırma özetleri.',
+      suggestedChannels: ['email', 'notification'],
+      expectedLift: 0.22,
+      audienceSize: 11,
+      cta: 'Yeni protokol pilotuna katılım talep et',
+      recommendedSendDate: '2024-10-09',
+    },
+    {
+      id: 'rec-3',
+      segmentId: 'seg-turkey-launch',
+      title: 'İstanbul Lansman Aktivasyonları',
+      description: 'Yerel partnerlerle ortak canlı etkinlik ve push bildirim kampanyası.',
+      suggestedChannels: ['notification', 'event'],
+      expectedLift: 0.26,
+      audienceSize: 13,
+      cta: 'Açılış etkinliği kayıtlarını topla',
+      recommendedSendDate: '2024-10-15',
+    },
+    {
+      id: 'rec-4',
+      segmentId: 'seg-growth-frontier',
+      title: 'Yeni Pazar Discovery Dizisi',
+      description: 'Körfez ve Kuzey Amerika partnerleri için kişiselleştirilmiş drip kampanyası.',
+      suggestedChannels: ['email', 'sms'],
+      expectedLift: 0.19,
+      audienceSize: 8,
+      cta: 'Uzaktan demo oturumu planla',
+      recommendedSendDate: '2024-10-18',
     },
   ],
 };

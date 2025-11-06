@@ -122,7 +122,8 @@
         "tasks": "Tasks",
         "approvals": "Approvals",
         "adminPanel": "Admin Panel",
-        "helpCenter": "Help Center"
+        "helpCenter": "Help Center",
+        "segments": "Segments"
     },
     "calendar": {
         "today": "Today",
@@ -205,7 +206,19 @@
         "country": "Country",
         "city": "City",
         "phone": "Phone",
-        "address": "Address"
+        "address": "Address",
+        "sector": "Sector",
+        "revenueContribution": "Revenue contribution",
+        "touchFrequency": "Touch frequency",
+        "segments": "Segments",
+        "touchFrequencyOptions": {
+            "daily": "Daily",
+            "weekly": "Weekly",
+            "biweekly": "Bi-weekly",
+            "monthly": "Monthly",
+            "quarterly": "Quarterly",
+            "adHoc": "Ad hoc"
+        }
     },
     "tasks": {
         "newTask": "New Task",
@@ -474,6 +487,48 @@
             "reset": "Reset",
             "submit": "Send feedback",
             "thankYou": "Thanks for your feedback! We’ll use it to improve future answers."
+        }
+    },
+    "common": {
+        "notAvailable": "N/A"
+    },
+    "segments": {
+        "tabLabel": "Segment intelligence",
+        "overviewSubtitle": "Inspect segment health, relationships and campaign opportunities.",
+        "selectPlaceholder": "Select segment",
+        "performanceTitle": "Segment performance overview",
+        "performanceSubtitle": "Monitor contribution, engagement and growth velocity.",
+        "members": "{count} members",
+        "revenueContribution": "Revenue contribution",
+        "engagement": "Engagement score",
+        "expansion": "Expansion potential",
+        "expectedGrowth": "Revenue growth",
+        "drilldownTitle": "Drill-down metrics",
+        "drilldownSubtitle": "A quick read on key operational signals.",
+        "noDrilldown": "No detailed analytics available for this segment yet.",
+        "emailExport": "Download email list",
+        "notificationExport": "Download notification list",
+        "360Title": "360° relationship graph",
+        "360Subtitle": "Top connections and interaction density",
+        "noContacts": "No contacts assigned to this segment yet.",
+        "timelineTitle": "Touchpoint timeline",
+        "timelineSubtitle": "Chronological view of the latest engagements",
+        "noTimeline": "No recent touchpoints recorded.",
+        "recommendationsTitle": "Campaign recommendations",
+        "recommendationsSubtitle": "Next best actions for this audience",
+        "noRecommendations": "There are no active recommendations for this segment.",
+        "audienceSize": "Audience size",
+        "nextAction": "Next action",
+        "ownerLabel": "Owner",
+        "emailExportCta": "Download email list",
+        "notificationExportCta": "Download notification list",
+        "channel": {
+            "meeting": "Meeting",
+            "call": "Call",
+            "email": "Email",
+            "event": "Event",
+            "deal": "Deal",
+            "note": "Note"
         }
     }
 }

@@ -31,6 +31,8 @@ export interface Advantage {
   description: string;
 }
 
+export type TouchFrequency = 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'quarterly' | 'adHoc';
+
 export interface Contact {
   id: string;
   firstName: string;
@@ -42,6 +44,117 @@ export interface Contact {
   address?: string;
   city?: string;
   country?: string;
+  sector?: string;
+  revenueContribution?: number;
+  touchFrequency?: TouchFrequency;
+  segmentIds?: string[];
+  autoSegmentIds?: string[];
+}
+
+export type SegmentRuleField =
+  | 'sector'
+  | 'type'
+  | 'country'
+  | 'city'
+  | 'role'
+  | 'revenueContribution'
+  | 'touchFrequency'
+  | 'manualSegment'
+  | 'tags';
+
+export type SegmentRuleOperator =
+  | 'equals'
+  | 'notEquals'
+  | 'in'
+  | 'notIn'
+  | 'gte'
+  | 'gt'
+  | 'lte'
+  | 'lt'
+  | 'contains'
+  | 'between';
+
+export interface SegmentRuleCondition {
+  field: SegmentRuleField;
+  operator: SegmentRuleOperator;
+  value: string | number | (string | number)[] | { min?: number; max?: number };
+}
+
+export interface SegmentRule {
+  id: string;
+  matcher?: 'all' | 'any';
+  conditions: SegmentRuleCondition[];
+  weight?: number;
+}
+
+export interface SegmentDefinition {
+  id: string;
+  name: string;
+  description?: string;
+  color?: string;
+  icon?: string;
+  priority?: number;
+  manualOnly?: boolean;
+  tags?: string[];
+  rules: SegmentRule[];
+}
+
+export interface SegmentRuleContext {
+  manualSegments?: string[];
+  tags?: string[];
+  metrics?: {
+    engagementScore?: number;
+    lastInteractionDays?: number;
+    revenueContribution?: number;
+    [key: string]: number | undefined;
+  };
+}
+
+export interface SegmentPerformanceMetric {
+  segmentId: string;
+  segmentName: string;
+  memberCount: number;
+  revenueContribution: number;
+  revenueGrowth: number;
+  engagementScore: number;
+  expansionPotential: number;
+}
+
+export interface SegmentDrillDownRecord {
+  id: string;
+  segmentId: string;
+  title: string;
+  metric: string;
+  value: number;
+  delta: number;
+  period: string;
+  narrative?: string;
+}
+
+export type RelationshipChannel = 'meeting' | 'call' | 'email' | 'event' | 'deal' | 'note';
+
+export interface RelationshipTimelineEvent {
+  id: string;
+  contactId: string;
+  segmentIds: string[];
+  occurredAt: string;
+  channel: RelationshipChannel;
+  summary: string;
+  sentiment?: 'positive' | 'neutral' | 'negative';
+  followUp?: string;
+  owner?: string;
+}
+
+export interface SegmentCampaignRecommendation {
+  id: string;
+  segmentId: string;
+  title: string;
+  description: string;
+  suggestedChannels: string[];
+  expectedLift: number;
+  audienceSize: number;
+  cta?: string;
+  recommendedSendDate?: string;
 }
 
 export type CalendarProvider = 'google' | 'outlook';
@@ -582,4 +695,9 @@ export interface DashboardData {
   abTests: AbTestExperiment[];
   campaignPerformance: CampaignPerformance[];
   campaignInsights?: CampaignComparisonInsight[];
+  segmentDefinitions: SegmentDefinition[];
+  segmentPerformance: SegmentPerformanceMetric[];
+  segmentDrillDowns: SegmentDrillDownRecord[];
+  relationshipTimeline: RelationshipTimelineEvent[];
+  campaignRecommendations: SegmentCampaignRecommendation[];
 }

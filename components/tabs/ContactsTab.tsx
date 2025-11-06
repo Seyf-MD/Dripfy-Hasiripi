@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Contact } from '../../types';
+import { Contact, SegmentDefinition } from '../../types';
 import { Building, User, PlusCircle, MapPin } from 'lucide-react';
 import { useLanguage } from '../../i18n/LanguageContext';
 
@@ -9,16 +9,17 @@ type SortDirection = 'asc' | 'desc';
 interface ContactsTabProps {
     data: Contact[];
     canEdit: boolean;
+    segmentDefinitions: SegmentDefinition[];
     onOpenModal: (item: Contact | Partial<Contact>, type: 'contacts', isNew?: boolean) => void;
     onUpdate: (itemId: string, field: keyof Contact, value: any) => void;
 }
 
-const ContactsTab: React.FC<ContactsTabProps> = ({ data, canEdit, onOpenModal, onUpdate }) => {
+const ContactsTab: React.FC<ContactsTabProps> = ({ data, canEdit, segmentDefinitions, onOpenModal, onUpdate }) => {
     const { t } = useLanguage();
     const [editingItem, setEditingItem] = React.useState<{ id: string, field: keyof Contact } | null>(null);
     const [searchTerm, setSearchTerm] = React.useState('');
     const [sortConfig, setSortConfig] = React.useState<{ key: SortKey; direction: SortDirection }>({ key: 'firstName', direction: 'asc' });
-    
+
     const inputClasses = "w-full bg-slate-100 dark:bg-neutral-700 border-transparent focus:bg-slate-200 dark:focus:bg-neutral-600 rounded p-1 text-sm focus:ring-2 focus:ring-[var(--drip-primary)] focus:outline-none focus:border-[var(--drip-primary)] text-[var(--drip-text)] dark:text-white";
 
     const sortedAndFilteredData = React.useMemo(() => {
@@ -68,8 +69,35 @@ const ContactsTab: React.FC<ContactsTabProps> = ({ data, canEdit, onOpenModal, o
         setEditingItem(null);
     };
 
+    const segmentLookup = React.useMemo(() => {
+        return new Map(segmentDefinitions.map((segment) => [segment.id, segment]));
+    }, [segmentDefinitions]);
+
+    const formatCurrency = React.useMemo(() => new Intl.NumberFormat('tr-TR', {
+        style: 'currency',
+        currency: 'EUR',
+        maximumFractionDigits: 0,
+    }), []);
+
+    const frequencyLabel = (frequency?: Contact['touchFrequency']) => {
+        if (!frequency) {
+            return t('common.notAvailable') ?? '–';
+        }
+        const key = `contacts.touchFrequencyOptions.${frequency}`;
+        const label = t(key);
+        return label === key ? frequency : label;
+    };
+
     const handleAddNew = () => {
-        onOpenModal({ firstName: '', lastName: '', role: '', type: 'Individual', email: ''}, 'contacts', true);
+        onOpenModal({
+            firstName: '',
+            lastName: '',
+            role: '',
+            type: 'Individual',
+            email: '',
+            touchFrequency: 'monthly',
+            segmentIds: [],
+        }, 'contacts', true);
     }
     
     const sortOptions: { label: string, value: string }[] = [
@@ -110,7 +138,15 @@ const ContactsTab: React.FC<ContactsTabProps> = ({ data, canEdit, onOpenModal, o
                 </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {sortedAndFilteredData.map((contact) => (
+                {sortedAndFilteredData.map((contact) => {
+                    const combinedSegmentIds = Array.from(new Set([...(contact.segmentIds ?? []), ...(contact.autoSegmentIds ?? [])]));
+                    const autoSegments = new Set(contact.autoSegmentIds ?? []);
+                    const manualSegments = new Set(contact.segmentIds ?? []);
+                    const resolvedSegments = combinedSegmentIds
+                        .map((segmentId) => segmentLookup.get(segmentId))
+                        .filter((segment): segment is SegmentDefinition => Boolean(segment));
+
+                    return (
                     <div key={contact.id} onClick={() => editingItem ? null : onOpenModal(contact, 'contacts')} className="bg-white dark:bg-neutral-800 p-5 rounded-xl border border-slate-200 dark:border-neutral-700 flex flex-col justify-between transition-all duration-300 hover:border-[rgba(75,165,134,0.6)] hover:-translate-y-1 relative group cursor-pointer">
                         <div>
                             <div className="flex items-start justify-between">
@@ -130,10 +166,50 @@ const ContactsTab: React.FC<ContactsTabProps> = ({ data, canEdit, onOpenModal, o
                                         <span>{[contact.city, contact.country].filter(Boolean).join(', ')}</span>
                                     </p>
                                 )}
+                                <div className="mt-3 grid grid-cols-1 gap-2 text-xs text-[var(--drip-muted)] dark:text-neutral-400">
+                                    {contact.sector && (
+                                        <div className="flex items-center justify-between">
+                                            <span>{t('contacts.sector')}</span>
+                                            <span className="font-medium text-[var(--drip-text)] dark:text-white">{contact.sector}</span>
+                                        </div>
+                                    )}
+                                    {typeof contact.revenueContribution === 'number' && (
+                                        <div className="flex items-center justify-between">
+                                            <span>{t('contacts.revenueContribution')}</span>
+                                            <span className="font-medium text-[var(--drip-text)] dark:text-white">{formatCurrency.format(contact.revenueContribution)}</span>
+                                        </div>
+                                    )}
+                                    {contact.touchFrequency && (
+                                        <div className="flex items-center justify-between">
+                                            <span>{t('contacts.touchFrequency')}</span>
+                                            <span className="font-medium text-[var(--drip-text)] dark:text-white">{frequencyLabel(contact.touchFrequency)}</span>
+                                        </div>
+                                    )}
+                                </div>
+                                {resolvedSegments.length > 0 && (
+                                    <div className="mt-4 flex flex-wrap gap-2">
+                                        {resolvedSegments.map((segment) => {
+                                            const isAuto = autoSegments.has(segment.id) && !manualSegments.has(segment.id);
+                                            return (
+                                                <span
+                                                    key={`${contact.id}-${segment.id}`}
+                                                    className={`inline-flex items-center gap-1 rounded-full border px-2 py-1 text-xs font-medium ${
+                                                        isAuto
+                                                            ? 'border-dashed border-emerald-300 text-emerald-600 dark:border-emerald-400/60 dark:text-emerald-300'
+                                                            : 'border-slate-200 text-slate-600 dark:border-neutral-600 dark:text-neutral-200'
+                                                    }`}
+                                                >
+                                                    <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: segment.color ?? 'var(--drip-primary)' }}></span>
+                                                    {segment.name}
+                                                </span>
+                                            );
+                                        })}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
-                ))}
+                )})}
             </div>
         </div>
     );

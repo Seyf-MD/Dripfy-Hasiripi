@@ -122,7 +122,8 @@
         "tasks": "Aufgaben",
         "approvals": "Freigaben",
         "adminPanel": "Admin-Panel",
-        "helpCenter": "Hilfe-Center"
+        "helpCenter": "Hilfe-Center",
+        "segments": "Segmente"
     },
     "calendar": {
         "today": "Heute",
@@ -205,7 +206,19 @@
         "country": "Land",
         "city": "Stadt",
         "phone": "Telefon",
-        "address": "Adresse"
+        "address": "Adresse",
+        "sector": "Branche",
+        "revenueContribution": "Umsatzbeitrag",
+        "touchFrequency": "Kontaktfrequenz",
+        "segments": "Segmente",
+        "touchFrequencyOptions": {
+            "daily": "Täglich",
+            "weekly": "Wöchentlich",
+            "biweekly": "Zweiwöchentlich",
+            "monthly": "Monatlich",
+            "quarterly": "Vierteljährlich",
+            "adHoc": "Bei Bedarf"
+        }
     },
     "tasks": {
         "newTask": "Neue Aufgabe",
@@ -474,6 +487,46 @@
             "reset": "Zurücksetzen",
             "submit": "Feedback senden",
             "thankYou": "Vielen Dank! Wir nutzen Ihr Feedback für bessere Antworten."
+        }
+    },
+    "common": {
+        "notAvailable": "Nicht verfügbar"
+    },
+    "segments": {
+        "tabLabel": "Segment Intelligence",
+        "overviewSubtitle": "Analysieren Sie Segmentgesundheit, Beziehungen und Kampagnenchancen.",
+        "selectPlaceholder": "Segment auswählen",
+        "performanceTitle": "Segment-Performance",
+        "performanceSubtitle": "Beobachten Sie Beitrag, Engagement und Wachstumsgeschwindigkeit.",
+        "members": "{count} Mitglieder",
+        "revenueContribution": "Umsatzbeitrag",
+        "engagement": "Engagement-Score",
+        "expansion": "Wachstumspotenzial",
+        "expectedGrowth": "Umsatzwachstum",
+        "drilldownTitle": "Detailmetriken",
+        "drilldownSubtitle": "Kurzer Überblick über wichtige Kennzahlen.",
+        "noDrilldown": "Für dieses Segment liegen noch keine Detailberichte vor.",
+        "emailExport": "E-Mail-Liste herunterladen",
+        "notificationExport": "Benachrichtigungsliste herunterladen",
+        "360Title": "360° Beziehungsgraph",
+        "360Subtitle": "Wichtigste Kontakte und Touchpoint-Dichte",
+        "noContacts": "Diesem Segment sind noch keine Kontakte zugeordnet.",
+        "timelineTitle": "Touchpoint-Zeitachse",
+        "timelineSubtitle": "Chronologische Ansicht der letzten Interaktionen",
+        "noTimeline": "Keine aktuellen Touchpoints erfasst.",
+        "recommendationsTitle": "Kampagnenempfehlungen",
+        "recommendationsSubtitle": "Nächste sinnvolle Aktionen für diese Zielgruppe",
+        "noRecommendations": "Für dieses Segment gibt es derzeit keine Empfehlungen.",
+        "audienceSize": "Zielgruppengröße",
+        "nextAction": "Nächster Schritt",
+        "ownerLabel": "Verantwortlich",
+        "channel": {
+            "meeting": "Meeting",
+            "call": "Anruf",
+            "email": "E-Mail",
+            "event": "Event",
+            "deal": "Deal",
+            "note": "Notiz"
         }
     }
 }

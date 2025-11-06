@@ -122,7 +122,8 @@
         "tasks": "Задачи",
         "approvals": "Согласования",
         "adminPanel": "Панель администратора",
-        "helpCenter": "Центр помощи"
+        "helpCenter": "Центр помощи",
+        "segments": "Сегменты"
     },
     "calendar": {
         "today": "Сегодня",
@@ -205,7 +206,19 @@
         "country": "Страна",
         "city": "Город",
         "phone": "Телефон",
-        "address": "Адрес"
+        "address": "Адрес",
+        "sector": "Сектор",
+        "revenueContribution": "Вклад в выручку",
+        "touchFrequency": "Частота контакта",
+        "segments": "Сегменты",
+        "touchFrequencyOptions": {
+            "daily": "Ежедневно",
+            "weekly": "Еженедельно",
+            "biweekly": "Раз в две недели",
+            "monthly": "Ежемесячно",
+            "quarterly": "Ежеквартально",
+            "adHoc": "По необходимости"
+        }
     },
     "tasks": {
         "newTask": "Новая задача",
@@ -474,6 +487,46 @@
             "reset": "Сбросить",
             "submit": "Отправить отзыв",
             "thankYou": "Спасибо за отзыв! Мы используем его для улучшения ответов."
+        }
+    },
+    "common": {
+        "notAvailable": "Недоступно"
+    },
+    "segments": {
+        "tabLabel": "Аналитика сегментов",
+        "overviewSubtitle": "Изучайте здоровье сегментов, связи и кампании.",
+        "selectPlaceholder": "Выберите сегмент",
+        "performanceTitle": "Показатели сегмента",
+        "performanceSubtitle": "Следите за вкладом, вовлечённостью и ростом.",
+        "members": "{count} контактов",
+        "revenueContribution": "Вклад в выручку",
+        "engagement": "Индекс вовлечённости",
+        "expansion": "Потенциал роста",
+        "expectedGrowth": "Рост выручки",
+        "drilldownTitle": "Детальные метрики",
+        "drilldownSubtitle": "Краткий обзор ключевых показателей.",
+        "noDrilldown": "Для сегмента пока нет детальных отчётов.",
+        "emailExport": "Скачать список e-mail",
+        "notificationExport": "Скачать список уведомлений",
+        "360Title": "360° карта отношений",
+        "360Subtitle": "Ключевые связи и плотность контактов",
+        "noContacts": "К сегменту ещё не привязаны контакты.",
+        "timelineTitle": "Лента взаимодействий",
+        "timelineSubtitle": "Хронология последних активностей",
+        "noTimeline": "Недавних взаимодействий не зафиксировано.",
+        "recommendationsTitle": "Рекомендации кампаний",
+        "recommendationsSubtitle": "Следующие шаги для этой аудитории",
+        "noRecommendations": "Для сегмента пока нет рекомендаций.",
+        "audienceSize": "Размер аудитории",
+        "nextAction": "Следующий шаг",
+        "ownerLabel": "Ответственный",
+        "channel": {
+            "meeting": "Встреча",
+            "call": "Звонок",
+            "email": "E-mail",
+            "event": "Событие",
+            "deal": "Сделка",
+            "note": "Заметка"
         }
     }
 }

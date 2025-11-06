@@ -202,6 +202,127 @@ export const mockData: DashboardData = {
       }
   ],
   signupRequests: [
-      { id: 'sr1', name: 'Laura Schmidt', email: 'laura.s@example.com', phone: '+49123456789', position: 'Team Lead', status: 'pending', timestamp: '2024-07-27 09:15:00' }
-  ]
+      {
+        id: 'sr1',
+        name: 'Laura Schmidt',
+        email: 'laura.s@example.com',
+        phone: '+49 123456789',
+        position: 'Team Lead',
+        status: 'pending',
+        timestamp: '2024-07-27T09:15:00.000Z',
+        country: 'Germany',
+        countryCode: '+49',
+        attribution: {
+          source: 'referral',
+          campaign: 'oktoberfest-partners',
+          country: 'Germany',
+          medium: 'partner',
+          landingPage: '/signup?utm_source=referral&utm_campaign=oktoberfest-partners',
+          referrer: 'https://partner.hasiripi.com',
+        },
+        tags: ['source:referral', 'campaign:oktoberfest-partners', 'country:Germany'],
+      }
+  ],
+  signupFunnel: {
+    stages: [
+      { id: 'visit', label: 'Landing Page Ziyaretleri', order: 0 },
+      { id: 'start', label: 'Form Başlangıcı', order: 1 },
+      { id: 'code-sent', label: 'Kod Gönderildi', order: 2 },
+      { id: 'verified', label: 'Kod Doğrulandı', order: 3 },
+      { id: 'qualified', label: 'Nitelikli Lead', order: 4 },
+      { id: 'approved', label: 'Onaylandı', order: 5 },
+    ],
+    events: [
+      { id: 'e1', leadId: 'lead-1', stageId: 'visit', occurredAt: '2024-09-01T09:00:00.000Z', source: 'paid', campaign: 'launch-dubai', country: 'United Arab Emirates' },
+      { id: 'e2', leadId: 'lead-1', stageId: 'start', occurredAt: '2024-09-01T09:02:00.000Z', source: 'paid', campaign: 'launch-dubai', country: 'United Arab Emirates' },
+      { id: 'e3', leadId: 'lead-1', stageId: 'code-sent', occurredAt: '2024-09-01T09:02:30.000Z', source: 'paid', campaign: 'launch-dubai', country: 'United Arab Emirates' },
+      { id: 'e4', leadId: 'lead-1', stageId: 'verified', occurredAt: '2024-09-01T09:05:00.000Z', source: 'paid', campaign: 'launch-dubai', country: 'United Arab Emirates' },
+      { id: 'e5', leadId: 'lead-1', stageId: 'qualified', occurredAt: '2024-09-01T09:07:00.000Z', source: 'paid', campaign: 'launch-dubai', country: 'United Arab Emirates' },
+      { id: 'e6', leadId: 'lead-1', stageId: 'approved', occurredAt: '2024-09-02T10:00:00.000Z', source: 'paid', campaign: 'launch-dubai', country: 'United Arab Emirates' },
+
+      { id: 'e7', leadId: 'lead-2', stageId: 'visit', occurredAt: '2024-09-03T10:00:00.000Z', source: 'organic', campaign: 'seo-longform', country: 'Germany' },
+      { id: 'e8', leadId: 'lead-2', stageId: 'start', occurredAt: '2024-09-03T10:04:00.000Z', source: 'organic', campaign: 'seo-longform', country: 'Germany' },
+      { id: 'e9', leadId: 'lead-2', stageId: 'code-sent', occurredAt: '2024-09-03T10:05:00.000Z', source: 'organic', campaign: 'seo-longform', country: 'Germany' },
+      { id: 'e10', leadId: 'lead-2', stageId: 'verified', occurredAt: '2024-09-03T10:08:00.000Z', source: 'organic', campaign: 'seo-longform', country: 'Germany' },
+
+      { id: 'e11', leadId: 'lead-3', stageId: 'visit', occurredAt: '2024-09-05T14:30:00.000Z', source: 'referral', campaign: 'oktoberfest-partners', country: 'Germany' },
+      { id: 'e12', leadId: 'lead-3', stageId: 'start', occurredAt: '2024-09-05T14:32:00.000Z', source: 'referral', campaign: 'oktoberfest-partners', country: 'Germany' },
+      { id: 'e13', leadId: 'lead-3', stageId: 'code-sent', occurredAt: '2024-09-05T14:32:45.000Z', source: 'referral', campaign: 'oktoberfest-partners', country: 'Germany' },
+
+      { id: 'e14', leadId: 'lead-4', stageId: 'visit', occurredAt: '2024-09-07T08:12:00.000Z', source: 'event', campaign: 'longevity-frankfurt', country: 'Germany' },
+      { id: 'e15', leadId: 'lead-4', stageId: 'start', occurredAt: '2024-09-07T08:13:10.000Z', source: 'event', campaign: 'longevity-frankfurt', country: 'Germany' },
+      { id: 'e16', leadId: 'lead-4', stageId: 'code-sent', occurredAt: '2024-09-07T08:13:55.000Z', source: 'event', campaign: 'longevity-frankfurt', country: 'Germany' },
+      { id: 'e17', leadId: 'lead-4', stageId: 'verified', occurredAt: '2024-09-07T08:15:20.000Z', source: 'event', campaign: 'longevity-frankfurt', country: 'Germany' },
+      { id: 'e18', leadId: 'lead-4', stageId: 'qualified', occurredAt: '2024-09-07T08:18:00.000Z', source: 'event', campaign: 'longevity-frankfurt', country: 'Germany' },
+
+      { id: 'e19', leadId: 'lead-5', stageId: 'visit', occurredAt: '2024-09-10T11:45:00.000Z', source: 'paid', campaign: 'launch-dubai', country: 'United Arab Emirates' },
+      { id: 'e20', leadId: 'lead-5', stageId: 'start', occurredAt: '2024-09-10T11:46:00.000Z', source: 'paid', campaign: 'launch-dubai', country: 'United Arab Emirates' },
+      { id: 'e21', leadId: 'lead-5', stageId: 'code-sent', occurredAt: '2024-09-10T11:46:40.000Z', source: 'paid', campaign: 'launch-dubai', country: 'United Arab Emirates' },
+    ],
+  },
+  abTests: [
+    {
+      id: 'ab1',
+      name: 'Signup CTA Metni',
+      goal: 'Kod doğrulama oranını artır',
+      status: 'running',
+      startDate: '2024-09-01',
+      variants: [
+        { id: 'control', label: 'Kontrol', participants: 320, conversions: 92, revenue: 0 },
+        { id: 'variant-a', label: '"Hemen erişim sağlayın" CTA', participants: 305, conversions: 118, revenue: 0 },
+      ],
+    },
+    {
+      id: 'ab2',
+      name: 'Funnel Form Adımları',
+      goal: 'Form tamamlama oranını yükselt',
+      status: 'completed',
+      startDate: '2024-07-15',
+      endDate: '2024-08-15',
+      variants: [
+        { id: 'multi-step', label: 'Çok Adımlı Form', participants: 540, conversions: 210 },
+        { id: 'single-step', label: 'Tek Sayfa Form', participants: 525, conversions: 256 },
+      ],
+    },
+  ],
+  campaignPerformance: [
+    {
+      id: 'cmp-1',
+      name: 'Dubai Launch Ads',
+      source: 'paid',
+      country: 'United Arab Emirates',
+      period: { start: '2024-08-25', end: '2024-09-24' },
+      metrics: { leads: 420, conversions: 132, spend: 8400, revenue: 22800 },
+    },
+    {
+      id: 'cmp-2',
+      name: 'Oktoberfest Partner Referral',
+      source: 'referral',
+      country: 'Germany',
+      period: { start: '2024-09-01', end: '2024-09-24' },
+      metrics: { leads: 160, conversions: 74, spend: 2100, revenue: 16400 },
+    },
+    {
+      id: 'cmp-3',
+      name: 'Longevity Frankfurt Event',
+      source: 'event',
+      country: 'Germany',
+      period: { start: '2024-09-05', end: '2024-09-25' },
+      metrics: { leads: 96, conversions: 41, spend: 4800, revenue: 19600 },
+    },
+  ],
+  campaignInsights: [
+    {
+      id: 'insight-1',
+      title: 'Partner referansları en yüksek dönüşümü sağladı',
+      detail: 'Oktoberfest partner kampanyası %46 dönüşüm ile paid kanalların %31 oranını geçti.',
+      severity: 'success',
+    },
+    {
+      id: 'insight-2',
+      title: 'Dubai reklamlarında maliyet optimizasyonu fırsatı',
+      detail: 'CPC %18 artarken dönüşüm oranı sabit kaldı. Yeni kreatiflerle yeniden test önerilir.',
+      severity: 'warning',
+    },
+  ],
 };

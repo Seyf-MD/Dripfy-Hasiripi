@@ -240,6 +240,66 @@ function saveSignupRequests(array $requests): void
 /**
  * Formdan gelen ham veriyi normalize eder; trim, telefon rakam filtreleri vb.
  */
+function normaliseSignupSource(?string $value): string
+{
+    $value = trim((string)$value);
+    if ($value === '') {
+        return 'organic';
+    }
+    $value = strtolower($value);
+    $supported = ['organic', 'paid', 'referral', 'partner', 'event', 'content', 'other'];
+    if (in_array($value, $supported, true)) {
+        return $value;
+    }
+    if (in_array($value, ['ads', 'paid-search', 'paid_social', 'sem', 'ppc'], true)) {
+        return 'paid';
+    }
+    if (in_array($value, ['blog', 'seo', 'content-marketing'], true)) {
+        return 'content';
+    }
+    if (in_array($value, ['conference', 'meetup', 'webinar'], true)) {
+        return 'event';
+    }
+    if (in_array($value, ['affiliate', 'reseller'], true)) {
+        return 'partner';
+    }
+    if (in_array($value, ['friend', 'colleague', 'customer'], true)) {
+        return 'referral';
+    }
+    return 'other';
+}
+
+function normaliseSignupAttribution(array $input): array
+{
+    $source = $input['signupSource'] ?? $input['source'] ?? $input['utm_source'] ?? ($input['attribution']['source'] ?? null);
+    $campaign = $input['signupCampaign'] ?? $input['campaign'] ?? $input['utm_campaign'] ?? ($input['attribution']['campaign'] ?? null);
+    $medium = $input['medium'] ?? $input['utm_medium'] ?? ($input['attribution']['medium'] ?? null);
+    $country = $input['attributionCountry'] ?? $input['utm_country'] ?? ($input['attribution']['country'] ?? $input['country'] ?? null);
+    $landingPage = $input['landingPage'] ?? ($input['attribution']['landingPage'] ?? null);
+    $referrer = $input['referrer'] ?? ($input['attribution']['referrer'] ?? null);
+
+    return [
+        'source' => normaliseSignupSource($source),
+        'campaign' => $campaign !== null && $campaign !== '' ? trim((string)$campaign) : null,
+        'medium' => $medium !== null && $medium !== '' ? trim((string)$medium) : null,
+        'country' => $country !== null && $country !== '' ? trim((string)$country) : null,
+        'landingPage' => $landingPage !== null && $landingPage !== '' ? trim((string)$landingPage) : null,
+        'referrer' => $referrer !== null && $referrer !== '' ? trim((string)$referrer) : null,
+    ];
+}
+
+function buildSignupAttributionTags(array $attribution): array
+{
+    $tags = ['source:' . ($attribution['source'] ?? 'other')];
+    if (!empty($attribution['campaign'])) {
+        $tags[] = 'campaign:' . $attribution['campaign'];
+    }
+    if (!empty($attribution['country'])) {
+        $tags[] = 'country:' . $attribution['country'];
+    }
+    return $tags;
+}
+
 function normaliseSignupPayload(array $input): array
 {
     $firstName = trim((string)($input['firstName'] ?? ''));
@@ -256,6 +316,7 @@ function normaliseSignupPayload(array $input): array
     $phoneDigits = preg_replace('/[^0-9]/', '', (string)($input['phone'] ?? ''));
     $position = trim((string)($input['position'] ?? ''));
     $company = trim((string)($input['company'] ?? ''));
+    $attribution = normaliseSignupAttribution($input);
 
     return [
         'firstName' => $firstName,
@@ -267,6 +328,8 @@ function normaliseSignupPayload(array $input): array
         'phoneDigits' => $phoneDigits,
         'position' => $position,
         'company' => $company,
+        'attribution' => $attribution,
+        'tags' => buildSignupAttributionTags($attribution),
     ];
 }
 
@@ -337,6 +400,18 @@ function buildInfoLines(array $payload): array
 
     if (!empty($payload['country'])) {
         $lines[] = 'Ülke: ' . $payload['country'];
+    }
+
+    if (!empty($payload['attribution']['source'])) {
+        $lines[] = 'Kaynak: ' . $payload['attribution']['source'];
+    }
+
+    if (!empty($payload['attribution']['campaign'])) {
+        $lines[] = 'Kampanya: ' . $payload['attribution']['campaign'];
+    }
+
+    if (!empty($payload['attribution']['country'])) {
+        $lines[] = 'Hedef Ülke: ' . $payload['attribution']['country'];
     }
 
     return $lines;
@@ -452,6 +527,8 @@ function storeSignupRequest(array $payload): array
         'position' => $payload['position'] ?? '',
         'status' => 'pending',
         'timestamp' => time(),
+        'attribution' => $payload['attribution'] ?? null,
+        'tags' => $payload['tags'] ?? buildSignupAttributionTags($payload['attribution'] ?? []),
     ];
 
     $requests[] = $request;

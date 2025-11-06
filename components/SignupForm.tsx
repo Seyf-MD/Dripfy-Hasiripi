@@ -6,6 +6,7 @@ import {
   SignupError,
   SignupFinalizePayload,
 } from '../services/signupService';
+import type { SignupAttribution, SignupSource } from '../types';
 
 interface SignupFormProps {
   onSignupRequest: (payload: { email: string; code: string }) => Promise<SignupFinalizePayload>;
@@ -61,6 +62,77 @@ const phoneCountries = [
   { code: '+1', label: 'United States (+1)', country: 'United States' },
 ];
 
+const SUPPORTED_SIGNUP_SOURCES: SignupSource[] = ['organic', 'paid', 'referral', 'partner', 'event', 'content', 'other'];
+
+const normaliseSignupSource = (value?: string | null): SignupSource => {
+  if (!value) {
+    return 'organic';
+  }
+  const trimmed = value.trim().toLowerCase();
+  if ((SUPPORTED_SIGNUP_SOURCES as readonly string[]).includes(trimmed)) {
+    return trimmed as SignupSource;
+  }
+  if (['ads', 'paid-search', 'paid_social', 'sem', 'ppc'].includes(trimmed)) {
+    return 'paid';
+  }
+  if (['blog', 'seo', 'content-marketing'].includes(trimmed)) {
+    return 'content';
+  }
+  if (['conference', 'meetup', 'webinar'].includes(trimmed)) {
+    return 'event';
+  }
+  if (['affiliate', 'reseller'].includes(trimmed)) {
+    return 'partner';
+  }
+  if (['friend', 'colleague', 'customer'].includes(trimmed)) {
+    return 'referral';
+  }
+  return 'other';
+};
+
+const detectInitialAttribution = (): SignupAttribution => {
+  if (typeof window === 'undefined') {
+    return {
+      source: 'organic',
+      campaign: null,
+      medium: null,
+      country: null,
+      landingPage: null,
+      referrer: null,
+    };
+  }
+  const params = new URLSearchParams(window.location.search);
+  const sourceParam = params.get('utm_source') ?? params.get('source');
+  const campaignParam = params.get('utm_campaign') ?? params.get('campaign');
+  const mediumParam = params.get('utm_medium') ?? params.get('medium');
+  const countryParam = params.get('utm_country') ?? params.get('country');
+  const landingPage = `${window.location.pathname}${window.location.search}` || null;
+  const referrer = typeof document !== 'undefined' && document.referrer ? document.referrer : null;
+
+  return {
+    source: normaliseSignupSource(sourceParam),
+    campaign: campaignParam ? campaignParam.trim() : null,
+    medium: mediumParam ? mediumParam.trim() : null,
+    country: countryParam ? countryParam.trim() : null,
+    landingPage,
+    referrer,
+  };
+};
+
+const buildAttributionTags = (attribution?: SignupAttribution | null): string[] => {
+  if (!attribution) {
+    return [];
+  }
+  const tags = [`source:${attribution.source}`];
+  if (attribution.campaign) {
+    tags.push(`campaign:${attribution.campaign}`);
+  }
+  if (attribution.country) {
+    tags.push(`country:${attribution.country}`);
+  }
+  return tags;
+};
+
 const initialSignupState: SignupFormData = {
   firstName: '',
   lastName: '',
@@ -76,6 +148,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSignupRequest, onSuccess, onC
   const { t } = useLanguage();
   const [view, setView] = React.useState<'form' | 'verify'>('form');
   const [signupData, setSignupData] = React.useState<SignupFormData>(initialSignupState);
+  const [attribution] = React.useState<SignupAttribution>(() => detectInitialAttribution());
   const [formErrors, setFormErrors] = React.useState<SignupFormErrors>({});
   const [verificationCode, setVerificationCode] = React.useState('');
   const [isSendingCode, setIsSendingCode] = React.useState(false);
@@ -199,6 +272,14 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSignupRequest, onSuccess, onC
       const payload: SignupCodePayload = {
         ...cleanedData,
         country: countryOption.country,
+        attribution,
+        signupSource: attribution.source,
+        signupCampaign: attribution.campaign ?? undefined,
+        attributionCountry: attribution.country ?? undefined,
+        landingPage: attribution.landingPage ?? undefined,
+        referrer: attribution.referrer ?? undefined,
+        medium: attribution.medium ?? undefined,
+        tags: buildAttributionTags(attribution),
       };
 
       setLastSignupPayload(payload);
@@ -340,6 +421,12 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSignupRequest, onSuccess, onC
       ) : (
         <>
           <form className="space-y-4" onSubmit={handleSignupSubmit}>
+            <input type="hidden" name="signupSource" value={attribution.source} />
+            <input type="hidden" name="signupCampaign" value={attribution.campaign ?? ''} />
+            <input type="hidden" name="attributionCountry" value={attribution.country ?? ''} />
+            <input type="hidden" name="landingPage" value={attribution.landingPage ?? ''} />
+            <input type="hidden" name="referrer" value={attribution.referrer ?? ''} />
+            <input type="hidden" name="medium" value={attribution.medium ?? ''} />
             <div className="space-y-3">
               <div>
                 <input

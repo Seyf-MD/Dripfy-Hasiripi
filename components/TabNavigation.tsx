@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Calendar, CheckCircle2, Euro, ShieldAlert, Users, ListChecks, Shield, CalendarCheck, LifeBuoy } from 'lucide-react';
+import { Calendar, CheckCircle2, Euro, ShieldAlert, Users, ListChecks, Shield, CalendarCheck, LifeBuoy, FileBarChart2 } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -27,6 +27,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab }
         { name: 'Tasks', icon: <ListChecks size={18} />, label: translate('tabs.tasks', 'Görevler') },
         { name: 'Personal Planner', icon: <CalendarCheck size={18} />, label: translate('tabs.personalPlanner', 'Kişisel Planlayıcı') },
         { name: 'Approvals', icon: <CheckCircle2 size={18} />, label: translate('tabs.approvals', 'Onaylar') },
+        { name: 'Reports', icon: <FileBarChart2 size={18} />, label: translate('tabs.reports', 'Raporlar') },
         { name: 'Help Center', icon: <LifeBuoy size={18} />, label: translate('tabs.helpCenter', 'Yardım Merkezi') },
         { name: 'Admin Panel', icon: <Shield size={18} />, label: translate('tabs.adminPanel', 'Yönetici Paneli') },
     ];

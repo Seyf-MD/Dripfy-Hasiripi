@@ -30,6 +30,7 @@ import {
   verifySignupCodeAttempt,
 } from './signupCodesStore.js';
 import { startCalendarSyncScheduler } from './services/calendar/index.js';
+import { normaliseSignupAttribution, buildSignupAttributionTags } from './models/signupSource.js';
 
 /**
  * Geliştirme sırasında çalışan mini API:
@@ -160,6 +161,7 @@ function normaliseSignupPayload(payload) {
   const countryCode = safeString(payload.countryCode);
   const phoneDigits = safeString(payload.phone || payload.phoneNumber).replace(/[^0-9]/g, '');
   const country = safeString(payload.country);
+  const attribution = normaliseSignupAttribution({ ...payload, safeString });
 
   return {
     firstName,
@@ -171,6 +173,7 @@ function normaliseSignupPayload(payload) {
     countryCode,
     phoneDigits,
     country,
+    attribution,
   };
 }
 
@@ -225,6 +228,15 @@ function buildInfoLines(payload) {
   }
   if (payload.country) {
     lines.push(`Ülke: ${payload.country}`);
+  }
+  if (payload.attribution) {
+    lines.push(`Kaynak: ${payload.attribution.source}`);
+    if (payload.attribution.campaign) {
+      lines.push(`Kampanya: ${payload.attribution.campaign}`);
+    }
+    if (payload.attribution.country) {
+      lines.push(`Hedef Ülke: ${payload.attribution.country}`);
+    }
   }
   return lines;
 }
@@ -414,6 +426,13 @@ app.post('/api/signup', signupRateLimiter, async (req, res) => {
     Pozisyon: payload.position,
     Firma: payload.company,
     Ülke: payload.country,
+    ...(payload.attribution
+      ? {
+          Kaynak: payload.attribution.source,
+          Kampanya: payload.attribution.campaign || undefined,
+          'Hedef Ülke': payload.attribution.country || undefined,
+        }
+      : {}),
   };
   const detailTable = buildKeyValueList(detailPairs);
 
@@ -456,6 +475,7 @@ app.post('/api/signup', signupRateLimiter, async (req, res) => {
     deleteSignupCodeRecord(email);
 
     const createdAt = Date.now();
+    const tags = buildSignupAttributionTags(payload.attribution);
     const request = {
       id: generateRequestId(),
       name: payload.name,
@@ -469,6 +489,8 @@ app.post('/api/signup', signupRateLimiter, async (req, res) => {
       company: payload.company,
       status: 'pending',
       timestamp: new Date(createdAt).toISOString(),
+      attribution: payload.attribution,
+      tags,
     };
     await addSignupRequest(request);
 

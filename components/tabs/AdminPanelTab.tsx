@@ -56,15 +56,46 @@ const AdminPanelTab: React.FC<AdminPanelTabProps> = ({ users, permissions, audit
                         {signupRequests.length > 0 ? signupRequests.map(req => (
                             <div key={req.id} className="bg-white dark:bg-neutral-800 p-4 rounded-lg border border-slate-200 dark:border-neutral-700">
                                 <div className="flex flex-wrap justify-between items-start gap-4">
-                                    <div>
-                                        <h3 className="font-semibold text-[var(--drip-text)] dark:text-white">{req.name}</h3>
-                                        <p className="text-sm text-[var(--drip-muted)] dark:text-neutral-400">{req.email}</p>
-                                        <p className="text-sm text-[var(--drip-muted)]/80 dark:text-neutral-500">
-                                            {req.phone}
-                                            {req.country ? ` • ${req.country}` : ''}
-                                            {` • ${t(`positions.${req.position.replace(/ /g, '')}`)}`}
-                                        </p>
-                                        {req.company && <p className="text-xs text-[var(--drip-muted)]/80 dark:text-neutral-500 mt-1">{req.company}</p>}
+                                    <div className="space-y-2">
+                                        <div>
+                                            <h3 className="font-semibold text-[var(--drip-text)] dark:text-white">{req.name}</h3>
+                                            <p className="text-sm text-[var(--drip-muted)] dark:text-neutral-400">{req.email}</p>
+                                            <p className="text-sm text-[var(--drip-muted)]/80 dark:text-neutral-500">
+                                                {req.phone}
+                                                {req.country ? ` • ${req.country}` : ''}
+                                                {` • ${t(`positions.${req.position.replace(/ /g, '')}`)}`}
+                                            </p>
+                                            {req.company && <p className="text-xs text-[var(--drip-muted)]/80 dark:text-neutral-500 mt-1">{req.company}</p>}
+                                        </div>
+                                        {(req.tags && req.tags.length > 0) || req.attribution ? (
+                                            <div className="flex flex-wrap gap-2">
+                                                {req.tags && req.tags.map(tag => (
+                                                    <span
+                                                        key={tag}
+                                                        className="inline-flex items-center rounded-full bg-emerald-100/70 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300 px-3 py-1 text-xs font-semibold"
+                                                    >
+                                                        {tag}
+                                                    </span>
+                                                ))}
+                                                {(!req.tags || req.tags.length === 0) && req.attribution && (
+                                                    <>
+                                                        <span className="inline-flex items-center rounded-full bg-slate-100 text-slate-600 dark:bg-neutral-700 dark:text-neutral-200 px-3 py-1 text-xs font-semibold">
+                                                            source:{req.attribution.source}
+                                                        </span>
+                                                        {req.attribution.campaign && (
+                                                            <span className="inline-flex items-center rounded-full bg-slate-100 text-slate-600 dark:bg-neutral-700 dark:text-neutral-200 px-3 py-1 text-xs font-semibold">
+                                                                campaign:{req.attribution.campaign}
+                                                            </span>
+                                                        )}
+                                                        {req.attribution.country && (
+                                                            <span className="inline-flex items-center rounded-full bg-slate-100 text-slate-600 dark:bg-neutral-700 dark:text-neutral-200 px-3 py-1 text-xs font-semibold">
+                                                                country:{req.attribution.country}
+                                                            </span>
+                                                        )}
+                                                    </>
+                                                )}
+                                            </div>
+                                        ) : null}
                                     </div>
                                     <div className="flex items-center gap-2 flex-shrink-0">
                                         <button onClick={() => onDenySignup(req.id)} className="p-2 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-500 dark:text-red-400 transition-colors"><XCircle size={20}/></button>

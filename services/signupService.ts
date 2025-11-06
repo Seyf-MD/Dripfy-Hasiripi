@@ -1,3 +1,5 @@
+import type { SignupAttribution } from '../types';
+
 export interface SignupCodePayload {
   firstName: string;
   lastName: string;
@@ -7,6 +9,14 @@ export interface SignupCodePayload {
   position: string;
   company?: string;
   country?: string;
+  attribution?: SignupAttribution | null;
+  signupSource?: string;
+  signupCampaign?: string;
+  attributionCountry?: string;
+  landingPage?: string;
+  referrer?: string;
+  medium?: string;
+  tags?: string[];
 }
 
 export interface SignupFinalizePayload {
@@ -22,6 +32,8 @@ export interface SignupFinalizePayload {
   company?: string;
   status: 'pending';
   timestamp: string;
+  attribution?: SignupAttribution | null;
+  tags?: string[];
 }
 
 const API_BASE = (import.meta.env.VITE_API_BASE || '').replace(/\/+$/, '');

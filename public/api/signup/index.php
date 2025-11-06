@@ -115,6 +115,9 @@ $detailPairs = [
     'Pozisyon' => $payload['position'] ?? '',
     'Firma' => $payload['company'] ?? '',
     'Ülke' => $payload['country'] ?? '',
+    'Kaynak' => $payload['attribution']['source'] ?? '',
+    'Kampanya' => $payload['attribution']['campaign'] ?? '',
+    'Hedef Ülke' => $payload['attribution']['country'] ?? '',
 ];
 $detailPairs = array_filter($detailPairs, static fn($value) => $value !== null && $value !== '');
 $detailTable = buildKeyValueList($detailPairs);
@@ -167,6 +170,8 @@ $responsePayload = [
     'company' => $payload['company'] ?? '',
     'status' => 'pending',
     'timestamp' => date(DATE_ATOM, (int)$storedRequest['timestamp']),
+    'attribution' => $payload['attribution'] ?? null,
+    'tags' => $payload['tags'] ?? buildSignupAttributionTags($payload['attribution'] ?? []),
 ];
 
 echo json_encode(['ok' => true, 'payload' => $responsePayload]);

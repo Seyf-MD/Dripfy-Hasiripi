@@ -64,9 +64,10 @@ automationRouter.post('/chat', async (req, res) => {
 
 automationRouter.post('/tasks', async (req, res) => {
   const { title, description, assignee, priority, dueDate } = req.body || {};
+  const actor = (req as any).user || null;
 
   try {
-    const task = await createTask({ title, description, assignee, priority, dueDate });
+    const task = await createTask({ title, description, assignee, priority, dueDate, actor });
     res.status(201).json({ ok: true, task });
   } catch (error) {
     console.error('[automation] create task failed', error);
@@ -77,9 +78,10 @@ automationRouter.post('/tasks', async (req, res) => {
 automationRouter.patch('/records/:collection/:id', async (req, res) => {
   const { collection, id } = req.params;
   const { changes } = req.body || {};
+  const actor = (req as any).user || null;
 
   try {
-    const record = await updateRecord({ collection, recordId: id, changes });
+    const record = await updateRecord({ collection, recordId: id, changes, actor });
     res.json({ ok: true, record });
   } catch (error) {
     console.error('[automation] update record failed', error);
@@ -89,9 +91,10 @@ automationRouter.patch('/records/:collection/:id', async (req, res) => {
 
 automationRouter.post('/reports/trigger', async (req, res) => {
   const { reportType, parameters, notes } = req.body || {};
+  const actor = (req as any).user || null;
 
   try {
-    const report = await triggerReport({ reportType, parameters, notes });
+    const report = await triggerReport({ reportType, parameters, notes, actor });
     res.status(201).json({ ok: true, report });
   } catch (error) {
     console.error('[automation] trigger report failed', error);

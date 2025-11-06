@@ -278,6 +278,24 @@ export interface UserPermission {
     }
 }
 
+export type SignupSource =
+  | 'organic'
+  | 'paid'
+  | 'referral'
+  | 'partner'
+  | 'event'
+  | 'content'
+  | 'other';
+
+export interface SignupAttribution {
+  source: SignupSource;
+  campaign?: string | null;
+  medium?: string | null;
+  country?: string | null;
+  landingPage?: string | null;
+  referrer?: string | null;
+}
+
 export interface SignupRequest {
     id: string;
     name: string;
@@ -291,6 +309,106 @@ export interface SignupRequest {
     position: string;
     status: 'pending';
     timestamp: string;
+    attribution?: SignupAttribution | null;
+    tags?: string[];
+}
+
+export interface SignupFunnelStageDefinition {
+  id: string;
+  label: string;
+  order: number;
+  description?: string;
+}
+
+export interface SignupFunnelEvent {
+  id: string;
+  leadId: string;
+  stageId: string;
+  occurredAt: string;
+  source: SignupSource;
+  campaign?: string | null;
+  country?: string | null;
+  metadata?: Record<string, unknown> | null;
+}
+
+export interface SignupFunnelDataset {
+  stages: SignupFunnelStageDefinition[];
+  events: SignupFunnelEvent[];
+}
+
+export interface SignupFunnelStageMetrics {
+  stageId: string;
+  label: string;
+  position: number;
+  uniqueLeads: number;
+  conversionRate: number;
+  cumulativeConversion: number;
+  dropOffRate: number;
+  dropOffCount: number;
+  averageLeadTimeSeconds: number | null;
+}
+
+export type SignupFunnelSegmentType = 'source' | 'campaign' | 'country';
+
+export interface SignupFunnelFilters {
+  segment?: { type: SignupFunnelSegmentType; value: string } | null;
+  startDate?: string | null;
+  endDate?: string | null;
+}
+
+export interface SignupFunnelBreakdownRow {
+  key: string;
+  type: SignupFunnelSegmentType;
+  totalLeads: number;
+  conversionRate: number;
+  dropOffStageId: string | null;
+}
+
+export interface SignupFunnelResult {
+  stages: SignupFunnelStageMetrics[];
+  totalLeads: number;
+  overallConversionRate: number;
+  averageLeadTimeSeconds: number | null;
+  breakdown: SignupFunnelBreakdownRow[];
+}
+
+export interface AbTestVariantResult {
+  id: string;
+  label: string;
+  participants: number;
+  conversions: number;
+  revenue?: number;
+}
+
+export interface AbTestExperiment {
+  id: string;
+  name: string;
+  goal: string;
+  status: 'running' | 'completed' | 'paused';
+  startDate: string;
+  endDate?: string | null;
+  variants: AbTestVariantResult[];
+}
+
+export interface CampaignPerformance {
+  id: string;
+  name: string;
+  source: SignupSource;
+  country?: string | null;
+  period: { start: string; end: string };
+  metrics: {
+    leads: number;
+    conversions: number;
+    spend: number;
+    revenue: number;
+  };
+}
+
+export interface CampaignComparisonInsight {
+  id: string;
+  title: string;
+  detail: string;
+  severity: 'success' | 'warning' | 'danger' | 'info';
 }
 
 export interface NotificationSettings {
@@ -460,4 +578,8 @@ export interface DashboardData {
   auditLog: AuditLogEntry[];
   userPermissions: UserPermission[];
   signupRequests: SignupRequest[];
+  signupFunnel: SignupFunnelDataset;
+  abTests: AbTestExperiment[];
+  campaignPerformance: CampaignPerformance[];
+  campaignInsights?: CampaignComparisonInsight[];
 }

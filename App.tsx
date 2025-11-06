@@ -22,6 +22,8 @@ import PasswordChangeModal from './components/PasswordChangeModal';
 import LegalPage from './components/LegalPage';
 import { LegalPageKey } from './data/legalContent';
 import OfflineBanner from './components/layout/OfflineBanner';
+import SignupFunnel from './components/analytics/SignupFunnel';
+import ReportsTab from './components/tabs/ReportsTab';
 
 import { mockData } from './data/mockData';
 import {
@@ -54,6 +56,22 @@ import { useOfflineQueue } from './hooks/useOfflineQueue';
 
 type ModalType = 'schedule' | 'financials' | 'challenges' | 'advantages' | 'contacts' | 'tasks' | 'users';
 type SettingsPanelTab = 'profile' | 'settings' | 'integrations' | 'privacy';
+
+const buildSignupTags = (
+  attribution?: SignupRequest['attribution'] | SignupFinalizePayload['attribution']
+): string[] => {
+  if (!attribution) {
+    return [];
+  }
+  const tags = [`source:${attribution.source}`];
+  if (attribution.campaign) {
+    tags.push(`campaign:${attribution.campaign}`);
+  }
+  if (attribution.country) {
+    tags.push(`country:${attribution.country}`);
+  }
+  return tags;
+};
 
 function App() {
   const { t } = useLanguage();
@@ -88,11 +106,38 @@ function App() {
           const mappedRequests = requests.map(req => ({
             ...req,
             timestamp: req.timestamp ?? new Date().toISOString(),
+            attribution: req.attribution ?? null,
+            tags: req.tags && req.tags.length > 0 ? req.tags : buildSignupTags(req.attribution),
           }));
+          const existingEvents = prev.signupFunnel?.events ?? [];
+          const funnelBackfill: typeof existingEvents = [];
+          mappedRequests.forEach((req) => {
+            const meta = {
+              source: req.attribution?.source ?? 'other',
+              campaign: req.attribution?.campaign ?? null,
+              country: req.attribution?.country ?? req.country ?? null,
+            };
+            ['verified', 'qualified'].forEach((stageId) => {
+              const hasStage = existingEvents.some((event) => event.leadId === req.id && event.stageId === stageId);
+              if (!hasStage) {
+                funnelBackfill.push({
+                  id: `${req.id}:${stageId}:${Date.now()}`,
+                  leadId: req.id,
+                  stageId,
+                  occurredAt: req.timestamp,
+                  ...meta,
+                });
+              }
+            });
+          });
           const localRemainder = prev.signupRequests.filter(req => !remoteIds.has(req.id));
           return {
             ...prev,
             signupRequests: [...mappedRequests, ...localRemainder],
+            signupFunnel: {
+              ...prev.signupFunnel,
+              events: [...existingEvents, ...funnelBackfill],
+            },
           };
         });
       } catch (error) {
@@ -409,13 +454,33 @@ function App() {
         position: payload.position,
         status: 'pending',
         timestamp: payload.timestamp || new Date().toISOString(),
+        attribution: payload.attribution ?? null,
+        tags: payload.tags && payload.tags.length > 0 ? payload.tags : buildSignupTags(payload.attribution),
       };
 
       setDashboardData(prev => {
         const existing = prev.signupRequests.filter(req => req.id !== normalized.id);
+        const existingEvents = prev.signupFunnel?.events ?? [];
+        const meta = {
+          source: normalized.attribution?.source ?? 'other',
+          campaign: normalized.attribution?.campaign ?? null,
+          country: normalized.attribution?.country ?? normalized.country ?? null,
+        };
+        const hasStage = (stageId: string) => existingEvents.some(event => event.leadId === normalized.id && event.stageId === stageId);
+        const funnelUpdates = ['verified', 'qualified'].filter(stageId => !hasStage(stageId)).map(stageId => ({
+          id: `${normalized.id}:${stageId}:${Date.now()}`,
+          leadId: normalized.id,
+          stageId,
+          occurredAt: normalized.timestamp,
+          ...meta,
+        }));
         return {
           ...prev,
           signupRequests: [normalized, ...existing],
+          signupFunnel: {
+            ...prev.signupFunnel,
+            events: [...existingEvents, ...funnelUpdates],
+          },
         };
       });
 
@@ -528,6 +593,14 @@ function App() {
             isLoading={isApprovalsLoading}
           />
         );
+      case 'Reports':
+        return (
+          <ReportsTab
+            experiments={dashboardData.abTests}
+            campaigns={dashboardData.campaignPerformance}
+            insights={dashboardData.campaignInsights}
+          />
+        );
       case 'Help Center':
         return <KnowledgeBase />;
       case 'Admin Panel':
@@ -602,6 +675,9 @@ function App() {
           <main className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
             <StatCards schedule={dashboardData.schedule} contacts={dashboardData.contacts} tasks={dashboardData.tasks} financials={dashboardData.financials} setActiveTab={setActiveTab} onPendingPaymentsClick={() => { setActiveTab('Financials'); setFinancialsDateFilter('week'); }} />
             <KPIBoard initialOkrs={dashboardData.okrs} onOkrsChange={handleSyncOkrs} />
+            <div className="mt-8">
+              <SignupFunnel dataset={dashboardData.signupFunnel} />
+            </div>
             <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
 
             <div className="mt-8">

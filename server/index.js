@@ -22,6 +22,7 @@ import { runMigrations } from './migrations/index.js';
 import integrationsRouter from './routes/integrations.js';
 import tasksRouter from './routes/tasks.js';
 import importerRouter from './routes/importer.js';
+import usageRouter from './routes/usage.js';
 import {
   SIGNUP_CODE_TTL,
   createSignupCodeRecord,
@@ -77,6 +78,7 @@ app.use('/api/approvals', approvalsRouter);
 app.use('/api/integrations', integrationsRouter);
 app.use('/api/tasks', tasksRouter);
 app.use('/api/importer', importerRouter);
+app.use('/api/usage', usageRouter);
 
 const adminOnlyMiddleware = authenticate({ requiredRole: 'admin' });
 

@@ -333,6 +333,14 @@
             "subtitle": "Powered by the help center",
             "open": "Open in help center",
             "relevance": "Relevance score: {score}"
+        },
+        "fallback": {
+            "generic": "I'm sorry, something went wrong. Please try again soon.",
+            "apiDown": "Our AI service is experiencing issues. Please try again in a few minutes.",
+            "limitReached": "We've reached this month's usage quota. Please try again after it resets.",
+            "unavailable": "The AI assistant is not available yet because it hasn't been configured.",
+            "retryAfter": "Please try again {relativeTime}.",
+            "dismiss": "Hide this message"
         }
     },
     "footer": {

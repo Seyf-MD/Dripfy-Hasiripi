@@ -383,7 +383,21 @@
         "prompt1": "Fassen Sie den Zeitplan der nächsten Woche zusammen.",
         "prompt2": "Gibt es bald fällige Aufgaben mit hoher Priorität?",
         "prompt3": "Listen Sie alle Kontakte aus Deutschland auf.",
-        "prompt4": "Was sind unsere größten Herausforderungen?"
+        "prompt4": "Was sind unsere größten Herausforderungen?",
+        "helpSuggestions": {
+            "title": "Empfohlene Hilfeartikel",
+            "subtitle": "Bereitgestellt vom Help Center",
+            "open": "Im Help Center öffnen",
+            "relevance": "Relevanzwert: {score}"
+        },
+        "fallback": {
+            "generic": "Entschuldigung, es ist ein Fehler aufgetreten. Bitte versuche es später erneut.",
+            "apiDown": "Unser KI-Dienst hat gerade Schwierigkeiten. Bitte versuche es in ein paar Minuten erneut.",
+            "limitReached": "Das Nutzungskontingent für diesen Monat ist ausgeschöpft. Bitte versuche es nach der Zurücksetzung erneut.",
+            "unavailable": "Der KI-Assistent ist noch nicht konfiguriert und steht daher nicht zur Verfügung.",
+            "retryAfter": "Bitte versuche es {relativeTime} erneut.",
+            "dismiss": "Nachricht ausblenden"
+        }
     },
     "footer": {
         "links": "Links",

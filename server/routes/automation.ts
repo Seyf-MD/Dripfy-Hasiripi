@@ -33,8 +33,32 @@ automationRouter.post('/chat', async (req, res) => {
 
     res.json({ ok: true, ...response });
   } catch (error) {
-    console.error('[automation] chat failed', error);
-    res.status(400).json({ ok: false, error: { message: error.message || 'Yanıt oluşturulamadı.' } });
+    const err = error as { code?: string; message?: string; meta?: { retryAfterSeconds?: number } } | undefined;
+    const errorCode = err?.code || 'CHATBOT_ERROR';
+    const retryAfterSeconds = err?.meta?.retryAfterSeconds;
+    const statusCode = errorCode === 'USAGE_LIMIT_EXCEEDED'
+      ? 429
+      : errorCode === 'OPENAI_NOT_CONFIGURED'
+        ? 503
+        : errorCode === 'OPENAI_TIMEOUT'
+          ? 504
+          : 400;
+
+    if (typeof retryAfterSeconds === 'number' && Number.isFinite(retryAfterSeconds)) {
+      res.setHeader('Retry-After', Math.max(1, Math.round(retryAfterSeconds)).toString());
+    }
+
+    console.error('[automation] chat failed', errorCode, err?.message);
+    res.status(statusCode).json({
+      ok: false,
+      error: {
+        message: err?.message || 'Yanıt oluşturulamadı.',
+        code: errorCode,
+        retryAfterSeconds: typeof retryAfterSeconds === 'number' && Number.isFinite(retryAfterSeconds)
+          ? Math.max(0, Math.round(retryAfterSeconds))
+          : null,
+      },
+    });
   }
 });
 

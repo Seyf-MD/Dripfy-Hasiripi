@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it, before, after, afterEach } from 'node:test';
-import jwt from 'jsonwebtoken';
+import jwt from '../lib/jwt.js';
 
 function createMockRes() {
   return {

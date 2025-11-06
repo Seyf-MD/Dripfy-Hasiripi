@@ -19,12 +19,15 @@ import financeForecastRouter from './routes/financeForecast.js';
 import auditRouter from './routes/audit.js';
 import approvalsRouter from './routes/approvals.js';
 import { runMigrations } from './migrations/index.js';
+import integrationsRouter from './routes/integrations.js';
+import tasksRouter from './routes/tasks.js';
 import {
   SIGNUP_CODE_TTL,
   createSignupCodeRecord,
   deleteSignupCodeRecord,
   verifySignupCodeAttempt,
 } from './signupCodesStore.js';
+import { startCalendarSyncScheduler } from './services/calendar/index.js';
 
 /**
  * Geliştirme sırasında çalışan mini API:
@@ -41,6 +44,7 @@ ensureDataEnvironment()
   .then(async () => {
     await runMigrations();
     startDailyBackupScheduler();
+    startCalendarSyncScheduler();
   })
   .catch((error) => {
     console.error('[bootstrap] Failed to prepare data environment:', error);
@@ -69,6 +73,8 @@ app.use('/api/analytics', analyticsRouter);
 app.use('/api/okr', okrRouter);
 app.use('/api/finance/forecast', authenticate(), financeForecastRouter);
 app.use('/api/approvals', approvalsRouter);
+app.use('/api/integrations', integrationsRouter);
+app.use('/api/tasks', tasksRouter);
 
 const adminOnlyMiddleware = authenticate({ requiredRole: 'admin' });
 

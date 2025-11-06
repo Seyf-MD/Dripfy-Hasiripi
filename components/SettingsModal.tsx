@@ -1,11 +1,12 @@
 import * as React from 'react';
-import { X, UserCircle, Settings as SettingsIcon, Shield, Key } from 'lucide-react';
+import { X, UserCircle, Settings as SettingsIcon, Shield, Key, Link2 } from 'lucide-react';
 import { useLanguage, Language } from '../i18n/LanguageContext';
 import { NotificationSettings } from '../types';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
+import IntegrationsSettings from './settings/Integrations';
 
-type SettingsTab = 'profile' | 'settings' | 'privacy';
+type SettingsTab = 'profile' | 'settings' | 'integrations' | 'privacy';
 
 interface SettingsModalProps {
     isOpen: boolean;
@@ -142,6 +143,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, activeTa
                         </div>
                     </div>
                 );
+            case 'integrations':
+                return <IntegrationsSettings />;
             case 'privacy':
                  return (
                      <div className="space-y-6">
@@ -161,10 +164,16 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, activeTa
         }
     }
 
+    const translate = (key: string, fallback: string) => {
+        const value = t(key);
+        return value === key ? fallback : value;
+    };
+
     const tabs = [
-        { id: 'profile' as SettingsTab, label: t('settings.tabs.profile'), icon: <UserCircle size={18} /> },
-        { id: 'settings' as SettingsTab, label: t('settings.tabs.settings'), icon: <SettingsIcon size={18} /> },
-        { id: 'privacy' as SettingsTab, label: t('settings.tabs.privacy'), icon: <Shield size={18} /> },
+        { id: 'profile' as SettingsTab, label: translate('settings.tabs.profile', 'Profil'), icon: <UserCircle size={18} /> },
+        { id: 'settings' as SettingsTab, label: translate('settings.tabs.settings', 'Genel'), icon: <SettingsIcon size={18} /> },
+        { id: 'integrations' as SettingsTab, label: translate('settings.tabs.integrations', 'Entegrasyonlar'), icon: <Link2 size={18} /> },
+        { id: 'privacy' as SettingsTab, label: translate('settings.tabs.privacy', 'Gizlilik'), icon: <Shield size={18} /> },
     ];
     
     const modalTitleId = 'settings-modal-title';

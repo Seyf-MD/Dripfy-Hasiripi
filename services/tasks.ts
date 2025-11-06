@@ -1,3 +1,5 @@
+import type { Task } from '../types';
+
 const API_BASE = (import.meta.env.VITE_API_BASE || '').replace(/\/+$/, '');
 
 function buildUrl(path: string) {
@@ -39,4 +41,82 @@ export async function createTask(input: {
     body: JSON.stringify(input),
   });
   return handleResponse(response, 'Görev oluşturulamadı.');
+}
+
+export interface PersonalTaskInput {
+  title: string;
+  description?: string;
+  assignee?: string;
+  priority?: string;
+  dueDate?: string;
+  status?: Task['status'];
+  personalNotes?: string;
+  focusTags?: string[];
+  reminders?: { id?: string; type?: string; minutesBefore?: number; scheduledAt?: string | null; createdAt?: string }[];
+  schedule?: { start?: string | null; end?: string | null; allDay?: boolean; timezone?: string | null };
+  calendarLinks?: {
+    id?: string;
+    provider?: string;
+    integrationId?: string | null;
+    calendarId?: string;
+    eventId?: string | null;
+    syncState?: string;
+    lastSyncedAt?: string | null;
+    lastError?: string | null;
+  }[];
+  color?: string | null;
+  timezone?: string | null;
+}
+
+interface PersonalTaskResponse {
+  ok: true;
+  task: Task;
+}
+
+interface PersonalTaskListResponse {
+  ok: true;
+  tasks: Task[];
+}
+
+export async function fetchPersonalTasks() {
+  const response = await fetch(buildUrl('/api/tasks/personal'), {
+    method: 'GET',
+    credentials: 'include',
+  });
+  const payload = await handleResponse<PersonalTaskListResponse>(response, 'Kişisel görevler alınamadı.');
+  return payload.tasks;
+}
+
+export async function createPersonalTask(input: PersonalTaskInput) {
+  const response = await fetch(buildUrl('/api/tasks/personal'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(input),
+  });
+  const payload = await handleResponse<PersonalTaskResponse>(response, 'Kişisel görev oluşturulamadı.');
+  return payload.task;
+}
+
+export async function updatePersonalTask(
+  taskId: string,
+  changes: Partial<PersonalTaskInput>,
+  expectedVersion?: number,
+) {
+  const response = await fetch(buildUrl(`/api/tasks/personal/${taskId}`), {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ changes, expectedVersion }),
+  });
+  const payload = await handleResponse<PersonalTaskResponse>(response, 'Görev güncellenemedi.');
+  return payload.task;
+}
+
+export async function syncPersonalTask(taskId: string) {
+  const response = await fetch(buildUrl(`/api/tasks/personal/${taskId}/sync`), {
+    method: 'POST',
+    credentials: 'include',
+  });
+  return handleResponse(response, 'Senkronizasyon başlatılamadı.');
 }

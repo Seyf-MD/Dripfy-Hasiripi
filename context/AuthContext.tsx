@@ -16,6 +16,7 @@ interface AuthContextValue {
   token: string | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  isExternalStakeholder: boolean;
   login: (email: string, password: string) => Promise<AuthUser>;
   logout: () => Promise<void>;
   canUseChatbotAction: (action: ChatbotAction) => boolean;
@@ -100,6 +101,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     token,
     isAuthenticated: Boolean(user),
     isAdmin: isRoleAtLeast(user?.role ?? null, 'admin'),
+    isExternalStakeholder: user?.role === 'external-stakeholder',
     login,
     logout,
     canUseChatbotAction,

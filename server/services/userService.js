@@ -4,6 +4,7 @@ import {
   readCollection,
   writeCollection,
 } from './storageService.js';
+import { normaliseRole } from '../models/roleModel.js';
 
 const USERS_COLLECTION = 'users';
 
@@ -90,11 +91,12 @@ export async function createUser({ email, name, role = 'user', password }) {
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
+  const resolvedRole = normaliseRole(role);
   const user = {
     id: randomUUID(),
     email: normalisedEmail,
     name: typeof name === 'string' && name.trim() ? name.trim() : normalisedEmail,
-    role: typeof role === 'string' && role.trim() ? role.trim() : 'user',
+    role: resolvedRole,
     passwordHash,
     createdAt: new Date().toISOString(),
   };
@@ -127,7 +129,7 @@ export async function updateUser(id, updates) {
   }
 
   if (typeof updates.role === 'string' && updates.role.trim()) {
-    user.role = updates.role.trim();
+    user.role = normaliseRole(updates.role);
   }
 
   if (typeof updates.password === 'string') {

@@ -15,6 +15,7 @@ import AdminPanelTab from './components/tabs/AdminPanelTab';
 import ApprovalsTab from './components/tabs/ApprovalsTab';
 import PersonalPlanner from './components/tasks/PersonalPlanner';
 import Chatbot from './components/Chatbot';
+import { StakeholderPortal } from './components/portal';
 import Footer from './components/Footer';
 import DetailModal from './components/DetailModal';
 import EditModal from './components/EditModal';
@@ -85,7 +86,7 @@ const buildSignupTags = (
 function App() {
   const { t } = useLanguage();
   const { theme } = useTheme();
-  const { user, isAuthenticated, isAdmin, token, logout } = useAuth();
+  const { user, isAuthenticated, isAdmin, token, logout, isExternalStakeholder } = useAuth();
   const { registerPage } = useTour();
   const { isOnline } = useNetworkStatus();
   const [queueState, retryQueue] = useOfflineQueue();
@@ -729,6 +730,8 @@ function App() {
         );
       case 'Help Center':
         return <KnowledgeBase />;
+      case 'Stakeholder Portal':
+        return <StakeholderPortal initialState={dashboardData.portalState ?? null} />;
       case 'Admin Panel':
         if (isAdmin) {
             return <AdminPanelTab
@@ -749,6 +752,12 @@ function App() {
         return null;
     }
   };
+
+  React.useEffect(() => {
+    if (user?.role === 'external-stakeholder') {
+      setActiveTab('Stakeholder Portal');
+    }
+  }, [user]);
   
   React.useEffect(() => {
     const pageId = activeTab === 'Help Center' ? 'help-center' : 'dashboard';
@@ -799,16 +808,20 @@ function App() {
           />
 
           <main className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
-            <StatCards schedule={dashboardData.schedule} contacts={dashboardData.contacts} tasks={dashboardData.tasks} financials={dashboardData.financials} setActiveTab={setActiveTab} onPendingPaymentsClick={() => { setActiveTab('Financials'); setFinancialsDateFilter('week'); }} />
-            <SegmentPerformancePanel
-              segments={dashboardData.segmentDefinitions}
-              performance={dashboardData.segmentPerformance}
-              drillDowns={dashboardData.segmentDrillDowns}
-            />
-            <KPIBoard initialOkrs={dashboardData.okrs} onOkrsChange={handleSyncOkrs} />
-            <div className="mt-8">
-              <SignupFunnel dataset={dashboardData.signupFunnel} />
-            </div>
+            {!isExternalStakeholder && (
+              <>
+                <StatCards schedule={dashboardData.schedule} contacts={dashboardData.contacts} tasks={dashboardData.tasks} financials={dashboardData.financials} setActiveTab={setActiveTab} onPendingPaymentsClick={() => { setActiveTab('Financials'); setFinancialsDateFilter('week'); }} />
+                <SegmentPerformancePanel
+                  segments={dashboardData.segmentDefinitions}
+                  performance={dashboardData.segmentPerformance}
+                  drillDowns={dashboardData.segmentDrillDowns}
+                />
+                <KPIBoard initialOkrs={dashboardData.okrs} onOkrsChange={handleSyncOkrs} />
+                <div className="mt-8">
+                  <SignupFunnel dataset={dashboardData.signupFunnel} />
+                </div>
+              </>
+            )}
             <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
 
             <div className="mt-8">

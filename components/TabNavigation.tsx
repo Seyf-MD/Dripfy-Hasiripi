@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Calendar, CheckCircle2, Euro, ShieldAlert, Users, ListChecks, Shield, CalendarCheck, LifeBuoy, FileBarChart2, Share2, Sparkles } from 'lucide-react';
+import { Calendar, CheckCircle2, Euro, ShieldAlert, Users, ListChecks, Shield, CalendarCheck, LifeBuoy, FileBarChart2, Share2, Sparkles, Handshake } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -12,7 +12,7 @@ interface TabNavigationProps {
 const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab }) => {
     const { t } = useLanguage();
     const { theme } = useTheme();
-    const { isAdmin, isAuthenticated } = useAuth();
+    const { isAdmin, isAuthenticated, isExternalStakeholder } = useAuth();
 
     const translate = (key: string, fallback: string) => {
         const value = t(key);
@@ -31,18 +31,24 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab }
         { name: 'Approvals', icon: <CheckCircle2 size={18} />, label: translate('tabs.approvals', 'Onaylar') },
         { name: 'Reports', icon: <FileBarChart2 size={18} />, label: translate('tabs.reports', 'Raporlar') },
         { name: 'Help Center', icon: <LifeBuoy size={18} />, label: translate('tabs.helpCenter', 'Yardım Merkezi') },
+        { name: 'Stakeholder Portal', icon: <Handshake size={18} />, label: translate('tabs.stakeholderPortal', 'Paydaş Portalı') },
         { name: 'Admin Panel', icon: <Shield size={18} />, label: translate('tabs.adminPanel', 'Yönetici Paneli') },
     ];
 
-    const visibleTabs = allTabs.filter(tab => {
+    const visibleTabs = allTabs
+        .filter(tab => {
         if (tab.name === 'Admin Panel') {
             return isAdmin;
         }
         if (tab.name === 'Approvals') {
             return isAuthenticated;
         }
+        if (isExternalStakeholder) {
+            return tab.name === 'Stakeholder Portal' || tab.name === 'Help Center';
+        }
         return true;
-    });
+    })
+        .filter((tab, index, arr) => arr.findIndex(item => item.name === tab.name) === index);
     
     return (
         <div className="mt-6 animate-slide-in-up" style={{ animationDelay: '600ms' }}>

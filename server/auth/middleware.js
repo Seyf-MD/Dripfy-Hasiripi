@@ -25,7 +25,9 @@ export function authenticate({ requiredRole } = {}) {
 
       return next();
     } catch (error) {
-      console.error('[auth] Token verification failed:', error);
+      if (process.env.NODE_ENV !== 'test' && process.env.SILENCE_AUTH_ERRORS !== 'true') {
+        console.error('[auth] Token verification failed:', error);
+      }
       return res.status(403).json({ ok: false, error: 'Invalid or expired token' });
     }
   };

@@ -26,6 +26,7 @@ import OfflineBanner from './components/layout/OfflineBanner';
 import SignupFunnel from './components/analytics/SignupFunnel';
 import ReportsTab from './components/tabs/ReportsTab';
 import SegmentView from './components/relations/SegmentView';
+import { InsightCards } from './components/insights/InsightCards';
 
 import { mockData } from './data/mockData';
 import {
@@ -45,6 +46,8 @@ import {
   OKRRecord,
   ApprovalFlowSummary,
   ApprovalFlowType,
+  InsightRecord,
+  InsightActionOption,
 } from './types';
 import { useLanguage } from './i18n/LanguageContext';
 import { useTheme } from './context/ThemeContext';
@@ -55,6 +58,8 @@ import { useAuth } from './context/AuthContext';
 import { useTour } from './context/TourContext';
 import { useNetworkStatus } from './hooks/useNetworkStatus';
 import { useOfflineQueue } from './hooks/useOfflineQueue';
+import { runInsightPipeline } from './services/insights';
+import type { InsightWarehouseSummary } from './datawarehouse/insights/schema';
 
 type ModalType = 'schedule' | 'financials' | 'challenges' | 'advantages' | 'contacts' | 'tasks' | 'users';
 type SettingsPanelTab = 'profile' | 'settings' | 'integrations' | 'privacy';
@@ -86,7 +91,78 @@ function App() {
   const [activeTab, setActiveTab] = React.useState<string>('Calendar');
   const [adminPanelSubTab, setAdminPanelSubTab] = React.useState<AdminSubTab>('permissions');
   const [activeLegalPage, setActiveLegalPage] = React.useState<LegalPageKey | null>(null);
-  
+  const [insightState, setInsightState] = React.useState<{
+    insights: InsightRecord[];
+    summary: InsightWarehouseSummary | null;
+    isLoading: boolean;
+    error: string | null;
+  }>(() => ({
+    insights: dashboardData.insightRecords ?? [],
+    summary: null,
+    isLoading: false,
+    error: null,
+  }));
+
+  const computeInsights = React.useCallback(
+    () =>
+      runInsightPipeline({
+        financials: dashboardData.financials ?? [],
+        tasks: dashboardData.tasks ?? [],
+        capacitySnapshots: dashboardData.capacitySnapshots ?? [],
+        customers: dashboardData.customerProfiles ?? [],
+        now: new Date(),
+      }),
+    [
+      dashboardData.financials,
+      dashboardData.tasks,
+      dashboardData.capacitySnapshots,
+      dashboardData.customerProfiles,
+    ],
+  );
+
+  const handlePipelineFailure = React.useCallback((error: unknown) => {
+    console.error('[App] Insight pipeline failed', error);
+    setInsightState((prev) => ({
+      ...prev,
+      isLoading: false,
+      error: error instanceof Error ? error.message : 'Insight oluşturma başarısız oldu.',
+    }));
+  }, []);
+
+  const handlePipelineSuccess = React.useCallback(
+    (result: Awaited<ReturnType<typeof runInsightPipeline>>) => {
+      setInsightState({
+        insights: result.insights,
+        summary: result.summary,
+        isLoading: false,
+        error: null,
+      });
+    },
+    [],
+  );
+
+  const handleRefreshInsights = React.useCallback(() => {
+    setInsightState((prev) => ({ ...prev, isLoading: true, error: null }));
+    computeInsights().then(handlePipelineSuccess).catch(handlePipelineFailure);
+  }, [computeInsights, handlePipelineSuccess, handlePipelineFailure]);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    setInsightState((prev) => ({ ...prev, isLoading: true, error: null }));
+    computeInsights()
+      .then((result) => {
+        if (cancelled) return;
+        handlePipelineSuccess(result);
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        handlePipelineFailure(error);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [computeInsights, handlePipelineFailure, handlePipelineSuccess]);
+
   // App-wide settings
   const [notificationSettings, setNotificationSettings] = React.useState<NotificationSettings>({
     email: false,
@@ -541,6 +617,15 @@ function App() {
     }));
   }, []);
 
+  const handleInsightActionExecuted = React.useCallback(
+    ({ ok }: { insight: InsightRecord; action: InsightActionOption; ok: boolean }) => {
+      if (ok) {
+        handleRefreshInsights();
+      }
+    },
+    [handleRefreshInsights],
+  );
+
 
   const renderActiveTab = () => {
     switch (activeTab) {
@@ -604,6 +689,17 @@ function App() {
             onRefresh={handleRefreshApprovals}
             currentUserRole={currentUser?.role ?? user?.role ?? null}
             isLoading={isApprovalsLoading}
+          />
+        );
+      case 'Insights':
+        return (
+          <InsightCards
+            insights={insightState.insights}
+            summary={insightState.summary}
+            isLoading={insightState.isLoading}
+            error={insightState.error}
+            onRefresh={handleRefreshInsights}
+            onActionExecuted={handleInsightActionExecuted}
           />
         );
       case 'Reports':
@@ -709,7 +805,7 @@ function App() {
         </div>
 
 
-        <Chatbot dataContext={{ ...dashboardData, activeView: activeTab }} />
+        <Chatbot dataContext={{ ...dashboardData, insightRecords: insightState.insights, activeView: activeTab }} />
 
         {detailModalItem && (
           <DetailModal

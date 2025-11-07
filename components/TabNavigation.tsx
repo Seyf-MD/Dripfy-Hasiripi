@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Calendar, CheckCircle2, Euro, ShieldAlert, Users, ListChecks, Shield, CalendarCheck, LifeBuoy, FileBarChart2, Share2 } from 'lucide-react';
+import { Calendar, CheckCircle2, Euro, ShieldAlert, Users, ListChecks, Shield, CalendarCheck, LifeBuoy, FileBarChart2, Share2, Sparkles } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -25,6 +25,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab }
         { name: 'Challenges', icon: <ShieldAlert size={18} />, label: translate('tabs.challenges', 'Zorluklar') },
         { name: 'Contacts', icon: <Users size={18} />, label: translate('tabs.contacts', 'Kişiler') },
         { name: 'Segments', icon: <Share2 size={18} />, label: translate('tabs.segments', 'Segmentler') },
+        { name: 'Insights', icon: <Sparkles size={18} />, label: translate('tabs.insights', 'İçgörüler') },
         { name: 'Tasks', icon: <ListChecks size={18} />, label: translate('tabs.tasks', 'Görevler') },
         { name: 'Personal Planner', icon: <CalendarCheck size={18} />, label: translate('tabs.personalPlanner', 'Kişisel Planlayıcı') },
         { name: 'Approvals', icon: <CheckCircle2 size={18} />, label: translate('tabs.approvals', 'Onaylar') },

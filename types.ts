@@ -294,6 +294,151 @@ export interface User {
   department?: Department;
 }
 
+export type CustomerLifecycleStage = 'prospect' | 'onboarding' | 'active' | 'atRisk' | 'lost';
+
+export interface CustomerProfile {
+  id: string;
+  name: string;
+  lifecycleStage: CustomerLifecycleStage;
+  ownerId?: string | null;
+  ownerName?: string | null;
+  monthlyRecurringRevenue?: number | null;
+  healthScore?: number | null;
+  churnRiskScore?: number | null;
+  lifetimeValue?: number | null;
+  lastInteractionAt?: string | null;
+  nextRenewalDate?: string | null;
+  segmentIds?: string[];
+  tags?: string[];
+  attributes?: Record<string, string | number | boolean | null>;
+}
+
+export interface CapacitySnapshot {
+  id: string;
+  unitId: string;
+  unitLabel: string;
+  capturedAt: string;
+  totalCapacity: number;
+  allocated: number;
+  available: number;
+  backlog: number;
+  utilisation: number;
+  forecastedDemand?: number | null;
+  status?: 'stable' | 'warning' | 'critical';
+  notes?: string;
+}
+
+export type InsightCategory = 'finance' | 'operations' | 'capacity' | 'customer';
+export type InsightKind = 'anomaly' | 'forecast' | 'churn' | 'capacity' | 'recommendation';
+export type InsightSeverity = 'info' | 'low' | 'medium' | 'high' | 'critical';
+
+export interface InsightEntityRef {
+  type: 'customer' | 'task' | 'financial' | 'capacity' | 'segment' | string;
+  id: string;
+  label?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface InsightSignal {
+  metric: string;
+  value: number;
+  baseline?: number | null;
+  delta?: number | null;
+  unit?: string;
+  direction?: 'up' | 'down' | 'flat';
+  period?: string;
+  confidence?: number;
+}
+
+export type InsightActionType = 'task' | 'chatbot' | 'notification' | 'automation' | 'link';
+
+export interface InsightActionOption {
+  id: string;
+  type: InsightActionType;
+  label: string;
+  description?: string;
+  payload?: Record<string, unknown>;
+  intent?: string;
+  priority?: 'low' | 'medium' | 'high';
+  requiresConfirmation?: boolean;
+}
+
+export interface InsightAudienceRule {
+  minRole?: UserRole;
+  roles?: UserRole[];
+  operationalRoles?: OperationalRole[];
+  departments?: Department[];
+  tags?: string[];
+}
+
+export interface InsightRecord {
+  id: string;
+  title: string;
+  summary: string;
+  category: InsightCategory;
+  kind: InsightKind;
+  severity: InsightSeverity;
+  score: number;
+  confidence: number;
+  generatedAt: string;
+  timeframe?: { start: string; end: string };
+  signals: InsightSignal[];
+  actions: InsightActionOption[];
+  audience?: InsightAudienceRule | null;
+  entityRefs?: InsightEntityRef[];
+  tags?: string[];
+  sourceModel?: string;
+  narrative?: string;
+}
+
+export interface InsightFeatureRow {
+  id: string;
+  category: InsightCategory;
+  kind: InsightKind;
+  entityId: string;
+  entityType: InsightEntityRef['type'];
+  metrics: Record<string, number>;
+  timestamp: string;
+  tags?: string[];
+}
+
+export interface InsightModelArtifacts {
+  anomaly: {
+    mean: number;
+    stdDev: number;
+    warningThreshold: number;
+    criticalThreshold: number;
+    featureNames: string[];
+    version: string;
+    trainedAt: string;
+    sampleSize: number;
+  };
+  churn: {
+    coefficients: Record<string, number>;
+    intercept: number;
+    threshold: number;
+    version: string;
+    trainedAt: string;
+    sampleSize: number;
+  };
+  capacity: {
+    upperBound: number;
+    lowerBound: number;
+    trend: number;
+    seasonality?: number;
+    window: number;
+    version: string;
+    trainedAt: string;
+  };
+}
+
+export interface InsightPersonalizationContext {
+  role: UserRole | null;
+  operationalRole?: OperationalRole | null;
+  department?: Department | null;
+  tags?: string[];
+}
+
 export type AuditLogCriticality = 'low' | 'medium' | 'high' | 'critical';
 
 export interface AuditLogEntry {
@@ -781,4 +926,7 @@ export interface DashboardData {
   segmentDrillDowns: SegmentDrillDownRecord[];
   relationshipTimeline: RelationshipTimelineEvent[];
   campaignRecommendations: SegmentCampaignRecommendation[];
+  capacitySnapshots: CapacitySnapshot[];
+  customerProfiles: CustomerProfile[];
+  insightRecords?: InsightRecord[];
 }

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head><title>Debug Login</title></head>
+<body>
+<h1>Debug Login Test</h1>
+<div id="result"></div>
+<script type="module">
+  const result = document.getElementById('result');
+  
+  // Check environment variable
+  const viteApiBase = import.meta.env.VITE_API_BASE;
+  const apiBase = viteApiBase ? viteApiBase.replace(/\/+$/, '') : '';
+  const loginEndpoint = apiBase ? `${apiBase}/api/auth/login` : '/api/auth/login/index.php';
+  
+  result.innerHTML = `
+    <p><strong>VITE_API_BASE:</strong> ${viteApiBase || 'NOT SET'}</p>
+    <p><strong>API_BASE:</strong> ${apiBase || 'EMPTY'}</p>
+    <p><strong>LOGIN_ENDPOINT:</strong> ${loginEndpoint}</p>
+    <p>Testing login...</p>
+  `;
+  
+  fetch(loginEndpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({
+      email: 'dripfy@hasiripi.com',
+      password: 'Dripfy123!'
+    })
+  })
+  .then(async r => {
+    const data = await r.json();
+    result.innerHTML += `
+      <p><strong>Status:</strong> ${r.status}</p>
+      <pre>${JSON.stringify(data, null, 2)}</pre>
+    `;
+  })
+  .catch(err => {
+    result.innerHTML += `<p><strong>Error:</strong> ${err.message}</p>`;
+  });
+</script>
+</body>
+</html>

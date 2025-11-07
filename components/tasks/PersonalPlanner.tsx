@@ -5,6 +5,7 @@ import type {
   CalendarIntegrationAccount,
   PlannerCalendarEvent,
   TaskReminder,
+  PlannerSyncStatus,
 } from '../../types';
 import {
   fetchPersonalTasks,
@@ -18,6 +19,11 @@ import {
   triggerIntegrationSync,
   fetchPlannerEvents,
 } from '../../services/integrations';
+import {
+  fetchPlanningSyncStatus,
+  syncPlanningCalendar,
+  syncPlanningTasks,
+} from '../../services/planning/sync';
 
 interface PersonalPlannerProps {
   userId: string | null;
@@ -73,6 +79,8 @@ const PersonalPlanner: React.FC<PersonalPlannerProps> = ({ userId, timezone }) =
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [plannerError, setPlannerError] = React.useState<string | null>(null);
+  const [plannerInfo, setPlannerInfo] = React.useState<string | null>(null);
+  const [plannerStatus, setPlannerStatus] = React.useState<PlannerSyncStatus | null>(null);
   const [formState, setFormState] = React.useState<PersonalTaskInput & { reminderMinutes: number }>({
     title: '',
     priority: 'Medium',
@@ -86,6 +94,8 @@ const PersonalPlanner: React.FC<PersonalPlannerProps> = ({ userId, timezone }) =
   const [syncingTaskId, setSyncingTaskId] = React.useState<string | null>(null);
   const [syncingIntegrationId, setSyncingIntegrationId] = React.useState<string | null>(null);
   const [draggedTaskId, setDraggedTaskId] = React.useState<string | null>(null);
+  const [calendarSyncing, setCalendarSyncing] = React.useState(false);
+  const [taskPlanningSyncing, setTaskPlanningSyncing] = React.useState(false);
 
   const currentWeekStart = React.useMemo(() => {
     const reference = new Date();
@@ -122,6 +132,15 @@ const PersonalPlanner: React.FC<PersonalPlannerProps> = ({ userId, timezone }) =
     }
   }, [currentWeekStart, currentWeekEnd]);
 
+  const refreshPlannerStatus = React.useCallback(async () => {
+    try {
+      const status = await fetchPlanningSyncStatus();
+      setPlannerStatus(status);
+    } catch (statusError) {
+      console.warn('[PersonalPlanner] sync status fetch failed', statusError);
+    }
+  }, []);
+
   const loadData = React.useCallback(async () => {
     if (!userId) {
       setTasks([]);
@@ -142,13 +161,14 @@ const PersonalPlanner: React.FC<PersonalPlannerProps> = ({ userId, timezone }) =
       setTasks(personalTasks);
       setIntegrations(accounts);
       await loadPlannerEvents();
+      await refreshPlannerStatus();
     } catch (loadError) {
       console.error('[PersonalPlanner] initial load failed', loadError);
       setError(loadError instanceof Error ? loadError.message : 'Veriler alınamadı.');
     } finally {
       setLoading(false);
     }
-  }, [userId, loadPlannerEvents]);
+  }, [userId, loadPlannerEvents, refreshPlannerStatus]);
 
   React.useEffect(() => {
     loadData().catch((loadError) => {
@@ -336,6 +356,45 @@ const PersonalPlanner: React.FC<PersonalPlannerProps> = ({ userId, timezone }) =
     }
   };
 
+  const handlePlannerCalendarSync = async () => {
+    try {
+      setCalendarSyncing(true);
+      setPlannerError(null);
+      setPlannerInfo(null);
+      const summary = await syncPlanningCalendar({
+        range: { start: toIsoString(currentWeekStart), end: toIsoString(currentWeekEnd) },
+        includePersonalCalendar: true,
+      });
+      const warnings = summary.warnings?.length ? ` Uyarılar: ${summary.warnings.join(' · ')}` : '';
+      setPlannerInfo(`Planlama takvimi ${summary.syncedEvents} etkinlik ile güncellendi.${warnings}`);
+      await loadPlannerEvents();
+      await refreshPlannerStatus();
+    } catch (calendarError) {
+      console.error('[PersonalPlanner] planning calendar sync failed', calendarError);
+      setPlannerError(calendarError instanceof Error ? calendarError.message : 'Planlama takvimi senkronize edilemedi.');
+    } finally {
+      setCalendarSyncing(false);
+    }
+  };
+
+  const handlePlannerTaskSync = async () => {
+    try {
+      setTaskPlanningSyncing(true);
+      setPlannerInfo(null);
+      const summary = await syncPlanningTasks({ assignMissingTasks: true, autoCreatePlaceholders: true });
+      const warnings = summary.warnings?.length ? ` Uyarılar: ${summary.warnings.join(' · ')}` : '';
+      setPlannerInfo(`Görev planlaması ${summary.syncedTasks} kayıt ile eşitlendi.${warnings}`);
+      await loadData();
+      await refreshPlannerStatus();
+      setPlannerError(null);
+    } catch (taskSyncError) {
+      console.error('[PersonalPlanner] planning task sync failed', taskSyncError);
+      setPlannerError(taskSyncError instanceof Error ? taskSyncError.message : 'Görev planlaması senkronize edilemedi.');
+    } finally {
+      setTaskPlanningSyncing(false);
+    }
+  };
+
   if (!userId) {
     return (
       <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-neutral-700 dark:bg-neutral-900">
@@ -356,30 +415,71 @@ const PersonalPlanner: React.FC<PersonalPlannerProps> = ({ userId, timezone }) =
             Haftalık takvim görünümünde kişisel görevlerinizi planlayın ve bağlı takvim hesaplarıyla senkronize edin.
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => setWeekOffset((prev) => prev - 1)}
-            className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
-          >
-            Önceki Hafta
-          </button>
-          <button
-            type="button"
-            onClick={() => setWeekOffset(0)}
-            className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
-          >
-            Bugün
-          </button>
-          <button
-            type="button"
-            onClick={() => setWeekOffset((prev) => prev + 1)}
-            className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
-          >
-            Sonraki Hafta
-          </button>
+        <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setWeekOffset((prev) => prev - 1)}
+              className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
+            >
+              Önceki Hafta
+            </button>
+            <button
+              type="button"
+              onClick={() => setWeekOffset(0)}
+              className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
+            >
+              Bugün
+            </button>
+            <button
+              type="button"
+              onClick={() => setWeekOffset((prev) => prev + 1)}
+              className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
+            >
+              Sonraki Hafta
+            </button>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handlePlannerCalendarSync}
+              disabled={calendarSyncing}
+              className="inline-flex items-center gap-2 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-1.5 text-sm font-semibold text-emerald-600 transition hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-emerald-500/30 dark:text-emerald-200 dark:hover:bg-emerald-500/15"
+            >
+              <RefreshCcw size={16} />
+              {calendarSyncing ? 'Senkronize ediliyor…' : 'Planlama Takvimi'}
+            </button>
+            <button
+              type="button"
+              onClick={handlePlannerTaskSync}
+              disabled={taskPlanningSyncing}
+              className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-slate-100 px-3 py-1.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100 dark:hover:bg-neutral-700"
+            >
+              <Link2 size={16} />
+              {taskPlanningSyncing ? 'Görevler eşitleniyor…' : 'Görevleri Eşitle'}
+            </button>
+          </div>
         </div>
       </header>
+
+      {plannerInfo && (
+        <div className="flex flex-col gap-1 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700 dark:border-emerald-800/60 dark:bg-emerald-900/30 dark:text-emerald-200">
+          <span>{plannerInfo}</span>
+          {(plannerStatus?.lastSyncedAt || plannerStatus?.nextSyncAt || typeof plannerStatus?.pendingItems === 'number') && (
+            <div className="flex flex-wrap gap-3 text-xs text-emerald-600/80 dark:text-emerald-200/80">
+              {plannerStatus?.lastSyncedAt && (
+                <span>Son senkron: {new Date(plannerStatus.lastSyncedAt).toLocaleString()}</span>
+              )}
+              {plannerStatus?.nextSyncAt && (
+                <span>Sıradaki senkron: {new Date(plannerStatus.nextSyncAt).toLocaleString()}</span>
+              )}
+              {typeof plannerStatus?.pendingItems === 'number' && plannerStatus.pendingItems > 0 && (
+                <span>Bekleyen {plannerStatus.pendingItems} öğe</span>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {error && (
         <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600 dark:border-red-800/60 dark:bg-red-900/30 dark:text-red-200">

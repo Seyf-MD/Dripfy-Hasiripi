@@ -40,6 +40,7 @@ import {
   Contact,
   Task,
   User,
+  UserRole,
   UserPermission,
   AdminSubTab,
   NotificationSettings,
@@ -630,7 +631,7 @@ function App() {
   const renderActiveTab = () => {
     switch (activeTab) {
       case 'Calendar':
-        return <CalendarTab data={dashboardData.schedule} canEdit={canEdit('schedule')} onOpenModal={handleOpenEditModal as any} />;
+        return <CalendarTab data={dashboardData.schedule} capacitySnapshots={dashboardData.capacitySnapshots} canEdit={canEdit('schedule')} onOpenModal={handleOpenEditModal as any} />;
       case 'Financials':
         return <FinancialsTab 
                     data={dashboardData.financials} 
@@ -708,6 +709,8 @@ function App() {
             experiments={dashboardData.abTests}
             campaigns={dashboardData.campaignPerformance}
             insights={dashboardData.campaignInsights}
+            capacity={dashboardData.capacitySnapshots}
+            schedule={dashboardData.schedule}
           />
         );
       case 'Help Center':

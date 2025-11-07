@@ -84,6 +84,83 @@ const EditModal: React.FC<EditModalProps> = ({ item, type, isNew, onClose, onSav
         setFormData(prev => ({ ...prev, participants: value.split(',').map(p => p.trim()) }));
     };
 
+    const ensureScheduleCapacity = (event?: Partial<ScheduleEvent>) => {
+        return event?.capacity ?? { requiredHours: 1, allocatedHours: 1, unit: 'hours' as const };
+    };
+
+    const ensureScheduleTeam = (event?: Partial<ScheduleEvent>) => {
+        return event?.team ?? { id: '', name: '', members: [], capacityHoursPerDay: 24, timezone: '' };
+    };
+
+    const ensureScheduleLocation = (event?: Partial<ScheduleEvent>) => {
+        return event?.location ?? { id: '', name: '', type: 'onsite', timezone: '', address: '', room: '' };
+    };
+
+    const handleCapacityFieldChange = (field: 'requiredHours' | 'allocatedHours' | 'unit', value: string) => {
+        setFormData(prev => {
+            const event = prev as Partial<ScheduleEvent>;
+            const current = ensureScheduleCapacity(event);
+            const next = {
+                ...current,
+                [field]: field === 'unit' ? (value as ScheduleEvent['capacity']['unit']) : Number(value || 0),
+            };
+            return { ...prev, capacity: next } as Partial<ScheduleEvent>;
+        });
+    };
+
+    const handleTeamFieldChange = (field: 'id' | 'name' | 'timezone', value: string) => {
+        setFormData(prev => {
+            const event = prev as Partial<ScheduleEvent>;
+            const current = ensureScheduleTeam(event);
+            const next = { ...current, [field]: value };
+            return { ...prev, team: next } as Partial<ScheduleEvent>;
+        });
+    };
+
+    const handleTeamCapacityChange = (value: string) => {
+        setFormData(prev => {
+            const event = prev as Partial<ScheduleEvent>;
+            const current = ensureScheduleTeam(event);
+            const next = { ...current, capacityHoursPerDay: Number(value || 0) };
+            return { ...prev, team: next } as Partial<ScheduleEvent>;
+        });
+    };
+
+    const handleTeamMembersChange = (value: string) => {
+        setFormData(prev => {
+            const event = prev as Partial<ScheduleEvent>;
+            const current = ensureScheduleTeam(event);
+            const members = value
+                .split(',')
+                .map(member => member.trim())
+                .filter(Boolean);
+            const next = { ...current, members };
+            return { ...prev, team: next } as Partial<ScheduleEvent>;
+        });
+    };
+
+    const handleLocationFieldChange = (field: 'id' | 'name' | 'type' | 'timezone' | 'address' | 'room', value: string) => {
+        setFormData(prev => {
+            const event = prev as Partial<ScheduleEvent>;
+            const current = ensureScheduleLocation(event);
+            const next = {
+                ...current,
+                [field]: field === 'type' ? (value as ScheduleEvent['location']['type']) : value,
+            };
+            return { ...prev, location: next } as Partial<ScheduleEvent>;
+        });
+    };
+
+    const handleTagsChange = (value: string) => {
+        setFormData(prev => {
+            const tags = value
+                .split(',')
+                .map(tag => tag.trim())
+                .filter(Boolean);
+            return { ...prev, tags } as Partial<ScheduleEvent>;
+        });
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         onSave(formData as DataItem, type);
@@ -95,6 +172,9 @@ const EditModal: React.FC<EditModalProps> = ({ item, type, isNew, onClose, onSav
         switch (type) {
             case 'schedule':
                 const event = formData as Partial<ScheduleEvent>;
+                const capacity = ensureScheduleCapacity(event);
+                const team = ensureScheduleTeam(event);
+                const location = ensureScheduleLocation(event);
                 return (
                     <>
                         <FormField label={t('schedule.title')}><input name="title" value={event.title || ''} onChange={handleChange} className={inputClass} required /></FormField>
@@ -113,6 +193,89 @@ const EditModal: React.FC<EditModalProps> = ({ item, type, isNew, onClose, onSav
                             <select name="type" value={event.type || 'Meeting'} onChange={handleChange} className={inputClass}>
                                 <option value="Meeting">Meeting</option><option value="Call">Call</option><option value="Event">Event</option>
                             </select>
+                        </FormField>
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                            <FormField label="Planlanan Kapasite (saat)">
+                                <input
+                                    type="number"
+                                    step="0.25"
+                                    value={capacity.requiredHours}
+                                    onChange={(e) => handleCapacityFieldChange('requiredHours', e.target.value)}
+                                    className={inputClass}
+                                    min={0}
+                                />
+                            </FormField>
+                            <FormField label="Bloke Edilen Kapasite (saat)">
+                                <input
+                                    type="number"
+                                    step="0.25"
+                                    value={capacity.allocatedHours}
+                                    onChange={(e) => handleCapacityFieldChange('allocatedHours', e.target.value)}
+                                    className={inputClass}
+                                    min={0}
+                                />
+                            </FormField>
+                            <FormField label="Kapasite Birimi">
+                                <select
+                                    value={capacity.unit}
+                                    onChange={(e) => handleCapacityFieldChange('unit', e.target.value)}
+                                    className={inputClass}
+                                >
+                                    <option value="hours">Saat</option>
+                                    <option value="sessions">Seans</option>
+                                </select>
+                            </FormField>
+                        </div>
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                            <FormField label="Ekip Adı">
+                                <input value={team.name} onChange={(e) => handleTeamFieldChange('name', e.target.value)} className={inputClass} placeholder="Örn. Operasyon" />
+                            </FormField>
+                            <FormField label="Ekip Kimliği">
+                                <input value={team.id} onChange={(e) => handleTeamFieldChange('id', e.target.value)} className={inputClass} placeholder="team-id" />
+                            </FormField>
+                            <FormField label="Ekip Üyeleri">
+                                <input value={team.members.join(', ')} onChange={(e) => handleTeamMembersChange(e.target.value)} className={inputClass} placeholder="Üyeleri virgülle ayırın" />
+                            </FormField>
+                            <FormField label="Ekip Günlük Kapasitesi (saat)">
+                                <input
+                                    type="number"
+                                    min={0}
+                                    step="0.5"
+                                    value={team.capacityHoursPerDay}
+                                    onChange={(e) => handleTeamCapacityChange(e.target.value)}
+                                    className={inputClass}
+                                />
+                            </FormField>
+                            <FormField label="Ekip Saat Dilimi">
+                                <input value={team.timezone || ''} onChange={(e) => handleTeamFieldChange('timezone', e.target.value)} className={inputClass} placeholder="Europe/Istanbul" />
+                            </FormField>
+                        </div>
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                            <FormField label="Lokasyon Adı">
+                                <input value={location.name} onChange={(e) => handleLocationFieldChange('name', e.target.value)} className={inputClass} placeholder="Merkez Ofis" />
+                            </FormField>
+                            <FormField label="Lokasyon Türü">
+                                <select value={location.type} onChange={(e) => handleLocationFieldChange('type', e.target.value)} className={inputClass}>
+                                    <option value="onsite">Ofis</option>
+                                    <option value="remote">Uzaktan</option>
+                                    <option value="hybrid">Hibrit</option>
+                                </select>
+                            </FormField>
+                            <FormField label="Saat Dilimi">
+                                <input value={location.timezone || ''} onChange={(e) => handleLocationFieldChange('timezone', e.target.value)} className={inputClass} placeholder="Europe/Berlin" />
+                            </FormField>
+                            <FormField label="Adres">
+                                <input value={location.address || ''} onChange={(e) => handleLocationFieldChange('address', e.target.value)} className={inputClass} placeholder="Adres bilgisi" />
+                            </FormField>
+                            <FormField label="Oda / Alan">
+                                <input value={location.room || ''} onChange={(e) => handleLocationFieldChange('room', e.target.value)} className={inputClass} placeholder="Toplantı Salonu" />
+                            </FormField>
+                        </div>
+                        <FormField label="Notlar">
+                            <textarea name="notes" value={event.notes || ''} onChange={handleChange} className={inputClass} rows={3} placeholder="Ek ayrıntılar" />
+                        </FormField>
+                        <FormField label="Etiketler">
+                            <input value={(event.tags || []).join(', ')} onChange={(e) => handleTagsChange(e.target.value)} className={inputClass} placeholder="Etiketleri virgülle ayırın" />
                         </FormField>
                     </>
                 );

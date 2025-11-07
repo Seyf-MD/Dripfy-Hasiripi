@@ -2,6 +2,7 @@ import type {
   ChatbotMessage,
   ChatbotResponsePayload,
   ChatbotActionPermissionMap,
+  ChatbotReference,
 } from '../../types';
 import { DEFAULT_TEMPLATE_ID } from './templates';
 import {
@@ -30,6 +31,19 @@ export interface ChatCompletionResult extends ChatbotResponsePayload {
 
 export { ChatbotApiError };
 
+function isChatbotReference(input: unknown): input is ChatbotReference {
+  if (!input || typeof input !== 'object') {
+    return false;
+  }
+  const candidate = input as Partial<ChatbotReference>;
+  return (
+    typeof candidate.id === 'string' &&
+    typeof candidate.title === 'string' &&
+    typeof candidate.snippet === 'string' &&
+    typeof candidate.source === 'string'
+  );
+}
+
 export async function requestChatCompletion(payload: ChatCompletionRequest): Promise<ChatCompletionResult> {
   const response = await postChatCompletion({
     prompt: payload.prompt,
@@ -39,9 +53,13 @@ export async function requestChatCompletion(payload: ChatCompletionRequest): Pro
     dashboardContext: payload.dashboardContext,
   });
 
+  const references = Array.isArray(response.references)
+    ? response.references.filter(isChatbotReference)
+    : [];
+
   return {
     answer: response.answer,
-    references: response.references,
+    references,
     provider: response.provider,
     usage: response.usage,
     language: response.language,

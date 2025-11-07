@@ -37,6 +37,25 @@ import { isRoleAtLeast } from '../models/roleModel.js';
 
 const importerRouter = express.Router();
 
+type DatasetFieldDefinition = {
+  label?: string | null;
+};
+
+type DatasetDefinition = {
+  id: string;
+  label: string;
+  description?: string;
+  fields: Record<string, DatasetFieldDefinition>;
+};
+
+type UploadSession = {
+  id: string;
+  datasetId: string;
+  userId?: string;
+  rows?: unknown[];
+  [key: string]: unknown;
+};
+
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: MAX_FILE_SIZE_BYTES },
@@ -49,11 +68,12 @@ const upload = multer({
   },
 });
 
-function buildSuggestedMapping(dataset, columns) {
-  const suggestions = {};
+function buildSuggestedMapping(dataset: DatasetDefinition, columns: string[]) {
+  const suggestions: Record<string, string> = {};
   const lowerColumns = columns.map((column) => column.toLowerCase());
   Object.entries(dataset.fields).forEach(([field, definition]) => {
-    const candidates = [field.toLowerCase(), (definition.label || '').toLowerCase()];
+    const label = (definition as DatasetFieldDefinition)?.label ?? '';
+    const candidates = [field.toLowerCase(), label.toLowerCase()];
     const matchIndex = lowerColumns.findIndex((column) => candidates.includes(column));
     if (matchIndex !== -1) {
       suggestions[field] = columns[matchIndex];
@@ -62,7 +82,7 @@ function buildSuggestedMapping(dataset, columns) {
   return suggestions;
 }
 
-function sanitiseMapping(input) {
+function sanitiseMapping(input: unknown): Record<string, string> {
   if (!input || typeof input !== 'object') {
     return {};
   }
@@ -73,14 +93,15 @@ function sanitiseMapping(input) {
   );
 }
 
-async function assertUploadAccess(req, session) {
+async function assertUploadAccess(req: express.Request, session: UploadSession | null) {
   if (!session) {
-    const error = new Error('Oturum bulunamadı');
+    const error = new Error('Oturum bulunamadı') as Error & { statusCode?: number };
     error.statusCode = 404;
     throw error;
   }
-  if (session.userId && session.userId !== req.user.id && !isRoleAtLeast(req.user.role, 'admin')) {
-    const error = new Error('Bu yüklemeye erişiminiz yok');
+  const userId = typeof session.userId === 'string' ? session.userId : null;
+  if (userId && userId !== req.user.id && !isRoleAtLeast(req.user.role, 'admin')) {
+    const error = new Error('Bu yüklemeye erişiminiz yok') as Error & { statusCode?: number };
     error.statusCode = 403;
     throw error;
   }
@@ -109,7 +130,7 @@ importerRouter.get('/datasets', (req, res) => {
 importerRouter.post('/upload', upload.single('file'), async (req, res) => {
   try {
     const datasetId = req.body?.datasetId;
-    const dataset = datasetId ? getDataset(datasetId) : null;
+    const dataset = datasetId ? (getDataset(datasetId) as DatasetDefinition | null) : null;
     if (!dataset) {
       res.status(400).json({ ok: false, error: { message: 'Geçersiz veri seti' } });
       return;
@@ -162,22 +183,22 @@ importerRouter.post('/sessions/:sessionId/validate', async (req, res) => {
     const { sessionId } = req.params;
     const mapping = sanitiseMapping(req.body?.mapping || {});
     const commit = Boolean(req.body?.commit);
-    const session = await getUploadSession(sessionId);
+    const session = (await getUploadSession(sessionId)) as UploadSession | null;
     await assertUploadAccess(req, session);
 
-    const dataset = getDataset(session.datasetId);
+    const dataset = session ? (getDataset(session.datasetId) as DatasetDefinition | null) : null;
     if (!dataset) {
       res.status(400).json({ ok: false, error: { message: 'Veri seti bulunamadı' } });
       return;
     }
 
-    const mappedRows = applyFieldMapping(session.rows || [], dataset.id, mapping);
+    const mappedRows = applyFieldMapping(((session?.rows as unknown[]) ?? []), dataset.id, mapping);
     const { valid, errors } = validateMappedRows(dataset.id, mappedRows);
 
     let errorReportId = null;
     if (errors.length > 0) {
       const buffer = buildErrorReportCsv(errors);
-      const report = await persistErrorReport(buffer, { sessionId });
+      const report = await persistErrorReport(buffer, { sessionId, jobId: undefined });
       errorReportId = report.id;
     }
 
@@ -224,10 +245,11 @@ importerRouter.post('/sessions/:sessionId/validate', async (req, res) => {
     });
   } catch (error) {
     console.error('[importer] validate failed', error);
-    const status = error.statusCode || 500;
+    const err = error as { statusCode?: number; message?: string };
+    const status = err.statusCode || 500;
     res.status(status).json({
       ok: false,
-      error: { message: error.message || 'Veri doğrulaması başarısız' },
+      error: { message: err.message || 'Veri doğrulaması başarısız' },
     });
   }
 });
@@ -236,10 +258,14 @@ importerRouter.post('/sessions/:sessionId/commit', async (req, res) => {
   try {
     const { sessionId } = req.params;
     const mapping = sanitiseMapping(req.body?.mapping || {});
-    const session = await getUploadSession(sessionId);
+    const session = (await getUploadSession(sessionId)) as UploadSession | null;
     await assertUploadAccess(req, session);
+    if (!session) {
+      res.status(404).json({ ok: false, error: { message: 'Yükleme oturumu bulunamadı' } });
+      return;
+    }
 
-    const dataset = getDataset(session.datasetId);
+    const dataset = getDataset(session.datasetId) as DatasetDefinition | null;
     if (!dataset) {
       res.status(400).json({ ok: false, error: { message: 'Veri seti bulunamadı' } });
       return;
@@ -249,7 +275,8 @@ importerRouter.post('/sessions/:sessionId/commit', async (req, res) => {
       return;
     }
 
-    const effectiveMapping = Object.keys(mapping).length ? mapping : session.mapping || {};
+    const sessionMapping = (session as Record<string, unknown>).mapping as Record<string, string> | undefined;
+    const effectiveMapping = Object.keys(mapping).length ? mapping : sessionMapping || {};
     if (!Object.keys(effectiveMapping).length) {
       res.status(400).json({ ok: false, error: { message: 'Alan eşlemesi tamamlanmalıdır' } });
       return;
@@ -267,7 +294,7 @@ importerRouter.post('/sessions/:sessionId/commit', async (req, res) => {
       action: 'IMPORT_ENQUEUED',
       targetType: `dataset:${dataset.id}`,
       targetId: sessionId,
-      details: `${session.filename} içe aktarma kuyruğa alındı`,
+      details: `${(session as Record<string, unknown>).filename || 'dosya'} içe aktarma kuyruğa alındı`,
       label: 'data-import',
       sourceModule: 'importer',
       criticality: 'medium',
@@ -276,10 +303,11 @@ importerRouter.post('/sessions/:sessionId/commit', async (req, res) => {
     res.json({ ok: true, jobId });
   } catch (error) {
     console.error('[importer] commit failed', error);
-    const status = error.statusCode || 500;
+    const err = error as { statusCode?: number; message?: string };
+    const status = err.statusCode || 500;
     res.status(status).json({
       ok: false,
-      error: { message: error.message || 'İçe aktarma başlatılamadı' },
+      error: { message: err.message || 'İçe aktarma başlatılamadı' },
     });
   }
 });
@@ -288,7 +316,7 @@ importerRouter.post('/export', async (req, res) => {
   try {
     const datasetId = req.body?.datasetId;
     const filters = req.body?.filters || {};
-    const dataset = datasetId ? getDataset(datasetId) : null;
+    const dataset = datasetId ? (getDataset(datasetId) as DatasetDefinition | null) : null;
     if (!dataset) {
       res.status(400).json({ ok: false, error: { message: 'Geçersiz veri seti' } });
       return;

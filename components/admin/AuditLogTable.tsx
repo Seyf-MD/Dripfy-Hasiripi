@@ -186,9 +186,9 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({ initialLogs = [], authTok
 
       try {
         const params = new URLSearchParams();
-        Object.entries(filters).forEach(([key, value]) => {
+        (Object.entries(filters) as Array<[keyof FilterState, FilterState[keyof FilterState]]>).forEach(([key, value]) => {
           if (value) {
-            params.set(key, value);
+            params.set(String(key), value);
           }
         });
 

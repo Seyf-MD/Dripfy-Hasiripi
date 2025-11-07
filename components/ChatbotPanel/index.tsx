@@ -76,25 +76,26 @@ const MarkdownRenderer: React.FC<{ content: string }> = ({ content }) => {
   }, []);
 
   const blocks = React.useMemo(() => {
-    return content
-      .split('\n')
-      .reduce<Array<{ type: 'p' | 'ul'; lines: string[] }>>((acc, line) => {
-        const trimmedLine = line.trim();
-        const isListItem = trimmedLine.startsWith('- ');
-        const lastBlock = acc.length > 0 ? acc[acc.length - 1] : null;
+    const accumulator: Array<{ type: 'p' | 'ul'; lines: string[] }> = [];
+    for (const line of content.split('\n')) {
+      const trimmedLine = line.trim();
+      const isListItem = trimmedLine.startsWith('- ');
+      const lastBlock = accumulator.length > 0 ? accumulator[accumulator.length - 1] : null;
 
-        if (isListItem) {
-          if (lastBlock && lastBlock.type === 'ul') {
-            lastBlock.lines.push(trimmedLine.substring(2));
-          } else {
-            acc.push({ type: 'ul', lines: [trimmedLine.substring(2)] });
-          }
-        } else if (trimmedLine) {
-          acc.push({ type: 'p', lines: [line] });
+      if (isListItem) {
+        if (lastBlock && lastBlock.type === 'ul') {
+          lastBlock.lines.push(trimmedLine.substring(2));
+        } else {
+          accumulator.push({ type: 'ul', lines: [trimmedLine.substring(2)] });
         }
+        continue;
+      }
 
-        return acc;
-      }, []);
+      if (trimmedLine) {
+        accumulator.push({ type: 'p', lines: [line] });
+      }
+    }
+    return accumulator;
   }, [content]);
 
   return (

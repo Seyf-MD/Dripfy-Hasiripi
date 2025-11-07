@@ -4,6 +4,7 @@ import type { ComponentProps } from 'react';
 import SignupForm from '../SignupForm';
 import * as signupService from '../../services/signupService';
 import type { SignupFinalizePayload } from '../../services/signupService';
+import type { Mock } from 'vitest';
 
 vi.mock('../../i18n/LanguageContext', () => {
   const translations: Record<string, string> = {
@@ -53,7 +54,7 @@ vi.mock('../../services/signupService', async () => {
 });
 
 type SignupFormProps = ComponentProps<typeof SignupForm>;
-const requestSignupCodeMock = signupService.requestSignupCode as unknown as vi.Mock;
+const requestSignupCodeMock = signupService.requestSignupCode as unknown as Mock;
 
 const fillSignupForm = async () => {
   const user = userEvent.setup();

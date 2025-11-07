@@ -7,6 +7,8 @@ import type {
   InsightModelArtifacts,
   InsightRecord,
   InsightSeverity,
+  OperationalRole,
+  UserRole,
   Task,
 } from '../../types';
 import {
@@ -228,7 +230,7 @@ function evaluateSeverity(row: InsightFactRow, models: InsightModelArtifacts): {
   return { severity: row.severity, score: clamp(Math.abs(row.anomaly_score ?? 0)) };
 }
 
-function resolveAudience(row: InsightFactRow) {
+function resolveAudience(row: InsightFactRow): { minRole: UserRole; operationalRoles: readonly OperationalRole[] } {
   switch (row.category) {
     case 'finance':
       return { minRole: 'finance', operationalRoles: ['finance', 'admin'] as const };
@@ -289,7 +291,7 @@ export function scoreInsights(rows: InsightFactRow[], models: InsightModelArtifa
       actions: ensureActionIds(row.recommended_actions, row.insight_id),
       audience: {
         minRole: audience.minRole,
-        operationalRoles: audience.operationalRoles as unknown as typeof audience.operationalRoles,
+        operationalRoles: [...audience.operationalRoles],
       },
       entityRefs: buildEntityRefs(row),
       tags: row.tags,

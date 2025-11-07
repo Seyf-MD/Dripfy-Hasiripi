@@ -3,10 +3,17 @@ import * as React from 'react';
 export type Language = 'en' | 'tr' | 'de' | 'ru' | 'ar';
 type Translations = { [key: string]: any };
 
+export type TranslateOptions =
+  | string
+  | {
+      defaultValue?: string;
+      [key: string]: string | number | undefined;
+    };
+
 interface LanguageContextType {
   language: Language;
   setLanguage: (language: Language) => void;
-  t: (key: string) => string;
+  t: (key: string, options?: TranslateOptions) => string;
 }
 
 const LanguageContext = React.createContext<LanguageContextType | undefined>(undefined);
@@ -45,7 +52,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, []);
 
   // Updated translation function to handle nested keys
-  const t = (key: string): string => {
+  const t = (key: string, options?: TranslateOptions): string => {
     if (!translations) return key;
 
     const resolve = (path: string, obj: any): string | undefined => {
@@ -57,8 +64,28 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const currentTranslations = translations[language];
     let translation = resolve(key, currentTranslations);
 
+    let defaultValue: string | undefined;
+    const replacements: Record<string, string> = {};
+    if (typeof options === 'string') {
+      defaultValue = options;
+    } else if (options && typeof options === 'object') {
+      if (typeof options.defaultValue === 'string') {
+        defaultValue = options.defaultValue;
+      }
+      for (const [replacementKey, replacementValue] of Object.entries(options)) {
+        if (replacementKey === 'defaultValue' || replacementValue === undefined) {
+          continue;
+        }
+        replacements[replacementKey] = String(replacementValue);
+      }
+    }
+
     if (typeof translation === 'string') {
-      return translation;
+      let resolved = translation;
+      for (const [replacementKey, replacementValue] of Object.entries(replacements)) {
+        resolved = resolved.replace(new RegExp(`{${replacementKey}}`, 'g'), replacementValue);
+      }
+      return resolved;
     }
 
     // Fallback to English if translation is not found in the current language
@@ -66,11 +93,23 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const fallbackTranslations = translations.en;
       translation = resolve(key, fallbackTranslations);
       if (typeof translation === 'string') {
-        return translation;
+        let resolved = translation;
+        for (const [replacementKey, replacementValue] of Object.entries(replacements)) {
+          resolved = resolved.replace(new RegExp(`{${replacementKey}}`, 'g'), replacementValue);
+        }
+        return resolved;
       }
     }
-    
+
     // If not found anywhere, return the key itself
+    if (typeof defaultValue === 'string' && defaultValue.length > 0) {
+      let resolved = defaultValue;
+      for (const [replacementKey, replacementValue] of Object.entries(replacements)) {
+        resolved = resolved.replace(new RegExp(`{${replacementKey}}`, 'g'), replacementValue);
+      }
+      return resolved;
+    }
+
     return key;
   };
   

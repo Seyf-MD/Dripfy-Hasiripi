@@ -1,6 +1,14 @@
 const DEFAULT_ROLE = 'viewer';
 
 const ROLE_DEFINITIONS = {
+  'external-stakeholder': {
+    id: 'external-stakeholder',
+    label: 'Harici Paydaş',
+    description: 'Portal üzerinden durum takibi ve belge paylaşımı yapabilen dış kullanıcı.',
+    inherits: [],
+    capabilities: ['portal-read', 'portal-upload'],
+    rank: -1,
+  },
   viewer: {
     id: 'viewer',
     label: 'Gözlemci',

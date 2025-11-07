@@ -40,10 +40,13 @@ describe('admin authenticate middleware', () => {
   const jwtSecret = 'test-secret-key';
   let authenticate;
   let originalSecret;
+  let originalSilenceSetting;
 
   before(async () => {
     originalSecret = process.env.JWT_SECRET;
+    originalSilenceSetting = process.env.SILENCE_AUTH_ERRORS;
     process.env.JWT_SECRET = jwtSecret;
+    process.env.SILENCE_AUTH_ERRORS = 'true';
     ({ authenticate } = await import('../auth/middleware.js'));
   });
 
@@ -56,6 +59,12 @@ describe('admin authenticate middleware', () => {
       process.env.JWT_SECRET = originalSecret;
     } else {
       delete process.env.JWT_SECRET;
+    }
+
+    if (originalSilenceSetting) {
+      process.env.SILENCE_AUTH_ERRORS = originalSilenceSetting;
+    } else {
+      delete process.env.SILENCE_AUTH_ERRORS;
     }
   });
 

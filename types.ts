@@ -450,11 +450,19 @@ export interface CalendarIntegrationAccount {
   };
 }
 
-export type UserRole = 'viewer' | 'user' | 'approver' | 'finance' | 'manager' | 'admin';
+export type UserRole =
+  | 'external-stakeholder'
+  | 'viewer'
+  | 'user'
+  | 'approver'
+  | 'finance'
+  | 'manager'
+  | 'admin';
 export type OperationalRole = 'admin' | 'finance' | 'operations' | 'product' | 'medical' | 'people';
 export type Department = 'Operations' | 'Expansion' | 'Revenue' | 'Medical' | 'Product' | 'People';
 
 export const ROLE_RANK: Record<UserRole, number> = {
+  'external-stakeholder': -1,
   viewer: 0,
   user: 1,
   approver: 2,
@@ -482,6 +490,7 @@ export function isRoleAtLeast(role: UserRole | null | undefined, required: UserR
     return true;
   }
   const inheritance: Record<UserRole, UserRole[]> = {
+    'external-stakeholder': [],
     viewer: [],
     user: ['viewer'],
     approver: ['user', 'viewer'],
@@ -1113,6 +1122,113 @@ export interface FinanceForecastResponse {
   error?: { message: string };
 }
 
+export type PortalStatusState = 'pending' | 'in-progress' | 'completed' | 'blocked';
+
+export interface StakeholderPortalStatus {
+  id: string;
+  title: string;
+  description: string;
+  status: PortalStatusState;
+  dueDate: string | null;
+  acknowledgedAt: string | null;
+  lastUpdatedAt: string;
+}
+
+export interface PortalDocumentSecureLink {
+  id: string;
+  createdAt: string;
+  createdBy: { id: string | null; name: string | null; email: string | null };
+  expiresAt: string;
+  url: string;
+}
+
+export interface PortalDocumentVersion {
+  id: string;
+  version: number;
+  fileName: string;
+  uploadedAt: string;
+  uploadedBy: { id: string | null; name: string | null; email: string | null };
+  notes?: string | null;
+  secureLinks?: PortalDocumentSecureLink[];
+}
+
+export interface PortalDocumentApprovalState {
+  status: 'pending' | 'approved' | 'rejected';
+  decidedAt: string | null;
+  decidedBy: { id: string | null; name: string | null; email: string | null } | null;
+  notes: string | null;
+}
+
+export interface PortalDocumentRecord {
+  id: string;
+  profileId: string;
+  title: string;
+  description: string | null;
+  category: string;
+  versions: PortalDocumentVersion[];
+  approval: PortalDocumentApprovalState;
+  createdAt: string;
+  updatedAt: string;
+  createdBy?: { id: string | null; name: string | null; email: string | null };
+}
+
+export type PortalSupportPriority = 'low' | 'normal' | 'high';
+
+export interface PortalSupportRequest {
+  id: string;
+  profileId: string;
+  subject: string;
+  message: string;
+  category: string;
+  status: 'open' | 'in-progress' | 'resolved';
+  priority: PortalSupportPriority;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: { id: string | null; name: string | null; email: string | null };
+}
+
+export interface PortalMessageAttachment {
+  name: string;
+  url: string;
+}
+
+export interface PortalMessage {
+  id: string;
+  profileId: string;
+  body: string;
+  direction: 'inbound' | 'outbound';
+  author: { id: string | null; name: string | null; email: string | null };
+  timestamp: string;
+  attachments?: PortalMessageAttachment[];
+}
+
+export interface StakeholderPortalProfile {
+  id: string;
+  invitationId?: string | null;
+  email: string;
+  contactName: string;
+  company?: string | null;
+  stakeholderUserId?: string | null;
+  statuses: StakeholderPortalStatus[];
+  createdAt: string;
+  updatedAt: string;
+  lastSyncedAt?: string | null;
+}
+
+export interface StakeholderPortalUsageSummary {
+  totalEvents: number;
+  lastActivityAt: string | null;
+  breakdown: Record<string, number>;
+}
+
+export interface StakeholderPortalState {
+  profile: StakeholderPortalProfile;
+  documents: PortalDocumentRecord[];
+  supportRequests: PortalSupportRequest[];
+  messages: PortalMessage[];
+  usage: StakeholderPortalUsageSummary;
+}
+
 export interface DashboardData {
   schedule: ScheduleEvent[];
   financials: FinancialRecord[];
@@ -1140,4 +1256,5 @@ export interface DashboardData {
   capacitySnapshots: CapacitySnapshot[];
   customerProfiles: CustomerProfile[];
   insightRecords?: InsightRecord[];
+  portalState?: StakeholderPortalState | null;
 }

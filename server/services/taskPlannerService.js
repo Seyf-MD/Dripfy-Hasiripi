@@ -1,6 +1,11 @@
 import { randomUUID } from 'node:crypto';
 import { readCollection, writeCollection } from './storageService.js';
 import { queueTaskSync, resolveTaskConflict } from './calendar/index.js';
+import {
+  registerTaskForSLAMonitoring,
+  updateTaskSLAMonitoring,
+  clearTaskSLATimer,
+} from './tasks/slaTimerService.js';
 
 export class TaskVersionConflictError extends Error {
   constructor(taskId, expected, actual) {
@@ -126,6 +131,10 @@ export async function createPersonalTask(user, input) {
     });
   }
 
+  await registerTaskForSLAMonitoring(newTask).catch((error) => {
+    console.warn('[taskPlanner] SLA monitoring registration failed', error);
+  });
+
   return newTask;
 }
 
@@ -188,6 +197,16 @@ export async function updatePersonalTask(user, taskId, changes, expectedVersion)
     });
   }
 
+  if (updated.status === 'Done') {
+    await clearTaskSLATimer(updated.id).catch((error) => {
+      console.warn('[taskPlanner] SLA timer clear failed', error);
+    });
+  } else {
+    await updateTaskSLAMonitoring(updated).catch((error) => {
+      console.warn('[taskPlanner] SLA monitoring update failed', error);
+    });
+  }
+
   return updated;
 }
 
@@ -200,10 +219,22 @@ export async function mergeRemoteTask(remoteTask) {
   if (index === -1) {
     tasks.push(remoteTask);
     await writeCollection('tasks', tasks);
+    await registerTaskForSLAMonitoring(remoteTask).catch((error) => {
+      console.warn('[taskPlanner] SLA monitoring registration failed (remote)', error);
+    });
     return remoteTask;
   }
   const merged = resolveTaskConflict(tasks[index], remoteTask);
   tasks[index] = merged;
   await writeCollection('tasks', tasks);
+  if (merged.status === 'Done' || !merged.sla) {
+    await clearTaskSLATimer(merged.id).catch((error) => {
+      console.warn('[taskPlanner] SLA timer clear failed (remote)', error);
+    });
+  } else {
+    await updateTaskSLAMonitoring(merged).catch((error) => {
+      console.warn('[taskPlanner] SLA monitoring update failed (remote)', error);
+    });
+  }
   return merged;
 }

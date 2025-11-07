@@ -61,6 +61,7 @@ import { useNetworkStatus } from './hooks/useNetworkStatus';
 import { useOfflineQueue } from './hooks/useOfflineQueue';
 import { runInsightPipeline } from './services/insights';
 import type { InsightWarehouseSummary } from './datawarehouse/insights/schema';
+import type { TemplateInstantiationResult } from './services/tasks/automation';
 
 type ModalType = 'schedule' | 'financials' | 'challenges' | 'advantages' | 'contacts' | 'tasks' | 'users';
 type SettingsPanelTab = 'profile' | 'settings' | 'integrations' | 'privacy';
@@ -423,6 +424,13 @@ function App() {
       return { ...prevData, [key]: updatedList };
     });
   }
+
+  const handleCreateTaskFromTemplate = React.useCallback((result: TemplateInstantiationResult) => {
+    setDashboardData((prev) => ({
+      ...prev,
+      tasks: [...prev.tasks, result.task, ...result.subtasks],
+    }));
+  }, []);
   
   const handleApproveSignup = (requestId: string) => {
     setDashboardData(prev => {
@@ -669,12 +677,18 @@ function App() {
           />
         );
       case 'Tasks':
-        return <TasksTab
-                    data={dashboardData.tasks}
-                    canEdit={canEdit('tasks')}
-                    onOpenModal={handleOpenDetailModal as any}
-                    onUpdateStatus={(taskId, newStatus) => handleQuickUpdate(taskId, 'tasks', 'status', newStatus)}
-                />;
+        return (
+          <TasksTab
+            data={dashboardData.tasks}
+            templates={dashboardData.taskTemplates}
+            automationTriggers={dashboardData.taskAutomationTriggers}
+            slaReports={dashboardData.taskSLAReports}
+            canEdit={canEdit('tasks')}
+            onOpenModal={handleOpenDetailModal as any}
+            onUpdateStatus={(taskId, newStatus) => handleQuickUpdate(taskId, 'tasks', 'status', newStatus)}
+            onCreateTask={handleCreateTaskFromTemplate}
+          />
+        );
       case 'Personal Planner':
         return (
           <PersonalPlanner

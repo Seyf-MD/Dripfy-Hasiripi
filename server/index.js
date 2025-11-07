@@ -32,6 +32,7 @@ import {
 } from './signupCodesStore.js';
 import { startCalendarSyncScheduler } from './services/calendar/index.js';
 import { normaliseSignupAttribution, buildSignupAttributionTags } from './models/signupSource.js';
+import { startTaskSLATimers } from './services/tasks/slaTimerService.js';
 
 /**
  * Geliştirme sırasında çalışan mini API:
@@ -49,6 +50,7 @@ ensureDataEnvironment()
     await runMigrations();
     startDailyBackupScheduler();
     startCalendarSyncScheduler();
+    await startTaskSLATimers();
   })
   .catch((error) => {
     console.error('[bootstrap] Failed to prepare data environment:', error);

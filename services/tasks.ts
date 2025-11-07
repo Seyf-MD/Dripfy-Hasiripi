@@ -1,4 +1,16 @@
-import type { Task } from '../types';
+import type {
+  Task,
+  TaskAutomationTrigger,
+  TaskTemplate,
+} from '../types';
+import {
+  evaluateAutomationTriggers,
+  instantiateTemplate,
+  listAutomationTriggers,
+  listTaskTemplates,
+  type TaskAutomationEvent,
+  type TemplateInstantiationResult,
+} from './tasks/automation';
 
 const API_BASE = (import.meta.env.VITE_API_BASE || '').replace(/\/+$/, '');
 
@@ -119,4 +131,23 @@ export async function syncPersonalTask(taskId: string) {
     credentials: 'include',
   });
   return handleResponse(response, 'Senkronizasyon başlatılamadı.');
+}
+
+export function getTaskTemplates(): TaskTemplate[] {
+  return listTaskTemplates();
+}
+
+export function getTaskAutomationTriggers(): TaskAutomationTrigger[] {
+  return listAutomationTriggers();
+}
+
+export function createTaskFromTemplate(
+  templateId: string,
+  options?: Parameters<typeof instantiateTemplate>[1],
+): TemplateInstantiationResult {
+  return instantiateTemplate(templateId, options);
+}
+
+export function evaluateTaskAutomation(event: TaskAutomationEvent) {
+  return evaluateAutomationTriggers(event);
 }

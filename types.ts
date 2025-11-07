@@ -225,6 +225,125 @@ export interface TaskPersonalization {
   schedule: TaskSchedulePlan;
 }
 
+export type TaskDependencyType =
+  | 'finish_to_start'
+  | 'start_to_start'
+  | 'finish_to_finish'
+  | 'start_to_finish';
+
+export interface TaskDependency {
+  id: string;
+  type: TaskDependencyType;
+  targetTaskId: string;
+  label?: string;
+  isBlocking?: boolean;
+  metadata?: Record<string, unknown>;
+}
+
+export type TaskAutomationTriggerType =
+  | 'status-change'
+  | 'sla-breach'
+  | 'dependency-resolved'
+  | 'time-elapsed';
+
+export type TaskAutomationChannel = 'email' | 'push' | 'webhook' | 'slack';
+
+export interface TaskAutomationAction {
+  id: string;
+  type: 'notify' | 'reassign' | 'create-subtask' | 'update-field';
+  label: string;
+  description?: string;
+  channel?: TaskAutomationChannel;
+  payload?: Record<string, unknown>;
+}
+
+export interface TaskAutomationTriggerCondition {
+  field: string;
+  operator: 'eq' | 'neq' | 'gt' | 'lt' | 'includes' | 'excludes';
+  value: string | number | boolean | (string | number | boolean)[];
+}
+
+export interface TaskAutomationTrigger {
+  id: string;
+  name: string;
+  description: string;
+  type: TaskAutomationTriggerType;
+  conditions?: TaskAutomationTriggerCondition[];
+  actions: TaskAutomationAction[];
+  cooldownMinutes?: number;
+  tags?: string[];
+}
+
+export interface TaskAutomationBadge {
+  id: string;
+  label: string;
+  color?: string;
+  icon?: string;
+  description?: string;
+}
+
+export type TaskSLAStatus = 'onTrack' | 'warning' | 'breached';
+
+export interface TaskSLAReminder {
+  id: string;
+  offsetMinutes: number;
+  channel: TaskAutomationChannel;
+  message?: string;
+}
+
+export interface TaskSLAEscalation {
+  notifyChannels?: TaskAutomationChannel[];
+  reassignment?: {
+    assigneeId?: string | null;
+    assigneeName?: string | null;
+    note?: string;
+  };
+}
+
+export interface TaskSLA {
+  id: string;
+  name: string;
+  durationHours: number;
+  status: TaskSLAStatus;
+  startedAt?: string | null;
+  dueAt?: string | null;
+  breachedAt?: string | null;
+  reminders?: TaskSLAReminder[];
+  escalation?: TaskSLAEscalation;
+}
+
+export interface TaskTemplateStep {
+  id: string;
+  title: string;
+  description?: string;
+  defaultAssignee?: string;
+  relativeDueInHours?: number;
+  sla?: Omit<TaskSLA, 'status' | 'startedAt' | 'dueAt' | 'breachedAt'> & { graceMinutes?: number };
+  dependencies?: Array<{
+    type: TaskDependencyType;
+    target: 'parent' | string;
+    label?: string;
+    isBlocking?: boolean;
+  }>;
+  automationBadges?: TaskAutomationBadge[];
+  autoCreate?: boolean;
+}
+
+export interface TaskTemplate {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  defaultPriority: Task['priority'];
+  defaultAssignee?: string;
+  tags?: string[];
+  icon?: string;
+  defaultBadges?: TaskAutomationBadge[];
+  defaultSla?: Omit<TaskSLA, 'status' | 'startedAt' | 'dueAt' | 'breachedAt'> & { graceMinutes?: number };
+  steps: TaskTemplateStep[];
+  updatedAt?: string;
+}
+
 export interface Task {
   id: string;
   title: string;
@@ -236,9 +355,45 @@ export interface Task {
   reminders?: TaskReminder[];
   calendarLinks?: TaskCalendarLink[];
   personalization?: TaskPersonalization;
+  parentTaskId?: string | null;
+  templateId?: string | null;
+  templateName?: string | null;
+  templateStepId?: string | null;
+  assigneeId?: string | null;
+  tags?: string[];
+  dependencies?: TaskDependency[];
+  automationBadges?: TaskAutomationBadge[];
+  sla?: TaskSLA | null;
+  triggerIds?: string[];
   version?: number;
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface TaskSLATrendPoint {
+  date: string;
+  onTrack: number;
+  warning: number;
+  breached: number;
+}
+
+export interface TaskSLAHotspot {
+  taskId: string;
+  taskTitle: string;
+  assignee: string;
+  breachedAt: string;
+  impact: 'low' | 'medium' | 'high';
+}
+
+export interface TaskSLAReport {
+  id: string;
+  label: string;
+  totalTracked: number;
+  breached: number;
+  warning: number;
+  averageResolutionHours: number;
+  trend: TaskSLATrendPoint[];
+  hotspots: TaskSLAHotspot[];
 }
 
 export interface PlannerCalendarEvent {
@@ -965,6 +1120,9 @@ export interface DashboardData {
   advantages: Advantage[];
   contacts: Contact[];
   tasks: Task[];
+  taskTemplates: TaskTemplate[];
+  taskAutomationTriggers: TaskAutomationTrigger[];
+  taskSLAReports: TaskSLAReport[];
   users: User[];
   okrs: OKRRecord[];
   auditLog: AuditLogEntry[];

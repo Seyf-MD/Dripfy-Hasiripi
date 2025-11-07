@@ -39,17 +39,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const permissions = React.useRef<ChatbotActionPermissionMap>(chatbotActionPermissions);
 
   const login = React.useCallback(async (email: string, password: string) => {
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+    
     console.log('[AuthContext] Attempting login to:', LOGIN_ENDPOINT);
     console.log('[AuthContext] API_BASE:', API_BASE);
+    console.log('[AuthContext] Email (original):', JSON.stringify(email));
+    console.log('[AuthContext] Email (trimmed):', JSON.stringify(trimmedEmail));
+    console.log('[AuthContext] Password length:', password.length);
+    console.log('[AuthContext] Password (trimmed) length:', trimmedPassword.length);
     
     try {
+      const requestBody = { email: trimmedEmail, password: trimmedPassword };
+      console.log('[AuthContext] Request body:', JSON.stringify(requestBody));
+      
       const response = await fetch(LOGIN_ENDPOINT, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(requestBody),
       });
 
       console.log('[AuthContext] Response status:', response.status);

@@ -185,6 +185,7 @@ export const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ onClose, dataContext
   const [pendingCommandSummary, setPendingCommandSummary] = React.useState<string | null>(null);
   const [commandError, setCommandError] = React.useState<string | null>(null);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
+  const hasCustomSourceSelection = React.useRef(false);
 
   const resetPendingCommand = React.useCallback(() => {
     setPendingCommand(null);
@@ -223,8 +224,16 @@ export const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ onClose, dataContext
       .then((response) => {
         if (cancelled) return;
         if (Array.isArray(response) && response.length > 0) {
-          setSources(response.map((item) => ({ id: item.id, label: item.label || item.id })));
-          setSelectedSources(new Set(response.map((item) => item.id)));
+          const mapped = response.map((item) => ({ id: item.id, label: item.label || item.id }));
+          const nextIds = new Set(mapped.map((item) => item.id));
+          setSources(mapped);
+          setSelectedSources((prev) => {
+            const filtered = [...prev].filter((id) => nextIds.has(id));
+            if (hasCustomSourceSelection.current) {
+              return new Set(filtered);
+            }
+            return new Set(nextIds);
+          });
         }
       })
       .catch(() => {
@@ -245,7 +254,8 @@ export const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ onClose, dataContext
     return null;
   }, [messages]);
 
-  const toggleSource = (sourceId: string) => {
+  const toggleSource = React.useCallback((sourceId: string) => {
+    hasCustomSourceSelection.current = true;
     setSelectedSources((prev) => {
       const next = new Set(prev);
       if (next.has(sourceId)) {
@@ -255,18 +265,19 @@ export const ChatbotPanel: React.FC<ChatbotPanelProps> = ({ onClose, dataContext
       }
       return next;
     });
-  };
+  }, []);
 
-  const handleTemplateSelect = (templateId: string) => {
+  const handleTemplateSelect = React.useCallback((templateId: string) => {
     const template = PROMPT_TEMPLATES.find((item) => item.id === templateId);
     setSelectedTemplateId(templateId);
     if (template) {
       setInput(template.prompt);
       if (template.recommendedSources?.length) {
+        hasCustomSourceSelection.current = true;
         setSelectedSources(new Set(template.recommendedSources));
       }
     }
-  };
+  }, []);
 
   const formatRetryAfter = React.useCallback((seconds: number | undefined) => {
     if (typeof seconds !== 'number' || !Number.isFinite(seconds) || seconds <= 0) {

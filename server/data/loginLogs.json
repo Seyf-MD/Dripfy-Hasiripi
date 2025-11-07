@@ -78,5 +78,13 @@
     "ip": "::1",
     "userAgent": "curl/8.5.0",
     "timestamp": "2025-11-07T19:28:38.188Z"
+  },
+  {
+    "id": "054eb423-bb9b-42ed-986f-10471d2703db",
+    "userId": "admin-2",
+    "email": "dripfy@hasiripi.com",
+    "ip": "::1",
+    "userAgent": "curl/8.5.0",
+    "timestamp": "2025-11-07T19:33:08.954Z"
   }
 ]

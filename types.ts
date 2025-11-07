@@ -1,5 +1,30 @@
 // types.ts
 
+export type ScheduleLocationType = 'onsite' | 'remote' | 'hybrid';
+
+export interface ScheduleEventCapacity {
+  requiredHours: number;
+  allocatedHours: number;
+  unit: 'hours' | 'sessions';
+}
+
+export interface ScheduleEventTeam {
+  id: string;
+  name: string;
+  members: string[];
+  capacityHoursPerDay: number;
+  timezone?: string;
+}
+
+export interface ScheduleEventLocation {
+  id: string;
+  name: string;
+  type: ScheduleLocationType;
+  timezone?: string;
+  address?: string;
+  room?: string;
+}
+
 export interface ScheduleEvent {
   id: string;
   day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
@@ -7,6 +32,11 @@ export interface ScheduleEvent {
   title: string;
   participants: string[];
   type: 'Meeting' | 'Call' | 'Event';
+  capacity: ScheduleEventCapacity;
+  team: ScheduleEventTeam;
+  location: ScheduleEventLocation;
+  notes?: string;
+  tags?: string[];
 }
 
 export interface FinancialRecord {
@@ -221,6 +251,29 @@ export interface PlannerCalendarEvent {
   allDay?: boolean;
   timezone?: string | null;
   status?: string;
+}
+
+export interface PlannerSyncSummary {
+  ok: true;
+  syncedEvents: number;
+  syncedTasks: number;
+  createdTasks?: number;
+  updatedTasks?: number;
+  warnings?: string[];
+  nextSyncAt?: string | null;
+}
+
+export interface PlannerSyncStatus {
+  ok: true;
+  lastSyncedAt?: string | null;
+  nextSyncAt?: string | null;
+  pendingItems?: number;
+  providerStates?: Array<{
+    provider: CalendarProvider;
+    status: 'idle' | 'running' | 'error';
+    lastSyncAt?: string | null;
+    lastError?: string | null;
+  }>;
 }
 
 export interface CalendarIntegrationAccount {

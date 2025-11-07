@@ -67,7 +67,23 @@ automationRouter.post('/tasks', async (req, res) => {
   const actor = (req as any).user || null;
 
   try {
-    const task = await createTask({ title, description, assignee, priority, dueDate, actor });
+    const task = await createTask({
+      title,
+      description,
+      assignee,
+      priority,
+      dueDate,
+      ownerId: actor?.id ?? null,
+      ownerName: actor?.name ?? actor?.email ?? null,
+      personalNotes: null,
+      focusTags: [],
+      reminders: [],
+      calendarLinks: [],
+      schedule: {},
+      color: null,
+      timezone: null,
+      actor,
+    });
     res.status(201).json({ ok: true, task });
   } catch (error) {
     console.error('[automation] create task failed', error);

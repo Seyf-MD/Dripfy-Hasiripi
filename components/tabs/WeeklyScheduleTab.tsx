@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { ScheduleEvent } from '../../types';
-import { Clock, Users, Calendar as CalendarIcon, PlusCircle, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { CapacitySnapshot, ScheduleEvent } from '../../types';
+import { Clock, Users, Calendar as CalendarIcon, PlusCircle, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, MapPin, BarChart2 } from 'lucide-react';
 import { useLanguage } from '../../i18n/LanguageContext';
+import ResourceScheduler from '../planning/ResourceScheduler';
 
 // Helper functions for date manipulation
 const getWeekDays = (date: Date): Date[] => {
@@ -116,11 +117,12 @@ const DatePicker: React.FC<DatePickerProps> = ({ selectedDate, onDateSelect, onC
 
 interface CalendarTabProps {
     data: ScheduleEvent[];
+    capacitySnapshots?: CapacitySnapshot[];
     canEdit: boolean;
     onOpenModal: (item: ScheduleEvent | Partial<ScheduleEvent>, type: 'schedule', isNew?: boolean) => void;
 }
 
-const CalendarTab: React.FC<CalendarTabProps> = ({ data, canEdit, onOpenModal }) => {
+const CalendarTab: React.FC<CalendarTabProps> = ({ data, capacitySnapshots = [], canEdit, onOpenModal }) => {
     const { t, language } = useLanguage();
     const [view, setView] = React.useState<'week' | 'month'>('week');
     const [currentDate, setCurrentDate] = React.useState(new Date());
@@ -170,7 +172,22 @@ const CalendarTab: React.FC<CalendarTabProps> = ({ data, canEdit, onOpenModal })
     
     const handleAddNew = (date: Date) => {
         const day = date.toLocaleString('en-us', { weekday: 'long' }) as ScheduleEvent['day'];
-        onOpenModal({ day, time: '12:00', title: '', participants: [], type: 'Meeting' }, 'schedule', true);
+        onOpenModal(
+            {
+                day,
+                time: '12:00',
+                title: '',
+                participants: [],
+                type: 'Meeting',
+                capacity: { requiredHours: 1, allocatedHours: 1, unit: 'hours' },
+                team: { id: '', name: '', members: [], capacityHoursPerDay: 24, timezone: '' },
+                location: { id: '', name: '', type: 'onsite', timezone: '', address: '', room: '' },
+                notes: '',
+                tags: [],
+            },
+            'schedule',
+            true,
+        );
     }
     
     const handleDateSelect = (date: Date) => {
@@ -235,6 +252,29 @@ const CalendarTab: React.FC<CalendarTabProps> = ({ data, canEdit, onOpenModal })
                                             {getTypeIcon(event.type)}
                                             <span>{event.time}</span>
                                         </div>
+                                        <div className="mt-1 flex items-center gap-1.5 text-xs text-[var(--drip-muted)] dark:text-neutral-400">
+                                            <Users size={12} className="text-emerald-500" />
+                                            <span>{event.team?.name || 'Ekip atanmamış'}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5 text-xs text-[var(--drip-muted)] dark:text-neutral-400">
+                                            <MapPin size={12} className="text-slate-400" />
+                                            <span>{event.location?.name || 'Lokasyon bekleniyor'}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5 text-xs text-[var(--drip-muted)] dark:text-neutral-400">
+                                            <BarChart2 size={12} className="text-amber-500" />
+                                            <span>
+                                                {event.capacity?.allocatedHours ?? 0}/{event.team?.capacityHoursPerDay ?? 0} saat
+                                            </span>
+                                        </div>
+                                        {event.tags && event.tags.length > 0 && (
+                                            <div className="mt-2 flex flex-wrap gap-1">
+                                                {event.tags.map(tag => (
+                                                    <span key={tag} className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-200">
+                                                        #{tag}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 ))}
                                 {canEdit && (
@@ -274,7 +314,16 @@ const CalendarTab: React.FC<CalendarTabProps> = ({ data, canEdit, onOpenModal })
                                         <span className={`text-sm ${isToday ? 'bg-[var(--drip-primary)] text-white rounded-full w-6 h-6 flex items-center justify-center font-bold' : 'text-neutral-800 dark:text-neutral-200'}`}>{day.getDate()}</span>
                                         <div className="mt-1 space-y-1 overflow-y-auto max-h-20">
                                             {dayEvents.map(event => (
-                                                <div key={event.id} onClick={() => onOpenModal(event, 'schedule')} className="text-xs text-left px-1 py-0.5 bg-blue-500/20 text-blue-500 dark:text-blue-300 rounded truncate cursor-pointer hover:bg-blue-500/40">{event.title}</div>
+                                                <div
+                                                    key={event.id}
+                                                    onClick={() => onOpenModal(event, 'schedule')}
+                                                    className="rounded bg-blue-500/15 px-1 py-0.5 text-left text-xs text-blue-600 transition hover:bg-blue-500/25 dark:bg-blue-500/10 dark:text-blue-300"
+                                                >
+                                                    <div className="truncate font-medium">{event.title}</div>
+                                                    <div className="truncate text-[10px] text-blue-500/80 dark:text-blue-200/80">
+                                                        {event.time} · {event.team?.name || 'Ekip yok'}
+                                                    </div>
+                                                </div>
                                             ))}
                                         </div>
                                         {canEdit && (
@@ -334,8 +383,12 @@ const CalendarTab: React.FC<CalendarTabProps> = ({ data, canEdit, onOpenModal })
                     )}
                 </div>
             </div>
-            
+
             {view === 'week' ? renderWeekView() : renderMonthView()}
+
+            <div className="mt-8">
+                <ResourceScheduler events={data} capacitySnapshots={capacitySnapshots} />
+            </div>
 
         </div>
     );

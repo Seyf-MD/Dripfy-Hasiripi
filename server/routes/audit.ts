@@ -2,6 +2,18 @@ import express from 'express';
 import { authenticate } from '../auth/middleware.js';
 import { getAuditFilterOptions, searchAuditLogs } from '../services/logService.js';
 
+type SearchAuditLogsOptions = {
+  startDate?: string | null;
+  endDate?: string | null;
+  user?: string | null;
+  action?: string | null;
+  label?: string | null;
+  sourceModule?: string | null;
+  criticality?: string | null;
+  cursor?: string | null;
+  limit?: number;
+};
+
 const router = express.Router();
 
 router.use(authenticate({ requiredRole: 'admin' }));
@@ -20,7 +32,10 @@ router.get('/logs', async (req, res) => {
   } = req.query || {};
 
   try {
-    const result = await searchAuditLogs({
+    const parsedLimit = typeof limit === 'string' ? Number.parseInt(limit, 10) : limit;
+    const numericLimit = typeof parsedLimit === 'number' && Number.isFinite(parsedLimit) ? parsedLimit : undefined;
+
+    const options: SearchAuditLogsOptions = {
       startDate: startDate as string | null,
       endDate: endDate as string | null,
       user: user as string | null,
@@ -29,8 +44,11 @@ router.get('/logs', async (req, res) => {
       sourceModule: sourceModule as string | null,
       criticality: criticality as string | null,
       cursor: cursor as string | null,
-      limit: limit as string | number | null,
-    });
+      limit: numericLimit,
+    };
+    const result = await (searchAuditLogs as unknown as (
+      params: SearchAuditLogsOptions
+    ) => Promise<Awaited<ReturnType<typeof searchAuditLogs>>>)(options);
     const filters = await getAuditFilterOptions();
     res.json({ ok: true, ...result, filters });
   } catch (error) {

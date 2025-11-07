@@ -48,6 +48,41 @@ const DetailModal: React.FC<DetailModalProps> = ({ item, type, canEdit, onClose,
                         <DetailRow label={t('schedule.time')}>{event.time}</DetailRow>
                         <DetailRow label={t('schedule.participants')}>{event.participants.join(', ')}</DetailRow>
                         <DetailRow label={t('schedule.type')}>{event.type}</DetailRow>
+                        <DetailRow label="Kapasite">
+                            <div className="flex flex-col gap-1 text-sm">
+                                <span>
+                                    Planlanan: {event.capacity.requiredHours} {event.capacity.unit === 'hours' ? 'saat' : 'seans'}
+                                </span>
+                                <span>
+                                    Bloke: {event.capacity.allocatedHours} {event.capacity.unit === 'hours' ? 'saat' : 'seans'}
+                                </span>
+                                <span>
+                                    Günlük Ekip Kapasitesi: {event.team.capacityHoursPerDay} saat
+                                </span>
+                            </div>
+                        </DetailRow>
+                        <DetailRow label="Ekip">
+                            <div className="flex flex-col gap-1 text-sm">
+                                <span>{event.team.name}</span>
+                                {event.team.timezone && <span>Zaman Dilimi: {event.team.timezone}</span>}
+                                {event.team.members.length > 0 && (
+                                    <span>Üyeler: {event.team.members.join(', ')}</span>
+                                )}
+                            </div>
+                        </DetailRow>
+                        <DetailRow label="Lokasyon">
+                            <div className="flex flex-col gap-1 text-sm">
+                                <span>{event.location.name}</span>
+                                <span>Tür: {event.location.type}</span>
+                                {event.location.timezone && <span>Saat Dilimi: {event.location.timezone}</span>}
+                                {event.location.address && <span>Adres: {event.location.address}</span>}
+                                {event.location.room && <span>Alan: {event.location.room}</span>}
+                            </div>
+                        </DetailRow>
+                        {event.notes && <DetailRow label="Notlar">{event.notes}</DetailRow>}
+                        {event.tags && event.tags.length > 0 && (
+                            <DetailRow label="Etiketler">{event.tags.join(', ')}</DetailRow>
+                        )}
                     </dl>
                 );
             }

@@ -1,10 +1,9 @@
 import * as React from 'react';
-import { driver, type DriveStep, type Driver } from 'driver.js';
-import 'driver.js/dist/driver.css';
 import './tourStyles.css';
 import { useAuth } from './AuthContext';
 import { getTourDefinition, getAutoStartToursForRole } from '../services/onboardingTour';
 import type { TourId, TourPageId, TourDefinition } from '../services/onboardingTour';
+import { createDriver, type DriveStep, type Driver } from './tourDriver';
 
 interface TourContextValue {
   activeTourId: TourId | null;
@@ -80,19 +79,26 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const runDriver = React.useCallback(
     (definition: TourDefinition) => {
+      const normalisePlacement = (placement?: TourDefinition['steps'][number]['placement']) => {
+        if (placement === 'top' || placement === 'bottom' || placement === 'left' || placement === 'right') {
+          return placement;
+        }
+        return 'bottom';
+      };
+
       const mappedSteps: DriveStep[] = definition.steps.map((step) => ({
         element: step.target,
         popover: {
           title: step.title ?? definition.title,
           description: step.content,
-          side: step.placement ?? 'bottom',
+          side: normalisePlacement(step.placement),
           align: 'start',
           showButtons: ['previous', 'next', 'close'],
           showProgress: true,
         },
       }));
 
-      const instance = driver({
+      const instance = createDriver({
         showProgress: true,
         allowClose: true,
         overlayColor: 'rgba(15, 23, 42, 0.55)',

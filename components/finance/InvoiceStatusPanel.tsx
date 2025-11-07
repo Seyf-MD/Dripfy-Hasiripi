@@ -41,11 +41,13 @@ function formatDate(value?: string | null) {
 }
 
 export const InvoiceStatusPanel: React.FC<InvoiceStatusPanelProps> = ({ invoices, selectedInvoiceId, onSelect }) => {
-  const totalByStatus = React.useMemo(() => invoices.reduce<Record<string, number>>((acc, invoice) => {
-    const key = invoice.approval?.status || 'pending';
-    acc[key] = (acc[key] || 0) + 1;
-    return acc;
-  }, {}), [invoices]);
+  const totalByStatus = React.useMemo(() => {
+    return invoices.reduce((acc: Record<string, number>, invoice) => {
+      const key = invoice.approval?.status || 'pending';
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+  }, [invoices]);
 
   return (
     <div className="bg-white dark:bg-neutral-900/40 rounded-xl border border-slate-200 dark:border-neutral-700">

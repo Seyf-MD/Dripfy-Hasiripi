@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { AlarmClock, Clock, ShieldCheck, UserCheck } from 'lucide-react';
 import { ApprovalFlowSummary, ApprovalStep, ApprovalStepStatus, ApprovalUserSummary, UserRole, isRoleAtLeast } from '../../types';
-import { useLanguage } from '../../i18n/LanguageContext';
+import { useLanguage, TranslateOptions } from '../../i18n/LanguageContext';
 
 interface ApprovalFlowProps {
   flow: ApprovalFlowSummary;
@@ -77,13 +77,14 @@ function StepCard({
   currentTime,
   t,
 }: {
+  key?: React.Key;
   step: ApprovalStep;
   language: string;
   currentUserRole: UserRole | null;
   onDecision: (decision: 'approved' | 'rejected', comment?: string) => void;
   disabled: boolean;
   currentTime: number;
-  t: (key: string) => string;
+  t: (key: string, options?: TranslateOptions) => string;
 }) {
   const [comment, setComment] = React.useState('');
   const [showComment, setShowComment] = React.useState(false);
@@ -116,7 +117,7 @@ function StepCard({
   if (typeof remainingSeconds === 'number' && Number.isFinite(remainingSeconds)) {
     const relative = formatRelativeTime(remainingSeconds, language);
     const key = remainingSeconds >= 0 ? 'approvals.step.sla.remaining' : 'approvals.step.sla.overdue';
-    slaMessage = t(key).replace('{time}', relative);
+    slaMessage = t(key, { time: relative });
   } else if (deadlineText) {
     slaMessage = t('approvals.step.sla.due').replace('{time}', deadlineText);
   } else {

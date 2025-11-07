@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { FinancialRecord, FinanceForecastData, ForecastInsightSeverity, InvoiceDocument, InvoicePreviewReference } from '../../types';
+import { FinancialRecord, FinanceForecastData, ForecastInsightSeverity, ForecastScenario, InvoiceDocument, InvoicePreviewReference } from '../../types';
 import { ArrowUp, ArrowDown, PlusCircle, TrendingUp, TrendingDown, AlertTriangle, Activity, Sparkles } from 'lucide-react';
 import { useLanguage } from '../../i18n/LanguageContext';
 import ForecastChart from '../finance/ForecastChart';
@@ -189,8 +189,9 @@ const FinancialsTab: React.FC<FinancialsTabProps> = ({ data, canEdit, onOpenModa
     }, [forecastData, forecastScenario]);
 
     const comparisonScenarios = React.useMemo(() => {
-        if (!forecastData?.scenarios || !activeScenarioData) return [];
-        return Object.values(forecastData.scenarios).filter(item => item.name !== activeScenarioData.name);
+        const scenarios = forecastData?.scenarios;
+        if (!scenarios || !activeScenarioData) return [];
+        return (Object.values(scenarios) as ForecastScenario[]).filter((item) => item.name !== activeScenarioData.name);
     }, [forecastData, activeScenarioData]);
 
     const anomalies = forecastData?.anomalies ?? [];

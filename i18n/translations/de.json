@@ -7,6 +7,9 @@
         "passwordPlaceholder": "Passwort",
         "signInButton": "Anmelden",
         "forgotPassword": "Passwort vergessen?",
+        "rememberMe": "Angemeldet bleiben",
+        "showPassword": "Passwort anzeigen",
+        "hidePassword": "Passwort verbergen",
         "errors": {
             "invalidCredentials": "E-Mail oder Passwort ist falsch.",
             "generic": "Anmeldung fehlgeschlagen. Bitte versuche es erneut.",
@@ -295,6 +298,7 @@
             "profile": "Profil",
             "settings": "Einstellungen",
             "privacy": "Datenschutz & Sicherheit",
+            "legalEditor": "Rechtstexte bearbeiten",
             "logout": "Abmelden"
         }
     },
@@ -362,5 +366,20 @@
         "lightMode": "Heller Modus",
         "darkMode": "Dunkler Modus",
         "backToDashboard": "Zurück zum Dashboard"
+    },
+    "legalEditor": {
+        "title": "Rechtsinhalts-Editor",
+        "subtitle": "Aktualisieren Sie alle rechtlichen Seiten und Footer-Texte an einem Ort.",
+        "footerSection": "Footer-Inhalt",
+        "footerCompany": "Firmenname",
+        "footerEmail": "Kontakt-E-Mail",
+        "footerPhone": "Telefonnummer",
+        "footerAddress": "Adresse (Zeile für Zeile)",
+        "footerAddressPlaceholder": "Geben Sie jede Adresszeile in eine separate Zeile ein.",
+        "legalSection": "Inhalt der Rechtsseiten",
+        "cancelButton": "Abbrechen",
+        "saveButton": "Änderungen speichern",
+        "saving": "Speichern...",
+        "saveError": "Speichern fehlgeschlagen. Bitte versuchen Sie es erneut."
     }
 }

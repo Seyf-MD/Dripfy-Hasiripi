@@ -17,6 +17,7 @@ import {
   deleteSignupCodeRecord,
   verifySignupCodeAttempt,
 } from './signupCodesStore.js';
+import { readWebsiteCopy, writeWebsiteCopy } from './services/legalCopyService.js';
 
 /**
  * Geliştirme sırasında çalışan mini API:
@@ -48,6 +49,77 @@ app.use('/api/auth', authRouter);
 app.use('/api/admin', adminRouter);
 
 const adminOnlyMiddleware = authenticate({ requiredRole: 'admin' });
+
+const LEGAL_PAGE_KEYS = ['impressum', 'privacy', 'terms'];
+const LEGAL_LANGUAGE_CODES = ['tr', 'en', 'de', 'ru', 'ar'];
+
+app.get('/api/legal-copy', async (_req, res) => {
+  try {
+    const copy = await readWebsiteCopy();
+    return res.json({ ok: true, data: copy });
+  } catch (error) {
+    console.error('[legal-copy] Failed to read legal content:', error);
+    return res.status(500).json({ ok: false, error: 'Failed to load legal content.' });
+  }
+});
+
+app.post('/api/legal-copy', adminOnlyMiddleware, async (req, res) => {
+  try {
+    const currentCopy = await readWebsiteCopy();
+    const updates = req.body ?? {};
+
+    const mergedLegal = {};
+    for (const page of LEGAL_PAGE_KEYS) {
+      mergedLegal[page] = {
+        ...((currentCopy.legalContent ?? {})[page] || {}),
+      };
+    }
+
+    if (updates.legalContent && typeof updates.legalContent === 'object') {
+      for (const page of LEGAL_PAGE_KEYS) {
+        const pageUpdates = updates.legalContent[page];
+        if (!pageUpdates || typeof pageUpdates !== 'object') continue;
+        for (const [lang, value] of Object.entries(pageUpdates)) {
+          if (!LEGAL_LANGUAGE_CODES.includes(lang)) continue;
+          if (typeof value !== 'string') continue;
+          mergedLegal[page][lang] = value;
+        }
+      }
+    }
+
+    const mergedFooter = {
+      ...((currentCopy.footer) || {}),
+    };
+    if (updates.footer && typeof updates.footer === 'object') {
+      if (typeof updates.footer.companyName === 'string') {
+        mergedFooter.companyName = updates.footer.companyName;
+      }
+      if (Array.isArray(updates.footer.addressLines)) {
+        mergedFooter.addressLines = updates.footer.addressLines
+          .filter(line => typeof line === 'string')
+          .map(line => line.trim())
+          .filter(Boolean);
+      }
+      if (typeof updates.footer.email === 'string') {
+        mergedFooter.email = updates.footer.email;
+      }
+      if (typeof updates.footer.phone === 'string') {
+        mergedFooter.phone = updates.footer.phone;
+      }
+    }
+
+    const newCopy = {
+      legalContent: mergedLegal,
+      footer: mergedFooter,
+    };
+
+    await writeWebsiteCopy(newCopy);
+    return res.json({ ok: true, data: newCopy });
+  } catch (error) {
+    console.error('[legal-copy] Failed to save legal content:', error);
+    return res.status(500).json({ ok: false, error: 'Failed to save legal content.' });
+  }
+});
 
 const SIGNUP_RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const SIGNUP_RATE_LIMIT_MAX = Math.max(
@@ -240,7 +312,7 @@ function buildEmailTemplate(title, intro, contentHtml, footerNote = '') {
               <td style="padding:20px 32px;background-color:#f3f9f3;border-top:1px solid #c8d9b9;">
                 <p style="margin:0;font-size:12px;line-height:18px;color:rgba(47,74,59,0.7);">
                   © ${year} Dripfy MIS. Tüm hakları saklıdır.<br>
-                  Bu mesajı <a href="mailto:dripfy@hasiripi.com" style="color:#4ba586;text-decoration:none;">dripfy@hasiripi.com</a> üzerinden yanıtlayabilirsiniz.
+                  Bu mesajı <a href="mailto:info@dripfy.de" style="color:#4ba586;text-decoration:none;">info@dripfy.de</a> üzerinden yanıtlayabilirsiniz.
                 </p>
               </td>
             </tr>
@@ -314,7 +386,7 @@ app.post('/api/signup/send-code', signupRateLimiter, async (req, res) => {
     `${buildCodeBlock(code)}
       <p style="margin:0 0 18px;font-size:14px;line-height:22px;color:#2f4a3b;">Kod ${ttlMinutes} dakika boyunca geçerlidir. Talep size ait değilse lütfen bu mesajı görmezden gelin.</p>
       <a href="https://hasiripi.com" style="display:inline-block;padding:14px 28px;border-radius:16px;background:linear-gradient(135deg,#4ba586,#84a084);color:#0b1612;font-weight:600;text-decoration:none;font-size:14px;">Paneli Aç</a>`,
-    'Sorularınız için <a href="mailto:dripfy@hasiripi.com" style="color:#84a084;text-decoration:none;">dripfy@hasiripi.com</a> adresinden bize ulaşabilirsiniz.'
+    'Sorularınız için <a href="mailto:info@dripfy.de" style="color:#84a084;text-decoration:none;">info@dripfy.de</a> adresinden bize ulaşabilirsiniz.'
   );
 
   try {

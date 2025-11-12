@@ -48,7 +48,7 @@ if ($mode === 'send-code' || !isset($input['code'])) {
         buildCodeBlock($code) .
             '<p style="margin:0 0 18px;font-size:14px;line-height:22px;color:#2f4a3b;">Kod ' . $ttlMinutes . ' dakika boyunca geçerlidir. Talep size ait değilse lütfen bu mesajı görmezden gelin.</p>' .
             '<a href="https://hasiripi.com" style="display:inline-block;padding:14px 28px;border-radius:16px;background:linear-gradient(135deg,#4ba586,#84a084);color:#0b1612;font-weight:600;text-decoration:none;font-size:14px;">Paneli Aç</a>',
-        'Sorularınız için <a href="mailto:dripfy@hasiripi.com" style="color:#84a084;text-decoration:none;">dripfy@hasiripi.com</a> adresinden bize ulaşabilirsiniz.'
+        'Sorularınız için <a href="mailto:info@dripfy.de" style="color:#84a084;text-decoration:none;">info@dripfy.de</a> adresinden bize ulaşabilirsiniz.'
     );
 
     $userText = "Merhaba {$displayName},\n\nDripfy Yönetim Paneli doğrulama kodunuz: {$code}\nKod {$ttlMinutes} dakika boyunca geçerlidir. Talep size ait değilse bu mesajı yok sayabilirsiniz.\n\nDripfy Ekibi";
@@ -140,7 +140,7 @@ $userHtml = buildEmailTemplate(
     'Saygılarımızla, Dripfy Ekibi'
 );
 
-$adminSent = sendSignupEmail('dripfy@hasiripi.com', '[Dripfy] Yeni kayıt talebi - ' . ($payload['name'] ?? ''), $adminBody, $adminHtml);
+$adminSent = sendSignupEmail('info@dripfy.de', '[Dripfy] Yeni kayıt talebi - ' . ($payload['name'] ?? ''), $adminBody, $adminHtml);
 $userSent = sendSignupEmail($payload['email'] ?? $email, 'Dripfy Yönetim Paneli | Talebiniz Alındı', $userBody, $userHtml);
 
 unset($store[$storeKey]);

@@ -5,10 +5,13 @@ import BrandLogo from './BrandLogo';
 import { LegalPageKey } from '../data/legalContent';
 import { SignupFinalizePayload } from '../services/signupService';
 import { useTheme } from '../context/ThemeContext';
-import { Sun, Moon, AlertCircle } from 'lucide-react';
+import { Sun, Moon, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import SignupForm from './SignupForm';
 import ForgotPasswordDialog from './ForgotPasswordDialog';
+
+const REMEMBER_EMAIL_STORAGE_KEY = 'dripfy_remember_email';
+const REMEMBER_PASSWORD_STORAGE_KEY = 'dripfy_remember_password';
 
 interface LoginPageProps {
     onSignupRequest: (payload: { email: string; code: string }) => Promise<SignupFinalizePayload>;
@@ -39,6 +42,35 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSignupRequest, onOpenLegal }) =
     const loginErrorHintRaw = t(loginErrorHintKey);
     const loginErrorHint = loginErrorHintRaw !== loginErrorHintKey ? loginErrorHintRaw : '';
     const [isForgotPasswordOpen, setIsForgotPasswordOpen] = React.useState(false);
+    const [showPassword, setShowPassword] = React.useState(false);
+    const [rememberMe, setRememberMe] = React.useState(false);
+    const [autoLoginAttempted, setAutoLoginAttempted] = React.useState(false);
+    const [isAutoLoggingIn, setIsAutoLoggingIn] = React.useState(false);
+
+    // Populate saved email/password when available
+    React.useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const storedEmail = window.localStorage.getItem(REMEMBER_EMAIL_STORAGE_KEY);
+        const storedPassword = window.localStorage.getItem(REMEMBER_PASSWORD_STORAGE_KEY);
+        if (storedEmail) {
+            setLoginEmail(storedEmail);
+            setRememberMe(true);
+        }
+        if (storedEmail && storedPassword) {
+            setAutoLoginAttempted(true);
+            const decodedPassword = atob(storedPassword);
+            (async () => {
+                setIsAutoLoggingIn(true);
+                try {
+                    await login(storedEmail, decodedPassword);
+                } catch (error) {
+                    setLoginErrorKey('login.errors.invalidCredentials');
+                } finally {
+                    setIsAutoLoggingIn(false);
+                }
+            })();
+        }
+    }, [login]);
 
     const dismissNotification = React.useCallback(() => setNotification(null), []);
 
@@ -47,7 +79,17 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSignupRequest, onOpenLegal }) =
         setLoginErrorKey(null);
         setIsLoggingIn(true);
         try {
-            await login(loginEmail.trim(), loginPassword);
+            const trimmedEmail = loginEmail.trim();
+            await login(trimmedEmail, loginPassword);
+            if (typeof window !== 'undefined') {
+                if (rememberMe) {
+                    window.localStorage.setItem(REMEMBER_EMAIL_STORAGE_KEY, trimmedEmail);
+                    window.localStorage.setItem(REMEMBER_PASSWORD_STORAGE_KEY, btoa(loginPassword));
+                } else {
+                    window.localStorage.removeItem(REMEMBER_EMAIL_STORAGE_KEY);
+                    window.localStorage.removeItem(REMEMBER_PASSWORD_STORAGE_KEY);
+                }
+            }
         } catch (error) {
             console.error('Login failed:', error);
             const enrichedError = error as Error & { code?: string };
@@ -88,12 +130,38 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSignupRequest, onOpenLegal }) =
                         </div>
                     )}
                     <form className="mt-8 space-y-6" onSubmit={handleLoginSubmit}>
-                        <div className="rounded-md shadow-sm -space-y-px">
+                        <div className="rounded-md shadow-sm">
                             <div>
-                                <input id="email-address" name="email" type="email" required className={`${inputClass} rounded-t-md`} placeholder={t('login.emailPlaceholder')} value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} />
+                                <input
+                                    id="email-address"
+                                    name="email"
+                                    type="email"
+                                    required
+                                    className={`${inputClass} rounded-t-md`}
+                                    placeholder={t('login.emailPlaceholder')}
+                                    value={loginEmail}
+                                    onChange={(e) => setLoginEmail(e.target.value)}
+                                />
                             </div>
-                            <div>
-                                <input id="password" name="password" type="password" required className={`${inputClass} rounded-b-md`} placeholder={t('login.passwordPlaceholder')} value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} />
+                            <div className="relative">
+                                <input
+                                    id="password"
+                                    name="password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    required
+                                    className={`${inputClass} rounded-b-md pr-20`}
+                                    placeholder={t('login.passwordPlaceholder')}
+                                    value={loginPassword}
+                                    onChange={(e) => setLoginPassword(e.target.value)}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword((prev) => !prev)}
+                                    className="absolute inset-y-0 right-2 flex items-center px-2 text-[var(--drip-primary)] hover:text-[var(--drip-primary-dark)] focus:outline-none z-20"
+                                    aria-label={showPassword ? t('login.hidePassword') : t('login.showPassword')}
+                                >
+                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
                             </div>
                         </div>
                         {loginErrorKey && (
@@ -111,7 +179,16 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSignupRequest, onOpenLegal }) =
                                 </div>
                             </div>
                         )}
-                        <div className="flex justify-end text-xs">
+                        <div className="flex items-center justify-between text-sm">
+                            <label className="flex items-center gap-2 text-[var(--drip-muted)] dark:text-neutral-400">
+                                <input
+                                    type="checkbox"
+                                    checked={rememberMe}
+                                    onChange={(event) => setRememberMe(event.target.checked)}
+                                    className="h-4 w-4 rounded border border-neutral-300 dark:border-neutral-600 text-[var(--drip-primary)] focus:ring-[var(--drip-primary)]"
+                                />
+                                {t('login.rememberMe')}
+                            </label>
                             <button
                                 type="button"
                                 onClick={() => setIsForgotPasswordOpen(true)}

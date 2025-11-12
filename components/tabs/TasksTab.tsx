@@ -59,10 +59,25 @@ const TaskColumn: React.FC<{
     const [isDragOver, setIsDragOver] = React.useState(false);
     
     const statusInfo = {
-        'To Do': { icon: <Clock size={16} />, color: 'text-blue-500 dark:text-blue-400', label: t('status.todo') },
-        'In Progress': { icon: <Loader size={16} />, color: 'text-yellow-500 dark:text-yellow-400', label: t('status.inprogress') },
-        'Done': { icon: <CheckCircle size={16} />, color: 'text-green-500 dark:text-green-400', label: t('status.done') },
-    }
+        'To Do': {
+            icon: <Clock size={16} />,
+            textClass: 'text-[#4ba586] dark:text-[color:rgba(141,209,183,1)]',
+            bgClass: 'bg-[color:rgba(75,165,134,0.15)] dark:bg-[color:rgba(141,209,183,0.2)]',
+            label: t('status.todo'),
+        },
+        'In Progress': {
+            icon: <Loader size={16} />,
+            textClass: 'text-[#f1c40f] dark:text-[color:rgba(255,232,127,1)]',
+            bgClass: 'bg-[color:rgba(241,196,15,0.15)] dark:bg-[color:rgba(255,232,127,0.2)]',
+            label: t('status.inprogress'),
+        },
+        Done: {
+            icon: <CheckCircle size={16} />,
+            textClass: 'text-[#47c25d] dark:text-[color:rgba(117,226,151,1)]',
+            bgClass: 'bg-[color:rgba(71,194,93,0.15)] dark:bg-[color:rgba(117,226,151,0.2)]',
+            label: t('status.done'),
+        },
+    };
 
     const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
@@ -90,8 +105,8 @@ const TaskColumn: React.FC<{
             onDrop={handleDrop}
             className={`flex-1 min-w-[300px] bg-slate-100 dark:bg-neutral-900/50 rounded-lg p-3 transition-colors ${isDragOver ? 'bg-slate-200 dark:bg-neutral-700/50' : ''}`}
         >
-            <div className={`flex items-center justify-between mb-4 px-2 py-1 rounded ${statusInfo[status].color.replace('text-', 'bg-')}/10`}>
-                <div className={`flex items-center gap-2 font-semibold text-sm ${statusInfo[status].color}`}>
+            <div className={`flex items-center justify-between mb-4 px-2 py-1 rounded ${statusInfo[status].bgClass}`}>
+                <div className={`flex items-center gap-2 font-semibold text-sm ${statusInfo[status].textClass}`}>
                     {statusInfo[status].icon}
                     <span>{statusInfo[status].label}</span>
                 </div>

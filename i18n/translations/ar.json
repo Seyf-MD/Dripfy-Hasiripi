@@ -7,6 +7,9 @@
         "passwordPlaceholder": "كلمة المرور",
         "signInButton": "تسجيل الدخول",
         "forgotPassword": "هل نسيت كلمة المرور؟",
+        "rememberMe": "تذكرني",
+        "showPassword": "إظهار كلمة المرور",
+        "hidePassword": "إخفاء كلمة المرور",
         "errors": {
             "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
             "generic": "تعذّر إتمام تسجيل الدخول. يرجى المحاولة مرة أخرى.",
@@ -295,6 +298,7 @@
             "profile": "الملف الشخصي",
             "settings": "الإعدادات",
             "privacy": "الخصوصية والأمان",
+            "legalEditor": "تحرير المحتوى القانوني",
             "logout": "تسجيل الخروج"
         }
     },
@@ -362,5 +366,20 @@
         "lightMode": "وضع الإضاءة",
         "darkMode": "الوضع الداكن",
         "backToDashboard": "العودة إلى لوحة التحكم"
+    },
+    "legalEditor": {
+        "title": "محرر المحتوى القانوني",
+        "subtitle": "حدّث كل صفحات الشروط والخصوصية ومحتوى الفوتر من مكان واحد.",
+        "footerSection": "محتوى الفوتر",
+        "footerCompany": "اسم الشركة",
+        "footerEmail": "البريد الإلكتروني للتواصل",
+        "footerPhone": "رقم الهاتف",
+        "footerAddress": "العنوان (كل سطر على حدة)",
+        "footerAddressPlaceholder": "أضف كل سطر من العنوان في سطر منفصل.",
+        "legalSection": "محتوى الصفحات القانونية",
+        "cancelButton": "إلغاء",
+        "saveButton": "حفظ التغييرات",
+        "saving": "جاري الحفظ...",
+        "saveError": "تعذّر حفظ المحتوى، يرجى المحاولة مرة أخرى."
     }
 }

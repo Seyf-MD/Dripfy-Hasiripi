@@ -7,6 +7,9 @@
         "passwordPlaceholder": "Password",
         "signInButton": "Sign In",
         "forgotPassword": "Forgot password?",
+        "rememberMe": "Remember me",
+        "showPassword": "Show password",
+        "hidePassword": "Hide password",
         "errors": {
             "invalidCredentials": "Email or password is incorrect.",
             "generic": "We couldn't sign you in. Please try again.",
@@ -59,7 +62,19 @@
             "email": "Enter a valid email address.",
             "phone": "Enter a valid phone number.",
             "countryCode": "Select a country code.",
-            "position": "Select a position."
+            "position": "Select a position.",
+            "badRequest": "We couldn't process your information. Please review the form and try again.",
+            "unauthorized": "You need to sign in before continuing.",
+            "forbidden": "You don't have permission to complete this action.",
+            "notFound": "We couldn't find a signup request matching your details.",
+            "conflict": "An account with this email already exists.",
+            "validation": "Some details look incorrect. Please review the form and try again.",
+            "rateLimited": "Too many attempts. Please wait a moment and try again.",
+            "server": "Our servers are having trouble. Please try again later.",
+            "generic": "We couldn't complete your signup right now. Please try again.",
+            "network": "We couldn't reach the server. Check your connection and try again.",
+            "sessionRequired": "Your admin session has expired. Please sign in again.",
+            "unexpectedResponse": "We received an unexpected response from the server."
         },
         "notification": {
             "codeSentTitle": "Verification code sent",
@@ -250,9 +265,10 @@
     "actions": {
         "edit": "Edit",
         "delete": "Delete",
+        "close": "Close",
         "save": "Save",
         "cancel": "Cancel",
-        "close": "Close"
+        "retry": "Retry"
     },
     "chatbot": {
         "toggle": "Toggle Chatbot",
@@ -282,6 +298,7 @@
             "profile": "Profile",
             "settings": "Settings",
             "privacy": "Privacy & Security",
+            "legalEditor": "Edit legal copy",
             "logout": "Logout"
         }
     },
@@ -349,5 +366,20 @@
         "lightMode": "Light mode",
         "darkMode": "Dark mode",
         "backToDashboard": "Back to dashboard"
+    },
+    "legalEditor": {
+        "title": "Legal Content Editor",
+        "subtitle": "Update every legal page and footer copy in one place.",
+        "footerSection": "Footer content",
+        "footerCompany": "Company name",
+        "footerEmail": "Contact email",
+        "footerPhone": "Phone number",
+        "footerAddress": "Address (line by line)",
+        "footerAddressPlaceholder": "Add each line of the address on its own line.",
+        "legalSection": "Legal page content",
+        "cancelButton": "Cancel",
+        "saveButton": "Save changes",
+        "saving": "Saving...",
+        "saveError": "Unable to save the updated content, please try again."
     }
 }

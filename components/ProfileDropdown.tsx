@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { User, Settings, LogOut, Shield, UserCircle } from 'lucide-react';
+import { User, Settings, LogOut, Shield, UserCircle, FileText } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
 
 type SettingsTab = 'profile' | 'settings' | 'privacy';
@@ -9,9 +9,11 @@ interface ProfileDropdownProps {
     userEmail: string;
     onLogout: () => void;
     onOpenSettings: (tab: SettingsTab) => void;
+    isAdmin?: boolean;
+    onOpenLegalEditor?: () => void;
 }
 
-const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ userName, userEmail, onLogout, onOpenSettings }) => {
+const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ userName, userEmail, onLogout, onOpenSettings, isAdmin, onOpenLegalEditor }) => {
     const { t } = useLanguage();
     const [isOpen, setIsOpen] = React.useState(false);
     const dropdownRef = React.useRef<HTMLDivElement>(null);
@@ -41,7 +43,7 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ userName, userEmail, 
             </button>
 
             {isOpen && (
-                <div className="absolute top-full right-0 mt-2 w-64 bg-white dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 rounded-lg shadow-lg z-50 animate-fade-in-up origin-top-right">
+        <div className="absolute top-full right-0 mt-2 w-64 bg-white dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 rounded-lg shadow-lg z-50 animate-fade-in-up origin-top-right">
                     <div className="p-4 border-b border-slate-200 dark:border-neutral-700">
                         <p className="font-semibold text-[var(--drip-text)] dark:text-white truncate">{userName}</p>
                         <p className="text-sm text-[var(--drip-muted)] dark:text-neutral-400 truncate">{userEmail}</p>
@@ -65,7 +67,7 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ userName, userEmail, 
                                 <span>{t('profile.menu.settings')}</span>
                             </button>
                         </li>
-                         <li>
+                        <li>
                             <button
                                 onClick={() => handleMenuClick('privacy')}
                                 className="w-full text-left flex items-center gap-3 px-4 py-2 text-sm text-neutral-700 dark:text-neutral-200 hover:bg-slate-100 dark:hover:bg-neutral-700 transition-colors"
@@ -74,6 +76,17 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ userName, userEmail, 
                                 <span>{t('profile.menu.privacy')}</span>
                             </button>
                         </li>
+                        {isAdmin && onOpenLegalEditor && (
+                            <li>
+                                <button
+                                    onClick={() => { onOpenLegalEditor(); setIsOpen(false); }}
+                                    className="w-full text-left flex items-center gap-3 px-4 py-2 text-sm text-neutral-700 dark:text-neutral-200 hover:bg-slate-100 dark:hover:bg-neutral-700 transition-colors"
+                                >
+                                    <FileText size={16} />
+                                    <span>{t('profile.menu.legalEditor')}</span>
+                                </button>
+                            </li>
+                        )}
                         <li>
                             <button
                                 onClick={() => { onLogout(); setIsOpen(false); }}

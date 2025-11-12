@@ -79,7 +79,7 @@ Geliştirme süresince Express API `http://localhost:4000` üzerinden çalışı
 | `GEMINI_API_KEY` | Chatbot için Google Gemini anahtarı | ✓ | ✓ |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` | Doğrulama e-postaları için SMTP bilgileri | ✓ | ✓ |
 | `SMTP_SECURE` | `true` (TLS/SSL) veya `false` | ✓ | ✓ |
-| `MAIL_FROM` | Gönderici adı/mail, ör: `Dripfy <dripfy@hasiripi.com>` | ✓ | ✓ |
+| `MAIL_FROM` | Gönderici adı/mail, ör: `Dripfy <info@dripfy.de>` | ✓ | ✓ |
 | `SIGNUP_NOTIFY_TO` | Admin bildirimi alacak adres | ✓ | ✓ |
 | `SEND_WELCOME_EMAIL` | Kullanıcıya hoş geldin maili gönderilsin mi? (`true/false`) | ✓ | ✓ |
 | `API_PORT` | Express dev sunucusunun portu (varsayılan `4000`) | ✓ | – |
@@ -138,7 +138,7 @@ cp .env.example .env.development
 
 0. **Admin giriş yapar** → `/api/auth/login` endpoint’i JWT üretir ve HttpOnly çerez/Authorization başlığı ile oturumu doğrular.
 1. **Kullanıcı kayıt formunu doldurur** → `Dripfy doğrulama kodunuz` başlıklı e-posta gelir.
-2. **Kod doğrulanır** → Admin adresine (ör. `dripfy@hasiripi.com`) talep özeti, kullanıcıya “kaydınız alındı” e-postası gönderilir.
+2. **Kod doğrulanır** → Admin adresine (ör. `info@dripfy.de`) talep özeti, kullanıcıya “kaydınız alındı” e-postası gönderilir.
 3. **Admin panelinde “Kayıt Talepleri” sekmesi** → tüm bekleyen talepler listelenir.
 4. Onay → kullanıcı + izin + kişi kaydı oluşturulur ve talep listeden kaldırılır.  
    Red → talep silinir, audit log’a “Denied” kaydı eklenir.
@@ -188,4 +188,4 @@ Python scriptleri:
 
 ---
 
-Bu dokümantasyon, projenin bütünsel resmini yeni katılan bir geliştiriciye aktarmak ve eski metinlerden kalan kafa karışıklığını gidermek amacıyla hazırlanmıştır. Sorular için `dripfy@hasiripi.com` yönetici hesabını kullanabilirsiniz.
+Bu dokümantasyon, projenin bütünsel resmini yeni katılan bir geliştiriciye aktarmak ve eski metinlerden kalan kafa karışıklığını gidermek amacıyla hazırlanmıştır. Sorular için `info@dripfy.de` yönetici hesabını kullanabilirsiniz.

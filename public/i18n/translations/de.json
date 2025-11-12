@@ -7,6 +7,9 @@
         "passwordPlaceholder": "Passwort",
         "signInButton": "Anmelden",
         "forgotPassword": "Passwort vergessen?",
+        "rememberMe": "Angemeldet bleiben",
+        "showPassword": "Passwort anzeigen",
+        "hidePassword": "Passwort verbergen",
         "errors": {
             "invalidCredentials": "E-Mail oder Passwort ist falsch.",
             "generic": "Anmeldung fehlgeschlagen. Bitte versuche es erneut.",
@@ -59,7 +62,19 @@
             "email": "Bitte eine gültige E-Mail-Adresse eingeben.",
             "phone": "Bitte eine gültige Telefonnummer eingeben.",
             "countryCode": "Bitte eine Ländervorwahl auswählen.",
-            "position": "Bitte eine Position auswählen."
+            "position": "Bitte eine Position auswählen.",
+            "badRequest": "Wir konnten deine Angaben nicht verarbeiten. Bitte überprüfe das Formular und versuche es erneut.",
+            "unauthorized": "Du musst dich anmelden, bevor du fortfahren kannst.",
+            "forbidden": "Du hast keine Berechtigung, diese Aktion durchzuführen.",
+            "notFound": "Wir konnten keine passende Registrierungsanfrage finden.",
+            "conflict": "Für diese E-Mail-Adresse besteht bereits ein Konto.",
+            "validation": "Einige Angaben scheinen nicht korrekt zu sein. Bitte überprüfe das Formular und versuche es erneut.",
+            "rateLimited": "Zu viele Versuche. Bitte warte einen Moment und versuche es erneut.",
+            "server": "Unsere Server haben gerade Probleme. Bitte versuche es später noch einmal.",
+            "generic": "Wir konnten deine Registrierung gerade nicht abschließen. Bitte versuche es erneut.",
+            "network": "Verbindung zum Server fehlgeschlagen. Bitte überprüfe deine Verbindung und versuche es erneut.",
+            "sessionRequired": "Deine Admin-Sitzung ist abgelaufen. Bitte melde dich erneut an.",
+            "unexpectedResponse": "Wir haben eine unerwartete Serverantwort erhalten."
         },
         "notification": {
             "codeSentTitle": "Bestätigungscode gesendet",
@@ -250,9 +265,10 @@
     "actions": {
         "edit": "Bearbeiten",
         "delete": "Löschen",
+        "close": "Schließen",
         "save": "Speichern",
         "cancel": "Abbrechen",
-        "close": "Schließen"
+        "retry": "Erneut versuchen"
     },
     "chatbot": {
         "toggle": "Chatbot umschalten",
@@ -282,6 +298,7 @@
             "profile": "Profil",
             "settings": "Einstellungen",
             "privacy": "Datenschutz & Sicherheit",
+            "legalEditor": "Rechtstexte bearbeiten",
             "logout": "Abmelden"
         }
     },
@@ -349,5 +366,20 @@
         "lightMode": "Heller Modus",
         "darkMode": "Dunkler Modus",
         "backToDashboard": "Zurück zum Dashboard"
+    },
+    "legalEditor": {
+        "title": "Rechtsinhalts-Editor",
+        "subtitle": "Aktualisieren Sie alle rechtlichen Seiten und Footer-Texte an einem Ort.",
+        "footerSection": "Footer-Inhalt",
+        "footerCompany": "Firmenname",
+        "footerEmail": "Kontakt-E-Mail",
+        "footerPhone": "Telefonnummer",
+        "footerAddress": "Adresse (Zeile für Zeile)",
+        "footerAddressPlaceholder": "Geben Sie jede Adresszeile in eine separate Zeile ein.",
+        "legalSection": "Inhalt der Rechtsseiten",
+        "cancelButton": "Abbrechen",
+        "saveButton": "Änderungen speichern",
+        "saving": "Speichern...",
+        "saveError": "Speichern fehlgeschlagen. Bitte versuchen Sie es erneut."
     }
 }

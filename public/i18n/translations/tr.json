@@ -7,6 +7,9 @@
         "passwordPlaceholder": "Şifre",
         "signInButton": "Giriş Yap",
         "forgotPassword": "Şifremi unuttum",
+        "rememberMe": "Beni hatırla",
+        "showPassword": "Şifreyi göster",
+        "hidePassword": "Şifreyi gizle",
         "errors": {
             "invalidCredentials": "E-posta veya parola hatalı.",
             "generic": "Giriş işlemi tamamlanamadı. Lütfen tekrar deneyin.",
@@ -59,7 +62,19 @@
             "email": "Geçerli bir e-posta adresi girin.",
             "phone": "Geçerli bir telefon numarası girin.",
             "countryCode": "Lütfen ülke kodu seçin.",
-            "position": "Lütfen pozisyon seçin."
+            "position": "Lütfen pozisyon seçin.",
+            "badRequest": "Bilgilerinizi işleyemedik. Lütfen formu gözden geçirip tekrar deneyin.",
+            "unauthorized": "Devam etmeden önce oturum açmanız gerekiyor.",
+            "forbidden": "Bu işlemi gerçekleştirme izniniz yok.",
+            "notFound": "Bilgilerinize uygun bir kayıt talebi bulunamadı.",
+            "conflict": "Bu e-posta ile kayıtlı bir hesap zaten var.",
+            "validation": "Bazı bilgiler hatalı görünüyor. Lütfen formu kontrol edip tekrar deneyin.",
+            "rateLimited": "Çok fazla deneme yaptınız. Lütfen biraz bekleyip tekrar deneyin.",
+            "server": "Sunucularımızda bir sorun var. Lütfen daha sonra tekrar deneyin.",
+            "generic": "Kaydınızı şu anda tamamlayamadık. Lütfen tekrar deneyin.",
+            "network": "Sunucuya ulaşılamadı. Bağlantınızı kontrol edip tekrar deneyin.",
+            "sessionRequired": "Yönetici oturumunuzun süresi doldu. Lütfen yeniden giriş yapın.",
+            "unexpectedResponse": "Sunucudan beklenmeyen bir yanıt alındı."
         },
         "notification": {
             "codeSentTitle": "Doğrulama kodu gönderildi",
@@ -250,9 +265,10 @@
     "actions": {
         "edit": "Düzenle",
         "delete": "Sil",
+        "close": "Kapat",
         "save": "Kaydet",
         "cancel": "İptal",
-        "close": "Kapat"
+        "retry": "Tekrar dene"
     },
     "chatbot": {
         "toggle": "Chatbot'u Aç/Kapat",
@@ -282,6 +298,7 @@
             "profile": "Profil",
             "settings": "Ayarlar",
             "privacy": "Gizlilik ve Güvenlik",
+            "legalEditor": "Yasal içeriği düzenle",
             "logout": "Çıkış Yap"
         }
     },
@@ -349,5 +366,20 @@
         "lightMode": "Aydınlık mod",
         "darkMode": "Karanlık mod",
         "backToDashboard": "Kontrol paneline dön"
+    },
+    "legalEditor": {
+        "title": "Yasal İçerik Düzenleyici",
+        "subtitle": "Tüm yasal sayfa ve footer metinlerini buradan güncelleyin.",
+        "footerSection": "Footer içeriği",
+        "footerCompany": "Şirket adı",
+        "footerEmail": "İletişim e-postası",
+        "footerPhone": "Telefon numarası",
+        "footerAddress": "Adres (satır satır)",
+        "footerAddressPlaceholder": "Her adres satırını ayrı satıra yazın.",
+        "legalSection": "Yasal sayfa içeriği",
+        "cancelButton": "İptal",
+        "saveButton": "Değişiklikleri kaydet",
+        "saving": "Kaydediliyor...",
+        "saveError": "İçerik kaydedilirken hata oluştu, lütfen tekrar deneyin."
     }
 }

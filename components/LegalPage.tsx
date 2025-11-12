@@ -4,6 +4,7 @@ import BrandLogo from './BrandLogo';
 import { legalContent, LEGAL_DEFAULT_LANGUAGE, LegalPageKey } from '../data/legalContent';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../i18n/LanguageContext';
+import { useWebsiteCopy } from '../context/WebsiteCopyContext';
 
 interface LegalPageProps {
     page: LegalPageKey;
@@ -14,7 +15,13 @@ const LegalPage: React.FC<LegalPageProps> = ({ page, onClose }) => {
     const { theme, setTheme } = useTheme();
     const { language, t } = useLanguage();
     const direction = language === 'ar' ? 'rtl' : 'ltr';
-    const content = legalContent[page][language] ?? legalContent[page][LEGAL_DEFAULT_LANGUAGE];
+    const { copy } = useWebsiteCopy();
+    const pageContent = copy.legalContent?.[page] ?? {};
+    const content =
+        pageContent[language] ??
+        pageContent[LEGAL_DEFAULT_LANGUAGE] ??
+        legalContent[page][language] ??
+        legalContent[page][LEGAL_DEFAULT_LANGUAGE];
 
     const handleToggleTheme = () => {
         setTheme(theme === 'dark' ? 'light' : 'dark');

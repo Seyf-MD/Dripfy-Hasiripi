@@ -16,6 +16,8 @@ import EditModal from './components/EditModal';
 import SettingsModal from './components/SettingsModal';
 import PasswordChangeModal from './components/PasswordChangeModal';
 import LegalPage from './components/LegalPage';
+import LegalEditorModal from './components/LegalEditorModal';
+import { WebsiteCopyProvider } from './context/WebsiteCopyContext';
 import { LegalPageKey } from './data/legalContent';
 
 import { mockData } from './data/mockData';
@@ -36,6 +38,7 @@ function App() {
   const [activeTab, setActiveTab] = React.useState<string>('Calendar');
   const [adminPanelSubTab, setAdminPanelSubTab] = React.useState<AdminSubTab>('permissions');
   const [activeLegalPage, setActiveLegalPage] = React.useState<LegalPageKey | null>(null);
+  const [legalEditorOpen, setLegalEditorOpen] = React.useState(false);
   
   // App-wide settings
   const [notificationSettings, setNotificationSettings] = React.useState<NotificationSettings>({
@@ -136,6 +139,14 @@ function App() {
     setSettingsActiveTab(tab);
     setSettingsModalOpen(true);
   }
+  
+  const handleOpenLegalEditor = React.useCallback(() => {
+    setLegalEditorOpen(true);
+  }, []);
+
+  const handleCloseLegalEditor = React.useCallback(() => {
+    setLegalEditorOpen(false);
+  }, []);
   
   const handleSaveSettings = (newNotifications: NotificationSettings) => {
       setNotificationSettings(newNotifications);
@@ -418,20 +429,6 @@ function App() {
     }
   }, [isAdmin, activeTab]);
 
-  if (!isAuthenticated) {
-    return (
-      <>
-        <LoginPage
-          onSignupRequest={handleSignupRequest}
-          onOpenLegal={handleOpenLegalPage}
-        />
-        {activeLegalPage && (
-          <LegalPage page={activeLegalPage} onClose={handleCloseLegalPage} />
-        )}
-      </>
-    );
-  }
-
   const baseContainerClass = `min-h-screen min-h-[100svh] min-h-[100dvh] font-sans w-full ${
     theme === 'light'
       ? 'bg-[var(--drip-surface)] text-[var(--drip-text)]'
@@ -439,77 +436,93 @@ function App() {
   }`;
 
   return (
-    <div className={baseContainerClass}>
-      <div className="isolate w-full">
-        <Header
-          onLogout={handleLogout}
-          onOpenSettings={handleOpenSettings}
-        />
-        
-        <main className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
-          <StatCards schedule={dashboardData.schedule} contacts={dashboardData.contacts} tasks={dashboardData.tasks} financials={dashboardData.financials} setActiveTab={setActiveTab} onPendingPaymentsClick={() => { setActiveTab('Financials'); setFinancialsDateFilter('week'); }} />
-          <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
-          
-          <div className="mt-8">
-              {renderActiveTab()}
-          </div>
-        </main>
-
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
-          <Footer onNavigateLegal={handleOpenLegalPage} />
-        </div>
-      </div>
-
-
-      <Chatbot dataContext={{ ...dashboardData, activeView: activeTab }} />
-      
-      {detailModalItem && (
-        <DetailModal 
-            item={detailModalItem.item} 
-            type={detailModalItem.type}
-            canEdit={canEdit(detailModalItem.type)}
-            onClose={() => setDetailModalItem(null)} 
-            onEdit={handleOpenEditModal as any}
-            onDelete={handleDeleteItem}
-        />
-      )}
-
-      {editModalItem && (
-          <EditModal
-              item={editModalItem.item}
-              type={editModalItem.type}
-              isNew={editModalItem.isNew}
-              onClose={() => setEditModalItem(null)}
-              onSave={editModalItem.isNew ? handleCreateItem as any : handleUpdateItem as any}
+    <WebsiteCopyProvider>
+      {!isAuthenticated ? (
+        <>
+          <LoginPage
+            onSignupRequest={handleSignupRequest}
+            onOpenLegal={handleOpenLegalPage}
           />
+        </>
+      ) : (
+        <>
+          <div className={baseContainerClass}>
+            <div className="isolate w-full">
+              <Header
+                onLogout={handleLogout}
+                onOpenSettings={handleOpenSettings}
+                onOpenLegalEditor={handleOpenLegalEditor}
+              />
+              <main className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
+                <StatCards
+                  schedule={dashboardData.schedule}
+                  contacts={dashboardData.contacts}
+                  tasks={dashboardData.tasks}
+                  financials={dashboardData.financials}
+                  setActiveTab={setActiveTab}
+                  onPendingPaymentsClick={() => {
+                    setActiveTab('Financials');
+                    setFinancialsDateFilter('week');
+                  }}
+                />
+                <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
+                <div className="mt-8">{renderActiveTab()}</div>
+              </main>
+              <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+                <Footer onNavigateLegal={handleOpenLegalPage} />
+              </div>
+            </div>
+            <Chatbot dataContext={{ ...dashboardData, activeView: activeTab }} />
+            {detailModalItem && (
+              <DetailModal
+                item={detailModalItem.item}
+                type={detailModalItem.type}
+                canEdit={canEdit(detailModalItem.type)}
+                onClose={() => setDetailModalItem(null)}
+                onEdit={handleOpenEditModal as any}
+                onDelete={handleDeleteItem}
+              />
+            )}
+            {editModalItem && (
+              <EditModal
+                item={editModalItem.item}
+                type={editModalItem.type}
+                isNew={editModalItem.isNew}
+                onClose={() => setEditModalItem(null)}
+                onSave={editModalItem.isNew ? handleCreateItem as any : handleUpdateItem as any}
+              />
+            )}
+            <SettingsModal
+              isOpen={settingsModalOpen}
+              onClose={() => setSettingsModalOpen(false)}
+              activeTab={settingsActiveTab}
+              setActiveTab={setSettingsActiveTab}
+              notificationSettings={notificationSettings}
+              onSaveSettings={handleSaveSettings}
+              onChangePasswordClick={() => {
+                setSettingsModalOpen(false);
+                setPasswordChangeModalOpen(true);
+              }}
+              onViewAuditLog={handleViewAuditLog}
+              onExportData={handleExportData}
+              onDeleteAccount={handleDeleteAccount}
+            />
+            <PasswordChangeModal
+              isOpen={passwordChangeModalOpen}
+              onClose={() => setPasswordChangeModalOpen(false)}
+            />
+          </div>
+        </>
       )}
 
-      <SettingsModal
-        isOpen={settingsModalOpen}
-        onClose={() => setSettingsModalOpen(false)}
-        activeTab={settingsActiveTab}
-        setActiveTab={setSettingsActiveTab}
-        notificationSettings={notificationSettings}
-        onSaveSettings={handleSaveSettings}
-        onChangePasswordClick={() => {
-            setSettingsModalOpen(false);
-            setPasswordChangeModalOpen(true);
-        }}
-        onViewAuditLog={handleViewAuditLog}
-        onExportData={handleExportData}
-        onDeleteAccount={handleDeleteAccount}
-      />
-      
-      <PasswordChangeModal
-        isOpen={passwordChangeModalOpen}
-        onClose={() => setPasswordChangeModalOpen(false)}
-      />
+      {legalEditorOpen && (
+        <LegalEditorModal isOpen={legalEditorOpen} onClose={handleCloseLegalEditor} />
+      )}
 
       {activeLegalPage && (
         <LegalPage page={activeLegalPage} onClose={handleCloseLegalPage} />
       )}
-
-    </div>
+    </WebsiteCopyProvider>
   );
 }
 

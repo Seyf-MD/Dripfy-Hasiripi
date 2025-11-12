@@ -7,6 +7,9 @@
         "passwordPlaceholder": "Şifre",
         "signInButton": "Giriş Yap",
         "forgotPassword": "Şifremi unuttum",
+        "rememberMe": "Beni hatırla",
+        "showPassword": "Şifreyi göster",
+        "hidePassword": "Şifreyi gizle",
         "errors": {
             "invalidCredentials": "E-posta veya parola hatalı.",
             "generic": "Giriş işlemi tamamlanamadı. Lütfen tekrar deneyin.",
@@ -295,6 +298,7 @@
             "profile": "Profil",
             "settings": "Ayarlar",
             "privacy": "Gizlilik ve Güvenlik",
+            "legalEditor": "Yasal içeriği düzenle",
             "logout": "Çıkış Yap"
         }
     },
@@ -362,5 +366,20 @@
         "lightMode": "Aydınlık mod",
         "darkMode": "Karanlık mod",
         "backToDashboard": "Kontrol paneline dön"
+    },
+    "legalEditor": {
+        "title": "Yasal İçerik Düzenleyici",
+        "subtitle": "Tüm yasal sayfa ve footer metinlerini buradan güncelleyin.",
+        "footerSection": "Footer içeriği",
+        "footerCompany": "Şirket adı",
+        "footerEmail": "İletişim e-postası",
+        "footerPhone": "Telefon numarası",
+        "footerAddress": "Adres (satır satır)",
+        "footerAddressPlaceholder": "Her adres satırını ayrı satıra yazın.",
+        "legalSection": "Yasal sayfa içeriği",
+        "cancelButton": "İptal",
+        "saveButton": "Değişiklikleri kaydet",
+        "saving": "Kaydediliyor...",
+        "saveError": "İçerik kaydedilirken hata oluştu, lütfen tekrar deneyin."
     }
 }

@@ -95,7 +95,7 @@ function buildEmailTemplate(string $title, string $intro, string $contentHtml, ?
               <td style="padding:20px 32px;background-color:#f3f9f3;border-top:1px solid #c8d9b9;">
                 <p style="margin:0;font-size:12px;line-height:18px;color:rgba(47,74,59,0.7);">
                   © {$currentYear} Dripfy MIS. Tüm hakları saklıdır.<br>
-                  Bu mesajı <a href="mailto:dripfy@hasiripi.com" style="color:#4ba586;text-decoration:none;">dripfy@hasiripi.com</a> üzerinden yanıtlayabilirsiniz.
+                  Bu mesajı <a href="mailto:info@dripfy.de" style="color:#4ba586;text-decoration:none;">info@dripfy.de</a> üzerinden yanıtlayabilirsiniz.
                 </p>
               </td>
             </tr>

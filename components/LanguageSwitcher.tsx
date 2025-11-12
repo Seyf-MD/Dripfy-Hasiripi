@@ -39,8 +39,8 @@ const LanguageSwitcher: React.FC = () => {
             : 'bg-neutral-800 border-neutral-700 text-neutral-200 hover:bg-neutral-700'
         }`}
       >
-        <span>{selectedLanguage.flag}</span>
-        <span className="hidden sm:inline">{selectedLanguage.name}</span>
+        <span aria-hidden="true">{selectedLanguage.flag}</span>
+        <span className="sr-only">{selectedLanguage.name}</span>
         <ChevronDown size={16} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 

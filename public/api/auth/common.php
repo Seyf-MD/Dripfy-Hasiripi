@@ -165,7 +165,7 @@ function buildEmailTemplate(string $title, string $intro, string $contentHtml, ?
               <td style="padding:20px 32px;background-color:#f3f9f3;border-top:1px solid #c8d9b9;">
                 <p style="margin:0;font-size:12px;line-height:18px;color:rgba(47,74,59,0.7);">
                   © {$currentYear} Dripfy MIS. Tüm hakları saklıdır.<br>
-                  Bu mesajı <a href="mailto:dripfy@hasiripi.com" style="color:#4ba586;text-decoration:none;">dripfy@hasiripi.com</a> üzerinden yanıtlayabilirsiniz.
+                  Bu mesajı <a href="mailto:info@dripfy.de" style="color:#4ba586;text-decoration:none;">info@dripfy.de</a> üzerinden yanıtlayabilirsiniz.
                 </p>
               </td>
             </tr>
@@ -457,10 +457,10 @@ function sendPasswordResetEmail(string $email, string $name, string $code): arra
             buildCodeBlock($code) .
                 '<p style="margin:0 0 18px;font-size:14px;line-height:22px;color:#2f4a3b;">Kod ' . $ttlMinutes . ' dakika boyunca geçerlidir. Talep size ait değilse bu mesajı yok sayabilir veya bizimle iletişime geçebilirsiniz.</p>' .
                 '<a href="https://hasiripi.com" style="display:inline-block;padding:14px 28px;border-radius:16px;background:linear-gradient(135deg,#4ba586,#84a084);color:#0b1612;font-weight:600;text-decoration:none;font-size:14px;">Panelde Parolamı Yenile</a>',
-            'Destek için her zaman <a href="mailto:dripfy@hasiripi.com" style="color:#4ba586;text-decoration:none;">dripfy@hasiripi.com</a> adresine yazabilirsiniz.'
+            'Destek için her zaman <a href="mailto:info@dripfy.de" style="color:#4ba586;text-decoration:none;">info@dripfy.de</a> adresine yazabilirsiniz.'
         );
 
-        $text = "Merhaba {$name},\n\nDripfy Yönetim Paneli parolanızı sıfırlamak için kodunuz: {$code}\nKod {$ttlMinutes} dakika boyunca geçerlidir. Talep size ait değilse bu mesajı göz ardı edebilir veya dripfy@hasiripi.com adresinden bize ulaşabilirsiniz.\n\nSaygılarımızla,\nDripfy Güvenlik Ekibi";
+        $text = "Merhaba {$name},\n\nDripfy Yönetim Paneli parolanızı sıfırlamak için kodunuz: {$code}\nKod {$ttlMinutes} dakika boyunca geçerlidir. Talep size ait değilse bu mesajı göz ardı edebilir veya info@dripfy.de adresinden bize ulaşabilirsiniz.\n\nSaygılarımızla,\nDripfy Güvenlik Ekibi";
 
         $mailer->Body = $html;
         $mailer->AltBody = $text;

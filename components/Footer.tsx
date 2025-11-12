@@ -3,6 +3,7 @@ import { Instagram, Linkedin } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
 import BrandLogo from './BrandLogo';
 import { LegalPageKey } from '../data/legalContent';
+import { useWebsiteCopy } from '../context/WebsiteCopyContext';
 
 interface FooterProps {
   onNavigateLegal?: (page: LegalPageKey) => void;
@@ -16,6 +17,8 @@ const legalLinkMap: Record<LegalPageKey, string> = {
 
 const Footer: React.FC<FooterProps> = ({ onNavigateLegal }) => {
   const { t } = useLanguage();
+  const { copy } = useWebsiteCopy();
+  const footer = copy.footer;
 
   const renderLegalLink = (label: string, key: LegalPageKey) => {
     if (!onNavigateLegal) {
@@ -47,16 +50,18 @@ const Footer: React.FC<FooterProps> = ({ onNavigateLegal }) => {
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
         <div>
           <BrandLogo className="h-8 w-auto mb-3" />
-          <p className="mt-2">Dripfy GmbH</p>
-          <p>Leipziger Pl. 15, 90491 Nürnberg</p>
+          <p className="mt-2">{footer.companyName}</p>
+          {footer.addressLines.map((line, idx) => (
+            <p key={`footer-line-${idx}`}>{line}</p>
+          ))}
           <p className="mt-2">
-            <a href="mailto:info@dripfy.de" className="hover:text-[var(--drip-text)] dark:hover:text-white transition-colors">
-              info@dripfy.de
+            <a href={`mailto:${footer.email}`} className="hover:text-[var(--drip-text)] dark:hover:text-white transition-colors">
+              {footer.email}
             </a>
           </p>
           <p>
-            <a href="tel:+491742433558" className="hover:text-[var(--drip-text)] dark:hover:text-white transition-colors">
-              +49 174 2433558
+            <a href={`tel:${footer.phone.replace(/\s+/g, '')}`} className="hover:text-[var(--drip-text)] dark:hover:text-white transition-colors">
+              {footer.phone}
             </a>
           </p>
         </div>

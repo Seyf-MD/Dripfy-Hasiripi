@@ -7,6 +7,9 @@
         "passwordPlaceholder": "Password",
         "signInButton": "Sign In",
         "forgotPassword": "Forgot password?",
+        "rememberMe": "Remember me",
+        "showPassword": "Show password",
+        "hidePassword": "Hide password",
         "errors": {
             "invalidCredentials": "Email or password is incorrect.",
             "generic": "We couldn't sign you in. Please try again.",
@@ -295,6 +298,7 @@
             "profile": "Profile",
             "settings": "Settings",
             "privacy": "Privacy & Security",
+            "legalEditor": "Edit legal copy",
             "logout": "Logout"
         }
     },
@@ -362,5 +366,20 @@
         "lightMode": "Light mode",
         "darkMode": "Dark mode",
         "backToDashboard": "Back to dashboard"
+    },
+    "legalEditor": {
+        "title": "Legal Content Editor",
+        "subtitle": "Update every legal page and footer copy in one place.",
+        "footerSection": "Footer content",
+        "footerCompany": "Company name",
+        "footerEmail": "Contact email",
+        "footerPhone": "Phone number",
+        "footerAddress": "Address (line by line)",
+        "footerAddressPlaceholder": "Add each line of the address on its own line.",
+        "legalSection": "Legal page content",
+        "cancelButton": "Cancel",
+        "saveButton": "Save changes",
+        "saving": "Saving...",
+        "saveError": "Unable to save the updated content, please try again."
     }
 }

@@ -47,7 +47,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSignupRequest, onOpenLegal }) =
         setLoginErrorKey(null);
         setIsLoggingIn(true);
         try {
-            await login(loginEmail.trim(), loginPassword);
+            const trimmedEmail = loginEmail.trim();
+            const trimmedPassword = loginPassword.trim();
+            console.log('[LoginPage] Attempting login with email:', trimmedEmail);
+            await login(trimmedEmail, trimmedPassword);
         } catch (error) {
             console.error('Login failed:', error);
             const enrichedError = error as Error & { code?: string };

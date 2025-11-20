@@ -38,18 +38,33 @@ router.post('/login', async (req, res) => {
   const email = typeof req.body?.email === 'string' ? req.body.email.trim() : '';
   const password = typeof req.body?.password === 'string' ? req.body.password : '';
 
+  console.log('[auth/login] Request received:', {
+    email: email,
+    emailLength: email.length,
+    passwordLength: password.length,
+    hasEmail: !!email,
+    hasPassword: !!password,
+    bodyKeys: Object.keys(req.body || {})
+  });
+
   if (!email || !password) {
+    console.log('[auth/login] Missing email or password');
     return res.status(400).json({ ok: false, error: 'Email and password are required' });
   }
 
   try {
     const user = await findUserByEmail(email);
     if (!user) {
+      console.log('[auth/login] User not found for email:', email);
       return res.status(401).json({ ok: false, error: 'Invalid email or password' });
     }
 
+    console.log('[auth/login] User found:', user.email);
     const passwordValid = await verifyPassword(user, password);
+    console.log('[auth/login] Password valid:', passwordValid);
+    
     if (!passwordValid) {
+      console.log('[auth/login] Password verification failed for:', email);
       return res.status(401).json({ ok: false, error: 'Invalid email or password' });
     }
 

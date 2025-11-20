@@ -1,11 +1,10 @@
-import { Queue, Worker, QueueScheduler } from 'bullmq';
+import { Queue, Worker } from 'bullmq';
 import Redis from 'ioredis';
 import { sendEmailNotification, sendWebPushNotification } from '../notificationService.js';
 
 const QUEUE_NAME = 'task-sla-monitor';
 let connection = null;
 let queue = null;
-let scheduler = null;
 let worker = null;
 const fallbackTimers = new Map();
 
@@ -37,13 +36,6 @@ function ensureQueue() {
     return null;
   }
   queue = new Queue(QUEUE_NAME, { connection: redisConnection });
-  scheduler = new QueueScheduler(QUEUE_NAME, { connection: redisConnection });
-  scheduler.on('failed', (jobId, error) => {
-    console.error(`[sla-timer] Scheduler job failed (${jobId})`, error);
-  });
-  scheduler.waitUntilReady().catch((error) => {
-    console.error('[sla-timer] Scheduler failed to start', error);
-  });
   return queue;
 }
 

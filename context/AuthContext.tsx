@@ -39,29 +39,54 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const permissions = React.useRef<ChatbotActionPermissionMap>(chatbotActionPermissions);
 
   const login = React.useCallback(async (email: string, password: string) => {
-    const response = await fetch(LOGIN_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify({ email, password }),
-    });
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+    
+    console.log('[AuthContext] Attempting login to:', LOGIN_ENDPOINT);
+    console.log('[AuthContext] API_BASE:', API_BASE);
+    console.log('[AuthContext] Email (original):', JSON.stringify(email));
+    console.log('[AuthContext] Email (trimmed):', JSON.stringify(trimmedEmail));
+    console.log('[AuthContext] Password length:', password.length);
+    console.log('[AuthContext] Password (trimmed) length:', trimmedPassword.length);
+    
+    try {
+      const requestBody = { email: trimmedEmail, password: trimmedPassword };
+      console.log('[AuthContext] Request body:', JSON.stringify(requestBody));
+      
+      const response = await fetch(LOGIN_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(requestBody),
+      });
 
-    const data = await response.json().catch(() => null);
+      console.log('[AuthContext] Response status:', response.status);
+      const data = await response.json().catch((err) => {
+        console.error('[AuthContext] Failed to parse response:', err);
+        return null;
+      });
+      console.log('[AuthContext] Response data:', data);
 
-    if (!response.ok || !data?.ok) {
-      const errorCode = response.status === 401 ? 'INVALID_CREDENTIALS' : 'LOGIN_FAILED';
-      const message = typeof data?.error === 'string' ? data.error : 'Login failed';
-      const error = new Error(message) as Error & { code?: string };
-      error.code = errorCode;
+      if (!response.ok || !data?.ok) {
+        const errorCode = response.status === 401 ? 'INVALID_CREDENTIALS' : 'LOGIN_FAILED';
+        const message = typeof data?.error === 'string' ? data.error : 'Login failed';
+        console.error('[AuthContext] Login failed:', { errorCode, message, status: response.status });
+        const error = new Error(message) as Error & { code?: string };
+        error.code = errorCode;
+        throw error;
+      }
+
+      const payload = data.user as AuthUser;
+      setUser(payload);
+      setToken(typeof data.token === 'string' ? data.token : null);
+      console.log('[AuthContext] Login successful:', payload.email);
+      return payload;
+    } catch (error) {
+      console.error('[AuthContext] Login error:', error);
       throw error;
     }
-
-    const payload = data.user as AuthUser;
-    setUser(payload);
-    setToken(typeof data.token === 'string' ? data.token : null);
-    return payload;
   }, []);
 
   const logout = React.useCallback(async () => {

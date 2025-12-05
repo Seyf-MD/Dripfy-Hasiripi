@@ -29,10 +29,31 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = React.useState<AuthUser | null>(null);
+  const [user, setUser] = React.useState<AuthUser | null>({
+    id: '1',
+    email: 'demo@dripfy.com',
+    name: 'Demo User',
+    role: 'admin',
+    lastLogin: new Date().toISOString()
+  });
   const [token, setToken] = React.useState<string | null>(null);
 
   const login = React.useCallback(async (email: string, password: string) => {
+    // Mock Login for Demo
+    if (email === 'demo@dripfy.com' && password === '123456') {
+      const mockUser: AuthUser = {
+        id: '1',
+        email: 'demo@dripfy.com',
+        name: 'Demo User',
+        role: 'admin',
+        lastLogin: new Date().toISOString()
+      };
+      await new Promise(resolve => setTimeout(resolve, 800)); // Fake delay
+      setUser(mockUser);
+      setToken('mock-token');
+      return mockUser;
+    }
+
     const response = await fetch(LOGIN_ENDPOINT, {
       method: 'POST',
       headers: {

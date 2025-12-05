@@ -39,7 +39,7 @@ function App() {
   const [adminPanelSubTab, setAdminPanelSubTab] = React.useState<AdminSubTab>('permissions');
   const [activeLegalPage, setActiveLegalPage] = React.useState<LegalPageKey | null>(null);
   const [legalEditorOpen, setLegalEditorOpen] = React.useState(false);
-  
+
   // App-wide settings
   const [notificationSettings, setNotificationSettings] = React.useState<NotificationSettings>({
     email: false,
@@ -84,7 +84,7 @@ function App() {
   const [settingsModalOpen, setSettingsModalOpen] = React.useState(false);
   const [settingsActiveTab, setSettingsActiveTab] = React.useState<SettingsPanelTab>('profile');
   const [passwordChangeModalOpen, setPasswordChangeModalOpen] = React.useState(false);
-  
+
   const [financialsDateFilter, setFinancialsDateFilter] = React.useState<'week' | 'month' | null>(null);
 
   const currentUser = React.useMemo(() => {
@@ -111,10 +111,10 @@ function App() {
   const canEdit = (view: ModalType): boolean => {
     if (isAdmin) return true;
     if (!currentUserPermissions) return false;
-    
+
     const permissionKey = view as PermissionableView;
     if (currentUserPermissions[permissionKey]) {
-        return currentUserPermissions[permissionKey].edit;
+      return currentUserPermissions[permissionKey].edit;
     }
 
     return false;
@@ -134,12 +134,12 @@ function App() {
     setDetailModalItem(null); // Close detail modal if open
     setEditModalItem({ item, type, isNew });
   };
-  
+
   const handleOpenSettings = (tab: SettingsPanelTab) => {
     setSettingsActiveTab(tab);
     setSettingsModalOpen(true);
   }
-  
+
   const handleOpenLegalEditor = React.useCallback(() => {
     setLegalEditorOpen(true);
   }, []);
@@ -147,48 +147,48 @@ function App() {
   const handleCloseLegalEditor = React.useCallback(() => {
     setLegalEditorOpen(false);
   }, []);
-  
+
   const handleSaveSettings = (newNotifications: NotificationSettings) => {
-      setNotificationSettings(newNotifications);
+    setNotificationSettings(newNotifications);
   };
 
   const handleUpdateItem = (updatedItem: DataItem, type: ModalType) => {
     setDashboardData(prevData => {
-        const key = type as keyof DashboardData;
-        if (!Array.isArray(prevData[key])) return prevData;
+      const key = type as keyof DashboardData;
+      if (!Array.isArray(prevData[key])) return prevData;
 
-        const updatedList = (prevData[key] as DataItem[]).map(item =>
-            item.id === updatedItem.id ? updatedItem : item
-        );
-        return { ...prevData, [key]: updatedList };
+      const updatedList = (prevData[key] as DataItem[]).map(item =>
+        item.id === updatedItem.id ? updatedItem : item
+      );
+      return { ...prevData, [key]: updatedList };
     });
     setEditModalItem(null);
   };
 
   const handleCreateItem = (newItem: Omit<DataItem, 'id'>, type: ModalType) => {
-     setDashboardData(prevData => {
-        const key = type as keyof DashboardData;
-        if (!Array.isArray(prevData[key])) return prevData;
+    setDashboardData(prevData => {
+      const key = type as keyof DashboardData;
+      if (!Array.isArray(prevData[key])) return prevData;
 
-        const createdItem = { ...newItem, id: `${type.slice(0,1)}${Date.now()}` } as DataItem;
-        
-        const updatedList = [...(prevData[key] as DataItem[]), createdItem];
-        return { ...prevData, [key]: updatedList };
+      const createdItem = { ...newItem, id: `${type.slice(0, 1)}${Date.now()}` } as DataItem;
+
+      const updatedList = [...(prevData[key] as DataItem[]), createdItem];
+      return { ...prevData, [key]: updatedList };
     });
     setEditModalItem(null);
   };
 
   const handleDeleteItem = (itemId: string, type: ModalType) => {
-      setDashboardData(prevData => {
-        const key = type as keyof DashboardData;
-        if (!Array.isArray(prevData[key])) return prevData;
+    setDashboardData(prevData => {
+      const key = type as keyof DashboardData;
+      if (!Array.isArray(prevData[key])) return prevData;
 
-        const updatedList = (prevData[key] as DataItem[]).filter(item => item.id !== itemId);
-        return { ...prevData, [key]: updatedList };
+      const updatedList = (prevData[key] as DataItem[]).filter(item => item.id !== itemId);
+      return { ...prevData, [key]: updatedList };
     });
     setDetailModalItem(null);
   };
-  
+
   // FIX: Changed `field` type from `keyof DataItem` to `string`.
   // `keyof DataItem` resolves to only keys common to all types in the union (i.e., 'id'), which was too restrictive.
   // Using `string` is more flexible and allows updating any field on any data item type.
@@ -203,7 +203,7 @@ function App() {
       return { ...prevData, [key]: updatedList };
     });
   }
-  
+
   const handleApproveSignup = (requestId: string) => {
     setDashboardData(prev => {
       const request = prev.signupRequests.find(r => r.id === requestId);
@@ -330,31 +330,31 @@ function App() {
 
   const handleViewAuditLog = () => {
     if (isAdmin) {
-        setSettingsModalOpen(false);
-        setActiveTab('Admin Panel');
-        setAdminPanelSubTab('audit');
+      setSettingsModalOpen(false);
+      setActiveTab('Admin Panel');
+      setAdminPanelSubTab('audit');
     }
   };
 
   const handleExportData = () => {
-      if (!currentUser) return;
-      const userData = {
-          profile: currentUser,
-          permissions: currentUserPermissions,
-          tasks: dashboardData.tasks.filter(t => t.assignee === currentUser.name),
-      };
-      const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(userData, null, 2))}`;
-      const link = document.createElement("a");
-      link.href = jsonString;
-      link.download = "dripfy_user_data.json";
-      link.click();
-      setSettingsModalOpen(false);
+    if (!currentUser) return;
+    const userData = {
+      profile: currentUser,
+      permissions: currentUserPermissions,
+      tasks: dashboardData.tasks.filter(t => t.assignee === currentUser.name),
+    };
+    const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(userData, null, 2))}`;
+    const link = document.createElement("a");
+    link.href = jsonString;
+    link.download = "dripfy_user_data.json";
+    link.click();
+    setSettingsModalOpen(false);
   };
 
   const handleDeleteAccount = () => {
-      if (window.confirm(t('settings.privacy.deleteAccountConfirm'))) {
-          handleLogout();
-      }
+    if (window.confirm(t('settings.privacy.deleteAccountConfirm'))) {
+      handleLogout();
+    }
   };
 
   const handleOpenLegalPage = (page: LegalPageKey) => {
@@ -369,59 +369,64 @@ function App() {
   const renderActiveTab = () => {
     switch (activeTab) {
       case 'Calendar':
-        return <CalendarTab data={dashboardData.schedule} canEdit={canEdit('schedule')} onOpenModal={handleOpenEditModal as any} />;
+        return <CalendarTab
+          data={dashboardData.schedule}
+          canEdit={canEdit('schedule')}
+          onOpenModal={handleOpenEditModal as any}
+          onUpdateEvent={(id, newDay) => handleQuickUpdate(id, 'schedule', 'day', newDay)}
+        />;
       case 'Financials':
-        return <FinancialsTab 
-                    data={dashboardData.financials} 
-                    canEdit={canEdit('financials')}
-                    onOpenModal={handleOpenEditModal as any} 
-                    onUpdate={(id, field, value) => handleQuickUpdate(id, 'financials', field, value)}
-                    dateFilter={financialsDateFilter}
-                />;
+        return <FinancialsTab
+          data={dashboardData.financials}
+          canEdit={canEdit('financials')}
+          onOpenModal={handleOpenEditModal as any}
+          onUpdate={(id, field, value) => handleQuickUpdate(id, 'financials', field, value)}
+          dateFilter={financialsDateFilter}
+        />;
       case 'Challenges':
-        return <ChallengesTab 
-                    challenges={dashboardData.challenges} 
-                    advantages={dashboardData.advantages}
-                    canEditChallenges={canEdit('challenges')}
-                    canEditAdvantages={canEdit('advantages')}
-                    onOpenModal={handleOpenEditModal as any}
-                    onUpdateChallenge={(id, field, value) => handleQuickUpdate(id, 'challenges', field, value)}
-                    onUpdateAdvantage={(id, field, value) => handleQuickUpdate(id, 'advantages', field, value)}
-                />;
+        return <ChallengesTab
+          challenges={dashboardData.challenges}
+          advantages={dashboardData.advantages}
+          canEditChallenges={canEdit('challenges')}
+          canEditAdvantages={canEdit('advantages')}
+          onOpenModal={handleOpenEditModal as any}
+          onUpdateChallenge={(id, field, value) => handleQuickUpdate(id, 'challenges', field, value)}
+          onUpdateAdvantage={(id, field, value) => handleQuickUpdate(id, 'advantages', field, value)}
+        />;
       case 'Contacts':
-        return <ContactsTab 
-                    data={dashboardData.contacts} 
-                    canEdit={canEdit('contacts')}
-                    onOpenModal={handleOpenEditModal as any}
-                    onUpdate={(id, field, value) => handleQuickUpdate(id, 'contacts', field, value)}
-                />;
+        return <ContactsTab
+          data={dashboardData.contacts}
+          canEdit={canEdit('contacts')}
+          onOpenModal={handleOpenEditModal as any}
+          onUpdate={(id, field, value) => handleQuickUpdate(id, 'contacts', field, value)}
+        />;
       case 'Tasks':
-        return <TasksTab 
-                    data={dashboardData.tasks} 
-                    canEdit={canEdit('tasks')}
-                    onOpenModal={handleOpenDetailModal as any}
-                    onUpdateStatus={(taskId, newStatus) => handleQuickUpdate(taskId, 'tasks', 'status', newStatus)}
-                />;
+        return <TasksTab
+          data={dashboardData.tasks}
+          canEdit={canEdit('tasks')}
+          onOpenModal={handleOpenDetailModal as any}
+          onUpdateStatus={(taskId, newStatus) => handleQuickUpdate(taskId, 'tasks', 'status', newStatus)}
+        />;
       case 'Admin Panel':
         if (isAdmin) {
-            return <AdminPanelTab
-                users={dashboardData.users}
-                permissions={dashboardData.userPermissions}
-                auditLog={dashboardData.auditLog}
-                signupRequests={dashboardData.signupRequests}
-                activeSubTab={adminPanelSubTab}
-                setActiveSubTab={setAdminPanelSubTab}
-                onOpenModal={handleOpenDetailModal as any}
-                onApproveSignup={handleApproveSignup}
-                onDenySignup={handleDenySignup}
-            />;
+          return <AdminPanelTab
+            users={dashboardData.users}
+            permissions={dashboardData.userPermissions}
+            auditLog={dashboardData.auditLog}
+            signupRequests={dashboardData.signupRequests}
+            activeSubTab={adminPanelSubTab}
+            setActiveSubTab={setAdminPanelSubTab}
+            onOpenModal={handleOpenDetailModal as any}
+            onApproveSignup={handleApproveSignup}
+            onDenySignup={handleDenySignup}
+          />;
         }
         return null;
       default:
         return null;
     }
   };
-  
+
   React.useEffect(() => {
     // If user is not admin and on Admin Panel tab, switch to Calendar
     if (!isAdmin && activeTab === 'Admin Panel') {
@@ -429,11 +434,10 @@ function App() {
     }
   }, [isAdmin, activeTab]);
 
-  const baseContainerClass = `min-h-screen min-h-[100svh] min-h-[100dvh] font-sans w-full ${
-    theme === 'light'
-      ? 'bg-[var(--drip-surface)] text-[var(--drip-text)]'
-      : 'bg-[var(--drip-dark-surface)] text-[var(--drip-dark-text)]'
-  }`;
+  const baseContainerClass = `min-h-screen min-h-[100svh] min-h-[100dvh] font-sans w-full ${theme === 'light'
+    ? 'bg-[var(--drip-surface)] text-[var(--drip-text)]'
+    : 'bg-[var(--drip-dark-surface)] text-[var(--drip-dark-text)]'
+    }`;
 
   return (
     <WebsiteCopyProvider>

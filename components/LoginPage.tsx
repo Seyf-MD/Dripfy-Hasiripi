@@ -12,6 +12,7 @@ import ForgotPasswordDialog from './ForgotPasswordDialog';
 
 const REMEMBER_EMAIL_STORAGE_KEY = 'dripfy_remember_email';
 const REMEMBER_PASSWORD_STORAGE_KEY = 'dripfy_remember_password';
+const LOGGED_OUT_KEY = 'dripfy-logged-out';
 
 interface LoginPageProps {
     onSignupRequest: (payload: { email: string; code: string }) => Promise<SignupFinalizePayload>;
@@ -44,7 +45,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSignupRequest, onOpenLegal }) =
     const [isForgotPasswordOpen, setIsForgotPasswordOpen] = React.useState(false);
     const [showPassword, setShowPassword] = React.useState(false);
     const [rememberMe, setRememberMe] = React.useState(false);
-    const [autoLoginAttempted, setAutoLoginAttempted] = React.useState(false);
     const [isAutoLoggingIn, setIsAutoLoggingIn] = React.useState(false);
 
     // Populate saved email/password when available
@@ -52,23 +52,35 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSignupRequest, onOpenLegal }) =
         if (typeof window === 'undefined') return;
         const storedEmail = window.localStorage.getItem(REMEMBER_EMAIL_STORAGE_KEY);
         const storedPassword = window.localStorage.getItem(REMEMBER_PASSWORD_STORAGE_KEY);
+        const justLoggedOut = window.localStorage.getItem(LOGGED_OUT_KEY) === 'true';
+
         if (storedEmail) {
             setLoginEmail(storedEmail);
             setRememberMe(true);
         }
-        if (storedEmail && storedPassword) {
-            setAutoLoginAttempted(true);
+
+        // Only auto-login if credentials exist AND user didn't just log out
+        if (storedEmail && storedPassword && !justLoggedOut) {
             const decodedPassword = atob(storedPassword);
+            // Autofill password just in case
+            setLoginPassword(decodedPassword);
+
             (async () => {
                 setIsAutoLoggingIn(true);
                 try {
                     await login(storedEmail, decodedPassword);
                 } catch (error) {
                     setLoginErrorKey('login.errors.invalidCredentials');
+                    // If auto login fails, maybe clear stored password?
+                    // window.localStorage.removeItem(REMEMBER_PASSWORD_STORAGE_KEY);
                 } finally {
                     setIsAutoLoggingIn(false);
                 }
             })();
+        } else if (storedEmail && storedPassword && justLoggedOut) {
+            // If just logged out, prefill password too for convenience, but don't submit
+            const decodedPassword = atob(storedPassword);
+            setLoginPassword(decodedPassword);
         }
     }, [login]);
 
@@ -81,7 +93,11 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSignupRequest, onOpenLegal }) =
         try {
             const trimmedEmail = loginEmail.trim();
             await login(trimmedEmail, loginPassword);
+
             if (typeof window !== 'undefined') {
+                // Clear the logged-out flag since we are logging in explicitly
+                window.localStorage.removeItem(LOGGED_OUT_KEY);
+
                 if (rememberMe) {
                     window.localStorage.setItem(REMEMBER_EMAIL_STORAGE_KEY, trimmedEmail);
                     window.localStorage.setItem(REMEMBER_PASSWORD_STORAGE_KEY, btoa(loginPassword));
@@ -115,6 +131,15 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSignupRequest, onOpenLegal }) =
     }, []);
 
     const renderContent = () => {
+        if (isAutoLoggingIn) {
+            return (
+                <div className="flex flex-col items-center justify-center space-y-4 py-8">
+                    <div className="w-12 h-12 border-4 border-white/20 border-t-[var(--drip-primary)] rounded-full animate-spin"></div>
+                    <p className="text-sm font-medium text-[var(--drip-muted)] dark:text-neutral-400 animate-pulse">{t('login.autoLoggingIn', 'Giriş yapılıyor...')}</p>
+                </div>
+            );
+        }
+
         if (view === 'login') {
             return (
                 <>

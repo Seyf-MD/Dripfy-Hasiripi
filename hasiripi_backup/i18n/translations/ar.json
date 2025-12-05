@@ -1,0 +1,385 @@
+
+{
+    "login": {
+        "welcome": "أهلاً بك في",
+        "subtitle": "longevity by infusions",
+        "emailPlaceholder": "البريد الإلكتروني",
+        "passwordPlaceholder": "كلمة المرور",
+        "signInButton": "تسجيل الدخول",
+        "forgotPassword": "هل نسيت كلمة المرور؟",
+        "rememberMe": "تذكرني",
+        "showPassword": "إظهار كلمة المرور",
+        "hidePassword": "إخفاء كلمة المرور",
+        "errors": {
+            "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
+            "generic": "تعذّر إتمام تسجيل الدخول. يرجى المحاولة مرة أخرى.",
+            "hint": "إذا كنت متأكدًا من صحة البيانات، يُرجى التواصل مع المسؤول للحصول على المساعدة."
+        }
+    },
+    "passwordReset": {
+        "title": "إعادة تعيين كلمة المرور",
+        "subtitleEmail": "أدخل بريدك الإلكتروني وسنرسل رمز تحقق.",
+        "subtitleVerify": "أدخل رمز التحقق المرسل إلى {email} وقم بتعيين كلمة مرور جديدة.",
+        "emailLabel": "البريد الإلكتروني",
+        "sendCode": "إرسال الرمز",
+        "sending": "جاري الإرسال...",
+        "codeLabel": "رمز التحقق",
+        "passwordLabel": "كلمة المرور الجديدة",
+        "confirmPasswordLabel": "تأكيد كلمة المرور الجديدة",
+        "back": "رجوع",
+        "resetPassword": "تحديث كلمة المرور",
+        "submitting": "جاري التحديث...",
+        "successTitle": "تم تحديث كلمة المرور",
+        "successBody": "تم تغيير كلمة المرور. يمكنك الآن تسجيل الدخول بالمعلومات الجديدة.",
+        "messages": {
+            "codeSent": "أرسلنا رمز التحقق إلى {email}. يرجى التحقق من بريدك الوارد."
+        },
+        "errors": {
+            "emailRequired": "يرجى إدخال البريد الإلكتروني.",
+            "requestFailed": "تعذر بدء عملية إعادة التعيين. يرجى المحاولة مرة أخرى.",
+            "codeAndPasswordRequired": "رمز التحقق وكلمة المرور الجديدة مطلوبان.",
+            "passwordLength": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل.",
+            "passwordMismatch": "كلمتا المرور غير متطابقتين.",
+            "resetFailed": "تعذر تحديث كلمة المرور. يرجى التحقق من الرمز والمحاولة مرة أخرى."
+        }
+    },
+    "signup": {
+        "prompt": "ليس لديك حساب؟ سجل الآن",
+        "loginPrompt": "هل لديك حساب بالفعل؟ تسجيل الدخول",
+        "firstNamePlaceholder": "الاسم الأول",
+        "lastNamePlaceholder": "اسم العائلة",
+        "emailPlaceholder": "البريد الإلكتروني",
+        "phonePlaceholder": "رقم الهاتف",
+        "companyPlaceholder": "الشركة (اختياري)",
+        "countryCodeLabel": "رمز الدولة",
+        "passwordPlaceholder": "أنشئ كلمة مرور",
+        "signUpButton": "تسجيل",
+        "requestReceived": "تم استلام طلب التسجيل! سيقوم المسؤول بمراجعته قريبًا.",
+        "requestError": "تعذّر إرسال طلب التسجيل. يُرجى المحاولة لاحقًا.",
+        "errors": {
+            "firstName": "يرجى إدخال اسم لا يقل عن حرفين.",
+            "lastName": "يرجى إدخال اسم عائلة لا يقل عن حرفين.",
+            "email": "يرجى إدخال بريد إلكتروني صالح.",
+            "phone": "يرجى إدخال رقم هاتف صالح.",
+            "countryCode": "يرجى اختيار رمز الدولة.",
+            "position": "يرجى اختيار المنصب.",
+            "badRequest": "تعذّر معالجة البيانات المدخلة. يرجى مراجعة النموذج والمحاولة مرة أخرى.",
+            "unauthorized": "يلزم تسجيل الدخول قبل المتابعة.",
+            "forbidden": "ليست لديك صلاحية لتنفيذ هذا الإجراء.",
+            "notFound": "تعذّر العثور على طلب تسجيل مطابق لبياناتك.",
+            "conflict": "يوجد حساب مسجل بهذا البريد الإلكتروني بالفعل.",
+            "validation": "تبدو بعض البيانات غير صحيحة. يرجى مراجعة النموذج والمحاولة مرة أخرى.",
+            "rateLimited": "تم إجراء محاولات كثيرة. يرجى الانتظار قليلاً ثم المحاولة مجددًا.",
+            "server": "هناك مشكلة في الخادم حالياً. يرجى المحاولة لاحقًا.",
+            "generic": "تعذّر إكمال التسجيل حالياً. يرجى المحاولة مرة أخرى.",
+            "network": "تعذّر الاتصال بالخادم. تحقق من الاتصال ثم أعد المحاولة.",
+            "sessionRequired": "انتهت صلاحية جلسة المسؤول. يرجى تسجيل الدخول مرة أخرى.",
+            "unexpectedResponse": "تلقينا استجابة غير متوقعة من الخادم."
+        },
+        "notification": {
+            "codeSentTitle": "تم إرسال رمز التحقق",
+            "codeSentBody": "يرجى التحقق من بريدك وإدخال الرمز المكوّن من 6 أرقام.",
+            "successTitle": "تم استلام طلب التسجيل",
+            "successBody": "سيقوم المسؤول بمراجعة الطلب وتفعيل الوصول قريباً.",
+            "errorTitle": "حدث خطأ",
+            "errorBody": "يرجى المحاولة مرة أخرى أو التواصل مع الدعم."
+        }
+    },
+    "verify": {
+        "title": "تحقق من بريدك الإلكتروني",
+        "subtitle": "أرسلنا رمز التحقق إلى {email}. يرجى إدخاله أدناه.",
+        "codePlaceholder": "رمز التحقق",
+        "button": "تحقق وسجل",
+        "backButton": "رجوع",
+        "invalidCode": "رمز التحقق غير صالح. يرجى المحاولة مرة أخرى."
+    },
+    "positions": {
+        "CEO": "الرئيس التنفيذي",
+        "CTO": "المدير التقني",
+        "CFO": "المدير المالي",
+        "COO": "مدير العمليات",
+        "HeadofDepartment": "رئيس القسم",
+        "TeamLead": "قائد الفريق",
+        "ProjectManager": "مدير المشروع",
+        "SeniorSpecialist": "أخصائي أول",
+        "JuniorSpecialist": "أخصائي مبتدئ",
+        "Intern": "متدرب"
+    },
+    "dashboard": {
+        "title": "لوحة التحكم"
+    },
+    "statCards": {
+        "totalMeetings": "إجمالي الاجتماعات",
+        "meetingsThisWeek": "اجتماعات تبدأ هذا الأسبوع",
+        "pendingPayments": "المدفوعات المعلقة",
+        "startThisWeek": "بداية هذا الأسبوع",
+        "activePartners": "الشركاء النشطون",
+        "acrossAllRegions": "في جميع المناطق",
+        "taskCompletion": "إنجاز المهام",
+        "progress": "التقدم"
+    },
+    "tabs": {
+        "calendar": "التقويم",
+        "financials": "المالية",
+        "challenges": "التحديات والمزايا",
+        "contacts": "جهات الاتصال",
+        "tasks": "المهام",
+        "adminPanel": "لوحة الإدارة"
+    },
+    "calendar": {
+        "today": "اليوم",
+        "month": "شهر",
+        "week": "أسبوع",
+        "newEvent": "حدث جديد",
+        "openPicker": "افتح منتقي التاريخ",
+        "addEventTo": "أضف حدثًا إلى"
+    },
+    "days": {
+        "monday": "الاثنين",
+        "tuesday": "الثلاثاء",
+        "wednesday": "الأربعاء",
+        "thursday": "الخميس",
+        "friday": "الجمعة",
+        "saturday": "السبت",
+        "sunday": "الأحد"
+    },
+    "daysShort": {
+        "mon": "إثن",
+        "tue": "ثلا",
+        "wed": "أرب",
+        "thu": "خمي",
+        "fri": "جمع",
+        "sat": "سبت",
+        "sun": "أحد"
+    },
+    "financials": {
+        "description": "الوصف",
+        "amount": "المبلغ",
+        "status": "الحالة",
+        "dueDate": "تاريخ الاستحقاق",
+        "type": "النوع",
+        "newRecord": "سجل جديد",
+        "incoming": "وارد",
+        "outgoing": "صادر"
+    },
+    "challenges": {
+        "title": "التحديات",
+        "add": "إضافة تحدي",
+        "description": "الوصف",
+        "severity": "الخطورة",
+        "severities": {
+            "high": "عالية",
+            "medium": "متوسطة",
+            "low": "منخفضة"
+        }
+    },
+    "advantages": {
+        "title": "المزايا",
+        "add": "إضافة ميزة",
+        "description": "الوصف"
+    },
+    "contacts": {
+        "searchPlaceholder": "ابحث بالاسم، الدور، المدينة...",
+        "newContact": "جهة اتصال جديدة",
+        "sort": {
+            "firstNameAsc": "الاسم الأول (أ-ي)",
+            "firstNameDesc": "الاسم الأول (ي-أ)",
+            "lastNameAsc": "الاسم الأخير (أ-ي)",
+            "lastNameDesc": "الاسم الأخير (ي-أ)",
+            "countryAsc": "الدولة (أ-ي)",
+            "cityAsc": "المدينة (أ-ي)",
+            "roleAsc": "الدور (أ-ي)"
+        },
+        "firstName": "الاسم الأول",
+        "lastName": "الاسم الأخير",
+        "email": "البريد الإلكتروني",
+        "role": "الدور",
+        "type": "النوع",
+        "country": "الدولة",
+        "city": "المدينة",
+        "phone": "الهاتف",
+        "address": "العنوان"
+    },
+    "tasks": {
+        "newTask": "مهمة جديدة",
+        "title": "العنوان",
+        "priority": "الأولوية",
+        "status": "الحالة",
+        "dueDate": "تاريخ الاستحقاق",
+        "assignee": "المكلف"
+    },
+    "status": {
+        "paid": "مدفوع",
+        "pending": "معلق",
+        "overdue": "متأخر",
+        "todo": "للقيام به",
+        "inprogress": "قيد التنفيذ",
+        "done": "تم"
+    },
+    "admin": {
+        "userPermissions": "أذونات المستخدم",
+        "auditLog": "سجل التدقيق",
+        "signupRequests": "طلبات التسجيل",
+        "approve": "موافقة",
+        "deny": "رفض",
+        "noRequests": "لا توجد طلبات تسجيل معلقة.",
+        "by": "بواسطة"
+    },
+    "userRoles": {
+        "admin": "مسؤول",
+        "user": "مستخدم"
+    },
+    "dataTypes": {
+        "schedule": "حدث تقويم",
+        "financials": "سجل مالي",
+        "challenges": "تحدي",
+        "advantages": "ميزة",
+        "contacts": "جهة اتصال",
+        "tasks": "مهمة",
+        "users": "مستخدم",
+        "SignupRequest": "طلب تسجيل"
+    },
+    "auditLogActions": {
+        "Created": "تم الإنشاء",
+        "Updated": "تم التحديث",
+        "Deleted": "تم الحذف",
+        "Approved": "تمت الموافقة",
+        "Denied": "تم الرفض"
+    },
+    "detailModal": {
+        "details": "التفاصيل"
+    },
+    "editModal": {
+        "editTitle": "تعديل {type}",
+        "new": {
+            "schedule": "حدث تقويم جديد",
+            "financials": "سجل مالي جديد",
+            "challenges": "تحدي جديد",
+            "advantages": "ميزة جديدة",
+            "contacts": "جهة اتصال جديدة",
+            "tasks": "مهمة جديدة",
+            "users": "مستخدم جديد"
+        },
+        "participantsPlaceholder": "أسماء مفصولة بفواصل"
+    },
+    "actions": {
+        "edit": "تعديل",
+        "delete": "حذف",
+        "save": "حفظ",
+        "cancel": "إلغاء",
+        "close": "إغلاق",
+        "retry": "إعادة المحاولة"
+    },
+    "chatbot": {
+        "toggle": "تبديل الشات بوت",
+        "header": "مساعد Dripfy الذكي",
+        "subtitle": "اسأل عن البيانات على شاشتك",
+        "initialMessage": "مرحبًا! أنا Dripfy AI. كيف يمكنني مساعدتك في تحليل بيانات لوحة التحكم اليوم؟",
+        "placeholder": "اطرح سؤالاً...",
+        "send": "إرسال",
+        "error": "عذراً، أواجه مشكلة في الاتصال. يرجى المحاولة لاحقًا.",
+        "clear": "مسح المحادثة",
+        "examplePrompts": "أمثلة على الأسئلة",
+        "prompt1": "لخص جدول الأسبوع القادم.",
+        "prompt2": "هل هناك أي مهام ذات أولوية عالية تستحق قريباً؟",
+        "prompt3": "اذكر جميع جهات الاتصال من ألمانيا.",
+        "prompt4": "ما هي أكبر التحديات التي نواجهها؟"
+    },
+    "footer": {
+        "links": "روابط",
+        "imprint": "بيانات النشر",
+        "privacy": "سياسة الخصوصية",
+        "terms": "الشروط والأحكام",
+        "followUs": "تابعنا",
+        "copyright": "© 2024 Dripfy GmbH. جميع الحقوق محفوظة."
+    },
+    "profile": {
+        "menu": {
+            "profile": "الملف الشخصي",
+            "settings": "الإعدادات",
+            "privacy": "الخصوصية والأمان",
+            "legalEditor": "تحرير المحتوى القانوني",
+            "logout": "تسجيل الخروج"
+        }
+    },
+    "settings": {
+        "title": "الإعدادات",
+        "closeButton": "إغلاق",
+        "saveButton": "حفظ التغييرات",
+        "tabs": {
+            "profile": "الملف الشخصي",
+            "settings": "عام",
+            "privacy": "الخصوصية"
+        },
+        "profile": {
+            "title": "معلومات الملف الشخصي",
+            "subtitle": "قم بتحديث تفاصيلك الشخصية هنا.",
+            "name": "الاسم الكامل",
+            "email": "البريد الإلكتروني",
+            "password": "كلمة المرور",
+            "changePassword": "تغيير كلمة المرور"
+        },
+        "settings": {
+            "title": "الإعدادات العامة",
+            "subtitle": "قم بتخصيص تجربة التطبيق الخاصة بك.",
+            "language": "اللغة",
+            "darkMode": "الوضع الداكن",
+            "emailNotifications": "إشعارات البريد الإلكتروني",
+            "pushNotifications": "الإشعارات الفورية"
+        },
+        "privacy": {
+            "title": "الخصوصية والأمان",
+            "subtitle": "إدارة بياناتك وأمان حسابك.",
+            "auditLog": "عرض سجل النشاط",
+            "exportData": "تصدير بياناتي",
+            "deleteAccount": "حذف حسابي",
+            "deleteAccountConfirm": "هل أنت متأكد أنك تريد حذف حسابك؟ هذا الإجراء دائم ولا يمكن التراجع عنه."
+        }
+    },
+    "passwordChange": {
+        "title": "تغيير كلمة المرور",
+        "subtitleEmail": "سنرسل رمز تحقق إلى بريدك الإلكتروني لتأكيد هويتك.",
+        "subtitleCode": "أدخل الرمز الذي أرسلناه إلى {email} وكلمة المرور الجديدة.",
+        "sendCodeButton": "إرسال رمز التحقق",
+        "updateButton": "تحديث كلمة المرور",
+        "newPassword": "كلمة المرور الجديدة",
+        "confirmPassword": "تأكيد كلمة المرور الجديدة",
+        "success": "تم تحديث كلمة المرور بنجاح!",
+        "error": {
+            "code": "رمز التحقق غير صالح.",
+            "match": "كلمات المرور غير متطابقة."
+        }
+    },
+    "schedule": {
+        "title": "العنوان",
+        "day": "اليوم",
+        "time": "الوقت",
+        "participants": "المشاركون",
+        "type": "النوع"
+    },
+    "legal": {
+        "title": {
+            "impressum": "البيانات القانونية",
+            "privacy": "سياسة الخصوصية",
+            "terms": "شروط وأحكام الموقع"
+        },
+        "lightMode": "وضع الإضاءة",
+        "darkMode": "الوضع الداكن",
+        "backToDashboard": "العودة إلى لوحة التحكم"
+    },
+    "legalEditor": {
+        "title": "محرر المحتوى القانوني",
+        "subtitle": "حدّث كل صفحات الشروط والخصوصية ومحتوى الفوتر من مكان واحد.",
+        "footerSection": "محتوى الفوتر",
+        "footerCompany": "اسم الشركة",
+        "footerEmail": "البريد الإلكتروني للتواصل",
+        "footerPhone": "رقم الهاتف",
+        "footerAddress": "العنوان (كل سطر على حدة)",
+        "footerAddressPlaceholder": "أضف كل سطر من العنوان في سطر منفصل.",
+        "legalSection": "محتوى الصفحات القانونية",
+        "cancelButton": "إلغاء",
+        "saveButton": "حفظ التغييرات",
+        "saving": "جاري الحفظ...",
+        "saveError": "تعذّر حفظ المحتوى، يرجى المحاولة مرة أخرى."
+    }
+}

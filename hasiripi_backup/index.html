@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" class="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="/favicon.png" sizes="96x96" />
+  <link rel="shortcut icon" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/favicon.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Dripfy MIS Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    }
+  </script>
+
+  <style>
+    /* Mobile spacing fix - Remove default margins and padding */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    :root {
+      color-scheme: light dark;
+
+      /* Original Dripfy Palette */
+      --drip-primary: #4ba586;
+      --drip-primary-dark: #307a07;
+      --drip-primary-muted: #84a084;
+      --drip-accent: #94a073;
+      --drip-surface: #edf6ed;
+      --drip-card: #faf9f6;
+      --drip-border: #c8d9b9;
+      --drip-text: #1e332a;
+      --drip-text-soft: rgba(30, 51, 42, 0.75);
+      --drip-muted: #2f4a3b;
+
+      --drip-dark-surface: #0b1612;
+      --drip-dark-surface-rgb: 11, 22, 18;
+      --drip-dark-elevated: #13241e;
+      --drip-dark-elevated-rgb: 19, 36, 30;
+      --drip-dark-card: #1b3329;
+      --drip-dark-card-rgb: 27, 51, 41;
+      --drip-dark-border: #244137;
+      --drip-dark-border-soft: rgba(36, 65, 55, 0.6);
+      --drip-dark-text: #e1f1ea;
+      --drip-dark-text-soft: rgba(225, 241, 234, 0.75);
+      --drip-dark-muted: #8caea1;
+      --drip-dark-muted-soft: rgba(140, 174, 161, 0.75);
+
+      /* iOS 26 Mappings to Dripfy Colors */
+      --ios-bg-light: var(--drip-surface);
+      --ios-bg-dark: var(--drip-dark-surface);
+
+      --ios-glass-light: rgba(250, 249, 246, 0.65);
+      /* Drip Card with opacity */
+      --ios-glass-dark: rgba(27, 51, 41, 0.65);
+      /* Drip Dark Card with opacity */
+
+      --ios-border-light: var(--drip-border);
+      --ios-border-dark: var(--drip-dark-border);
+
+      --ios-primary: var(--drip-primary);
+      --ios-primary-glow: rgba(75, 165, 134, 0.5);
+
+      --ios-accent: var(--drip-accent);
+      --ios-danger: #FF453A;
+
+      --ios-text-light: var(--drip-text);
+      --ios-text-dark: var(--drip-dark-text);
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
+      overflow-x: hidden;
+      background-color: var(--drip-surface);
+      transition: background-color 0.5s ease;
+    }
+
+    html.dark,
+    html.dark body {
+      background-color: var(--drip-dark-surface);
+      color: var(--drip-dark-text);
+    }
+
+    body {
+      font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+    }
+
+    /* Glassmorphism Utilities */
+    .ios-glass {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+    }
+
+    html.dark .ios-glass {
+      background: rgba(22, 22, 24, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    .ios-card {
+      border-radius: 24px;
+      transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease;
+    }
+
+    .ios-card:hover {
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    html.dark .ios-card:hover {
+      box-shadow: 0 12px 40px rgba(0, 122, 255, 0.15);
+      /* Subtle blue glow */
+    }
+
+    .ios-btn {
+      border-radius: 999px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .ios-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* Animations */
+    @keyframes float {
+      0% {
+        transform: translateY(0px);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+
+      100% {
+        transform: translateY(0px);
+      }
+    }
+
+    .animate-float {
+      animation: float 6s ease-in-out infinite;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(150, 150, 150, 0.3);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(150, 150, 150, 0.5);
+    }
+
+    /* Overrides for existing Tailwind classes to enforce theme */
+    html.light .bg-white {
+      background-color: rgba(255, 255, 255, 0.8) !important;
+      backdrop-filter: blur(12px);
+    }
+
+    html.dark .dark\:bg-neutral-900,
+    html.dark .dark\:bg-neutral-800,
+    html.dark .dark\:bg-neutral-700 {
+      background-color: rgba(30, 30, 35, 0.6) !important;
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.27.0",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.548.0"
+  }
+}
+</script>
+  <script type="module" crossorigin src="/assets/index-DzBSWaEA.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/react-vendor-Dfoqj1Wf.js">
+</head>
+
+<body>
+  <div id="root"></div>
+</body>
+
+</html>

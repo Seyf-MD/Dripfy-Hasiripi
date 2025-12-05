@@ -29,22 +29,17 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = React.useState<AuthUser | null>({
-    id: '1',
-    email: 'demo@dripfy.com',
-    name: 'Demo User',
-    role: 'admin',
-    lastLogin: new Date().toISOString()
-  });
+  const [user, setUser] = React.useState<AuthUser | null>(null);
   const [token, setToken] = React.useState<string | null>(null);
 
   const login = React.useCallback(async (email: string, password: string) => {
-    // Mock Login for Demo
-    if (email === 'demo@dripfy.com' && password === '123456') {
+    // Mock Login for Demo & Local Dev
+    if ((email === 'demo@dripfy.com' && password === '123456') ||
+      (email === 'dripfy@hasiripi.com' && password === 'fykciw-9busgI-nosgem')) {
       const mockUser: AuthUser = {
-        id: '1',
-        email: 'demo@dripfy.com',
-        name: 'Demo User',
+        id: email === 'demo@dripfy.com' ? '1' : '2',
+        email: email,
+        name: email === 'demo@dripfy.com' ? 'Demo User' : 'Dripfy Admin',
         role: 'admin',
         lastLogin: new Date().toISOString()
       };
@@ -88,6 +83,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } finally {
       setUser(null);
       setToken(null);
+      localStorage.setItem('dripfy-logged-out', 'true');
     }
   }, []);
 

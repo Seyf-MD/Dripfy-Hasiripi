@@ -49,6 +49,11 @@ const isSameDay = (d1: Date, d2: Date) =>
     d1.getDate() === d2.getDate();
 
 // Component-specific helpers
+const getCreatorInitials = (name?: string) => {
+    if (!name) return '';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+}
+
 const getTypeIcon = (type: string) => {
     const icons = { Meeting: <CalendarIcon size={14} className="text-blue-500 flex-shrink-0" />, Call: <Users size={14} className="text-green-500 flex-shrink-0" />, Event: <Clock size={14} className="text-purple-500 flex-shrink-0" /> };
     return icons[type as keyof typeof icons] || null;
@@ -279,16 +284,30 @@ const CalendarTab: React.FC<CalendarTabProps> = ({ data, canEdit, onOpenModal, o
                                         onDragStart={(e) => handleDragStart(e, event.id)}
                                         onClick={() => onOpenModal(event, 'schedule')}
                                         className={`
-                                            ios-card bg-white/40 dark:bg-black/20 backdrop-blur-sm p-3 rounded-2xl border border-white/10 
+                                            ios-card relative bg-white/40 dark:bg-black/20 backdrop-blur-sm p-3 rounded-2xl border border-white/10 
                                             hover:bg-white/60 dark:hover:bg-white/10 transition-all text-left group
                                             ${canEdit ? 'cursor-grab active:cursor-grabbing hover:shadow-lg hover:-translate-y-0.5' : 'cursor-default'}
                                         `}
                                     >
-                                        <p className="text-sm font-semibold leading-tight break-words group-hover:text-[var(--drip-primary)] transition-colors">{event.title}</p>
+                                        <p className="text-sm font-semibold leading-tight break-words group-hover:text-[var(--drip-primary)] transition-colors pr-4">{event.title}</p>
                                         <div className="flex items-center gap-1.5 mt-2 text-xs opacity-70">
                                             {getTypeIcon(event.type)}
                                             <span>{event.time}</span>
                                         </div>
+                                        {event.creator && (
+                                            <div className="absolute bottom-2 right-2 group/tooltip z-10">
+                                                <div className="w-6 h-6 rounded-full flex items-center justify-center bg-gradient-to-br from-white/40 to-white/10 dark:from-white/10 dark:to-transparent border border-white/20 shadow-sm backdrop-blur-md transition-transform hover:scale-110 cursor-help">
+                                                    <span className="text-[9px] font-extrabold text-[var(--drip-primary)] tracking-tight">
+                                                        {getCreatorInitials(event.creator)}
+                                                    </span>
+                                                </div>
+
+                                                <div className="absolute bottom-full right-0 mb-2 px-3 py-1.5 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border border-white/20 text-[var(--drip-text)] dark:text-white text-xs font-medium rounded-xl shadow-xl whitespace-nowrap opacity-0 translate-y-2 scale-95 group-hover/tooltip:opacity-100 group-hover/tooltip:translate-y-0 group-hover/tooltip:scale-100 transition-all duration-300 origin-bottom-right pointer-events-none">
+                                                    {event.creator}
+                                                    <div className="absolute -bottom-1 right-2 w-2 h-2 bg-white/80 dark:bg-neutral-900/80 border-r border-b border-white/20 transform rotate-45"></div>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 ))}
                                 {canEdit && (

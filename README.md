@@ -1,191 +1,108 @@
-# Dripfy MIS Dashboard
+# Dripfy MIS Dashboard (v2.0 - iOS 28 Redesign)
 
-Dripfy yönetim paneli; çok dilli React/Vite arayüzü, e-posta doğrulamalı kayıt akışı ve PHP tabanlı bir API ile çalışan modern bir MIS (Management Information System) uygulamasıdır. Bu dosya, projeyi ilk kez inceleyen birinin bile geliştirme ve yayına alma süreçlerini baştan sona anlayabilmesi için hazırlandı.
+Dripfy yönetim paneli, modern bir MIS (Management Information System) uygulamasıdır. Bu versiyon (v2.0), **"iOS 28" konsepti** ile tamamen yeniden tasarlanmış, **Glassmorphism** (buzlu cam) efektleri, akıcı animasyonlar ve üst düzey kullanıcı deneyimi sunan bir arayüze sahiptir.
+
+Arka planda çok dilli React/Vite mimarisi, Express (dev) ve PHP (prod) hibrid yapısı ile çalışır.
 
 ---
 
-## 1. Hızlı Başlangıç
+## 🌟 v2.0 Yenilikleri (iOS 28 Redesign)
+
+Bu sürümde yapılan temel değişiklikler:
+
+### 1. Görsel Tasarım ve UX
+- **Ultra-Glassmorphism:** Tüm paneller, modallar ve kartlar iOS tarzı buzlu cam efektine sahiptir.
+- **Akıcı Animasyonlar:** Sayfa geçişleri, modal açılışları ve hover efektleri özel CSS animasyonları (`animate-fade-in-up`, `ios-glass`) ile güçlendirildi.
+- **Karanlık/Aydınlık Mod:** Sistem, tema seçimine göre dinamik olarak sınır renklerini (`border`) ve arka plan opaklıklarını ayarlar. (Örn: Light modda sınırlar belirginleşirken, Dark modda daha silikleşir).
+
+### 2. Özel Bileşenler
+- **iOS Date Picker:** Standart HTML tarih seçicisi yerine, hem manuel giriş (klavye) hem de görsel seçim (takvim) destekleyen, özel tasarlanmış bir tarih seçici geliştirildi. `GG Ay YYYY` formatında kullanıcı dostu gösterim yapar.
+- **Sürükle-Bırak Takvim:** Haftalık takvim görünümünde etkinlikler günler arasında sürükle-bırak yöntemiyle taşınabilir.
+
+### 3. Güvenlik İyileştirmeleri
+- **.env Yapısı:** FTP şifreleri ve Admin bypass şifreleri kod içinden **tamamen temizlendi**. Artık sadece `.env` dosyasından okunuyor.
+- **Güvenli Dağıtım:** `download_ftp.js` ve diğer scriptler artık kimlik bilgilerini environment değişkenlerinden alır.
+
+---
+
+## 🚀 Hızlı Başlangıç (Geliştiriciler İçin)
+
+Projeyi ilk kez bilgisayarınıza indirdiyseniz aşağıdaki adımları izleyin:
+
+### 1. Kurulum
 
 ```bash
-git clone <repo>
-cd Dripfy-Hasiripi
+git clone <repo-url>
+cd Dripfy-Hasiripi-2
 npm install
-cp .env.example .env    # Gerekli alanları doldurun
-npm run dev:full        # Vite + Express dev sunucusu birlikte açılır
 ```
 
-Tarayıcı: http://localhost:3000
-Geliştirme süresince Express API `http://localhost:4000` üzerinden çalışır ve SMTP ayarlarınızı `.env` dosyasından okur.
+### 2. Ortam Değişkenleri (.env)
 
-> Not: Frontend tarafının dev API’ye bağlanması için `.env` veya `.env.development` dosyanıza `VITE_API_BASE=http://localhost:4000` ve `JWT_SECRET`, `JWT_EXPIRES_IN` gibi kimlik doğrulama değişkenlerini eklemeyi unutmayın.
+Kök dizinde `.env` dosyası oluşturun (veya `.env.example`'dan kopyalayın). Aşağıdaki değerler **zorunludur**:
 
----
+```ini
+# Chatbot için (Google Gemini)
+GEMINI_API_KEY=AIzaSy...
 
-## 2. Mimari Genel Bakış
+# FTP Scriptleri için (Opsiyonel, deployment yapacaksanız gerekli)
+FTP_HOST=ftp.ornek.com
+FTP_USER=admin@ornek.com
+FTP_PASSWORD=GizliSifre
 
-| Katman | Teknoloji | Açıklama |
-|--------|-----------|----------|
-| **Ön Yüz** | React 19, Vite, TailwindCSS | Tüm dashboard ekranları, tema yönetimi, çoklu dil desteği |
-| **Geliştirme API’si** | Node.js + Express | Yerel çalışırken doğrulama kodları ve e-postaları gönderir (`npm run server`) |
-| **Kimlik Doğrulama** | JWT + bcrypt | `/api/auth/login` ve `/api/auth/logout` dev ortamı admin oturumu |
-| **Üretim API’si** | PHP 8 + PHPMailer | Paylaşımlı hosting üzerinde çalışan, doğrulama kodu ve kayıt taleplerini yöneten `public/api/signup/*` |
-| **Veri Saklama** | JSON dosyaları | `public/api/runtime/signup_codes.json` (kodlar) ve `signup_requests.json` (bekleyen talepler); PHP scripti tarafından yönetilir |
-
-**Signup akışı**  
-1. Kullanıcı formu doldurur → `api/signup/index.php` kullanıcıya 6 haneli kod e-postalar.  
-2. Kullanıcı kodu girer → aynı endpoint kodu doğrular, admin’e ve kullanıcıya bilgi e-postası gönderir, talebi dosyaya kaydeder.  
-3. Admin panelinde “Kayıt Talepleri” listelenir.  
-4. Admin onaylarsa React tarafı yeni kullanıcı + izin + kişi kaydı oluşturur; PHP tarafındaki kayıt silinir.
-
----
-
-## 3. Dizinyapısı
-
-```
-.
-├── components/               # UI bileşenleri
-│   ├── LoginPage.tsx         # Yeni kullanıcı kayıt süreci ve doğrulama ekranı
-│   ├── tabs/                 # Dashboard sekmeleri
-│   └── ...
-├── context/
-│   ├── AuthContext.tsx       # JWT oturumu yöneten context
-│   └── ThemeContext.tsx      # Tema context'i
-├── data/                     # Demo/mock veriler
-├── public/
-│   ├── api/
-│   │   ├── signup/
-│   │   │   ├── common.php    # PHP yardımcı fonksiyonlar (kod üretme, saklama)
-│   │   │   ├── index.php     # Kod gönderme + talep oluşturma API’si
-│   │   │   └── requests.php  # Bekleyen talepleri listeleme/silme API’si
-│   │   └── vendor/PHPMailer/ # PHPMailer kaynak dosyaları
-│   └── i18n/                 # Build-time dil dosyaları
-├── server/
-│   ├── auth/                 # Login/logout router'ı ve JWT yardımcıları
-│   ├── data/users.json       # Dev ortamındaki admin kullanıcılar
-│   ├── services/userService.js
-│   └── index.js              # Geliştirme sırasında çalışan Express API
-├── services/signupService.ts # Frontend tarafı fetch yardımcıları
-├── types.ts                  # TypeScript tipleri
-├── index.html                # Vite giriş noktası (tema ayarlarıyla birlikte)
-└── README.md                 # Bu belge
+# Local Geliştirme Admin Girişi (Dev Ortamı İçin)
+VITE_ADMIN_EMAIL=admin@dripfy.com
+VITE_ADMIN_PASSWORD=GucluBirSifre
 ```
 
----
+### 3. Uygulamayı Çalıştırma
 
-## 4. Ortam Değişkenleri
+Geliştirme modunda hem Frontend (Vite) hem Backend (Express) sunucusunu aynı anda başlatmak için:
 
-| Değişken | Açıklama | Dev | Prod |
-|----------|----------|-----|------|
-| `GEMINI_API_KEY` | Chatbot için Google Gemini anahtarı | ✓ | ✓ |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` | Doğrulama e-postaları için SMTP bilgileri | ✓ | ✓ |
-| `SMTP_SECURE` | `true` (TLS/SSL) veya `false` | ✓ | ✓ |
-| `MAIL_FROM` | Gönderici adı/mail, ör: `Dripfy <info@dripfy.de>` | ✓ | ✓ |
-| `SIGNUP_NOTIFY_TO` | Admin bildirimi alacak adres | ✓ | ✓ |
-| `SEND_WELCOME_EMAIL` | Kullanıcıya hoş geldin maili gönderilsin mi? (`true/false`) | ✓ | ✓ |
-| `API_PORT` | Express dev sunucusunun portu (varsayılan `4000`) | ✓ | – |
-| `CORS_ORIGINS` | Dev API’ye izinli origin listesi | ✓ | – |
-| `SIGNUP_CODE_TTL` | Kod geçerliliği (ms cinsinden) – opsiyonel | ✓ | ✓ |
-| `VITE_API_BASE` | Frontend fetch istekleri için Express taban URL’si (`http://localhost:4000`) | ✓ | – |
-| `JWT_SECRET` | Login sırasında imzalanan JWT anahtarı | ✓ | – |
-| `JWT_EXPIRES_IN` | Token süresi (örn. `15m`) | ✓ | – |
-| `AUTH_COOKIE_NAME` | HttpOnly oturum çerezi adı (varsayılan `dripfy_admin_token`) | ✓ | – |
-| `JWT_COOKIE_MAX_AGE` | Çerez ömrü (`s`, `m`, `h`, `d` veya saniye) | ✓ | – |
-
-> Üretimde PHP scriptleri `.env` dosyasını okumaz; SMTP bilgilerini PHP dosyalarındaki `sendSignupEmail` fonksiyonunda güncellemeniz yeterlidir. Hosting ortamında `public/api/runtime/` dizininin yazma iznine sahip olduğundan emin olun.
-
-### Güvenlik ve rotasyon
-
-- **SMTP şifresi / servis hesabı**: Paylaşımlı hesap bilgilerini düzenli aralıklarla yenileyin ve `.env` ile `public/api/signup/common.php` içindeki değerleri güncelleyin. Eski şifreleri saklamayın.
-- **JWT/AUTH gizli anahtarları**: `JWT_SECRET` ve `AUTH_SECRET` değişkenlerini en az 32 karakterlik rastgele dizelerle doldurun. Ekip değişikliklerinde bu değerleri döndürüp yeniden deploy edin.
-- **Runtime dosyaları**: PHP tarafı güncel parolaları `public/api/runtime/auth_users.json` içine yazar. Şifre döndürdükten sonra bu dosyanın yalnızca yeni hash'i içerdiğinden emin olun veya backup'tan temizleyin.
-
-### `.env` oluşturma
 ```bash
-cp .env.example .env
-# Geliştirme sırasında Vite’ın Express API’yi kullanması için:
-cp .env.example .env.development
+npm run dev:full
 ```
+Tarayıcıda: `http://localhost:3000`
 
 ---
 
-## 5. Geliştirme Adımları
+## 🏗 Proje Yapısı
 
-1. `npm run dev:full` komutu hem Vite’ı hem Express API’yi paralel çalıştırır. Dilerseniz ayrı ayrı `npm run server` ve `npm run dev` komutlarını da kullanabilirsiniz.
-2. Signup kodları gerçek SMTP üzerinden gönderilir. Test ortamında mail erişiminiz yoksa `.env` içinde SMTP bilgilerinizi geçici olarak sahte SMTP (Mailtrap vb.) ile değiştirebilirsiniz.
-3. Yönetici oturumu için `/api/auth/login` endpoint’ini kullanın. Varsayılan admin hesabı `server/data/users.json` dosyasında tanımlıdır ve parolası `ChangeMe123!` değerinin bcrypt hash’i olarak saklanır. Farklı bir parola oluşturmak için `node -e "import('bcrypt').then(async b => console.log(await b.hash('YeniSifre', 10)))"` komutuyla yeni hash üretip dosyayı güncelleyin.
+Yeni gelenler için klasörlerin ne işe yaradığını basitçe açıklayalım:
+
+- **`components/`**: Butonlar, modallar, giriş ekranı gibi tüm React parçaları burada.
+    - `EditModal.tsx`: Veri düzenleme/ekleme penceresi. (iOS Date Picker burada tanımlıdır).
+    - `tabs/`: Ana ekrandaki sekmelerin (Takvim, Finans, vb.) içerikleri.
+- **`context/`**:
+    - `AuthContext.tsx`: Giriş yapan kullanıcının bilgisini saklar. (Mock login mantığı buradadır).
+    - `ThemeContext.tsx`: Dark/Light mod geçişini yönetir.
+- **`i18n/`**: Çoklu dil alt yapısı.
+    - `i18n/translations/tr.json`: Türkçe çeviriler. Yeni bir metin ekleyecekseniz buraya ve `en.json` dosyasına eklemelisiniz.
+- **`public/api/`**: **Sadece Üretim (Production)** ortamında çalışan PHP kodları.
+    - Sunucuya yüklendiğinde (FTP ile), bu PHP dosyaları çalışır.
+    - Local geliştirme sırasında bu klasör **çalışmaz**, onun yerine `server/` klasöründeki Node.js API çalışır.
+- **`server/`**: **Sadece Geliştirme (Development)** ortamında çalışan Node.js/Express API.
 
 ---
 
-## 6. Deployment (Paylaşımlı Hosting / FTP)
+## ⚠️ Önemli Notlar
 
-1. **Build**: `npm run build`  
-   Vite, üretim dosyalarını `dist/` altına oluşturur.
-2. **`dist/` klasörünü yükleyin**:  
-   - PHP scriptleri `public/api/signup/*` klasörleriyle birlikte gelir; FTP ile olduğu gibi yüklenmelidir.  
-   - `public/api/runtime/` içinde yalnızca `.htaccess` yer alır; dosya yazma izinlerini (ör. `755`) kontrol edin.
-3. **Güncel dist’i yayınlamak için** `scripts/ftp_upload.py` kullanabilirsiniz:
+1. **Dil Dosyaları:**
+   `t('schedule.title')` gibi bir kod görürseniz, bu metin `i18n/translations/tr.json` içinden geliyordur. Sabit metin yazmak yerine daima çeviri anahtarı kullanın.
+
+2. **Takvim Mantığı:**
+   Takvim verileri `App.tsx` içindeki `dashboardData` state'inde tutulur. Gerçek bir veritabanı yerine şimdilik tarayıcı belleğinde ve örnek JSON dosyalarında çalışır.
+
+3. **Deploy (Canlıya Alma):**
    ```bash
-   FTP_HOST=ftp.hasiripi.com \
-   FTP_USER=siteadmin@hasiripi.com \
-   FTP_PASS=*** \
-   python3 scripts/ftp_upload.py --local dist --remote / --passive
+   npm run build
    ```
-4. Barındırıcı PHP sürümünün 8+ olduğundan ve `mail.hasiripi.com` SMTP erişimine izin verdiğinden emin olun.
+   Bu komut `dist/` klasörünü oluşturur. Bu klasörün içindekileri FTP ile sunucunuza yükleyebilirsiniz.
 
 ---
 
-## 7. Admin & Kullanıcı İş Akışı
+## 🔧 Sık Karşılaşılan Sorunlar
 
-0. **Admin giriş yapar** → `/api/auth/login` endpoint’i JWT üretir ve HttpOnly çerez/Authorization başlığı ile oturumu doğrular.
-1. **Kullanıcı kayıt formunu doldurur** → `Dripfy doğrulama kodunuz` başlıklı e-posta gelir.
-2. **Kod doğrulanır** → Admin adresine (ör. `info@dripfy.de`) talep özeti, kullanıcıya “kaydınız alındı” e-postası gönderilir.
-3. **Admin panelinde “Kayıt Talepleri” sekmesi** → tüm bekleyen talepler listelenir.
-4. Onay → kullanıcı + izin + kişi kaydı oluşturulur ve talep listeden kaldırılır.  
-   Red → talep silinir, audit log’a “Denied” kaydı eklenir.
-
----
-
-## 8. Scriptler & NPM Komutları
-
-| Komut | Açıklama |
-|-------|----------|
-| `npm run dev` | Vite geliştirme sunucusu |
-| `npm run server` | Express SMTP proxy (yalnızca dev) |
-| `npm run dev:full` | Her ikisini aynı anda çalıştırır |
-| `npm run build` | Üretim build’i (`dist/`) |
-| `npm run preview` | Build edilmiş uygulamayı yerelde çalıştırır |
-
-Python scriptleri:
-- `scripts/ftp_upload.py` – dist klasörünü FTP’ye yükler (`--help` ile seçenekleri görebilirsiniz).
-
----
-
-## 9. Sorun Giderme
-
-- **Kod e-postası gelmiyor**:  
-  - SMTP şifresini kontrol edin (`public/api/signup/common.php` → `sendSignupEmail` fonksiyonundaki bilgiler).  
-  - Hosting’inizin 465 portunu engellemediğinden emin olun.  
-  - `public/api/runtime/signup_codes.json` dosyasının yazılabildiğini kontrol edin.
-- **Kayıt talebi admin panelinde görünmüyor**:  
-  - `public/api/signup/index.php` doğrulama adımı, talebi `signup_requests.json` içine kaydeder. Bu dosya bozuksa silebilir, API’nin yeniden oluşturmasına izin verebilirsiniz.  
-  - Admin paneli açıldığında `fetchSignupRequests()` çağrısı yapılır; önce `/api/auth/login` ile oturum açtığınızdan ve isteklerin `Authorization` başlığı/çerezi taşıdığından emin olun.
-- **Safari’de beyaz şeritler**: `index.html` içindeki tema ayarları safe-area’ları yönetir; farklı cihazlarda sorun görürseniz `meta theme-color` değerlerini kontrol edin.
-
----
-
-## 10. Katkıda Bulunma & Kod Stili
-
-- React bileşenlerinde mümkün olduğunca fonksiyonları `useCallback` ile sarmalayın ve TypeScript tiplerini güncel tutun.
-- Yeni backend fonksiyonları eklerken PHP ve Express tarafındaki davranışın eşleşmesine dikkat edin.
-- `npm run build` komutunu çalıştırıp hata olmadığını doğrulamadan deployment yapmayın.
-
-## 11. Dokümantasyon ve Referanslar
-
-- `docs/email-branding.md` – E-posta şablon renkleri, yardımcı fonksiyonlar ve HTML/Text sürümlerini güncelleme adımları.
-- `docs/testing.md` – Kayıt ve hata yönetimi için manuel test senaryoları.
-- `public/api/signup/common.php` ve `public/api/auth/common.php` – Üretimde kullanılan PHP yardımcıları; Express (`server/index.js`) ile uyumlu tutulmalıdır.
-- `scripts/ftp_upload.py --help` – FTP dağıtım sürecini otomasyonla yapmak için kullanılabilir.
-
----
-
-Bu dokümantasyon, projenin bütünsel resmini yeni katılan bir geliştiriciye aktarmak ve eski metinlerden kalan kafa karışıklığını gidermek amacıyla hazırlanmıştır. Sorular için `info@dripfy.de` yönetici hesabını kullanabilirsiniz.
+- **"Admin girişi yapamıyorum":** `.env` dosyanızda `VITE_ADMIN_EMAIL` ve `VITE_ADMIN_PASSWORD` değerlerinin doğru ayarlandığından emin olun.
+- **"Değişikliklerim yansımadı":** Tarayıcı önbelleğini temizleyin veya `npm run dev:full` komutunu durdurup tekrar başlatın.
+- **"Takvim çizgileri görünmüyor":** Light modda çizgiler çok hafif gri, Dark modda beyazdır. `WeeklyScheduleTab.tsx` dosyasındaki `border-white/10` (Dark) ve `border-black/5` (Light) sınıflarını kontrol edin.

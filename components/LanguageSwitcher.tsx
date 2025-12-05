@@ -33,26 +33,17 @@ const LanguageSwitcher: React.FC = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-2 px-3 py-2 rounded-lg shadow-sm text-sm font-medium transition-colors border ${
-          theme === 'light'
-            ? 'bg-[var(--drip-card)] border-[var(--drip-border)] text-[var(--drip-text)] hover:bg-[var(--drip-surface)]'
-            : 'bg-neutral-800 border-neutral-700 text-neutral-200 hover:bg-neutral-700'
-        }`}
+        className="flex items-center gap-2 px-3 py-2 rounded-2xl text-sm font-bold transition-all duration-300 ios-glass hover:scale-105 active:scale-95 shadow-md border border-white/20 text-[var(--drip-text)] dark:text-white"
       >
-        <span aria-hidden="true">{selectedLanguage.flag}</span>
-        <span className="sr-only">{selectedLanguage.name}</span>
-        <ChevronDown size={16} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+        <span aria-hidden="true" className="text-lg">{selectedLanguage.flag}</span>
+        <ChevronDown size={14} className={`transition-transform duration-200 opacity-60 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
         <div
-          className={`absolute top-full right-0 mt-2 w-48 rounded-lg shadow-lg z-20 animate-fade-in-up origin-top-right border ${
-            theme === 'light'
-              ? 'bg-[var(--drip-card)] border-[var(--drip-border)]'
-              : 'bg-neutral-800 border-neutral-700'
-          }`}
+          className="absolute top-full right-0 mt-2 w-48 ios-glass rounded-2xl shadow-xl z-20 animate-fade-in-up origin-top-right border border-white/20 overflow-hidden backdrop-blur-xl"
         >
-          <ul className="py-1">
+          <ul className="py-2">
             {languages.map(lang => (
               <li key={lang.code}>
                 <button
@@ -60,13 +51,9 @@ const LanguageSwitcher: React.FC = () => {
                     setLanguage(lang.code as Language);
                     setIsOpen(false);
                   }}
-                  className={`w-full text-left flex items-center gap-3 px-4 py-2 text-sm transition-colors ${
-                    theme === 'light'
-                      ? 'text-[var(--drip-text)] hover:bg-[var(--drip-surface)]'
-                      : 'text-neutral-200 hover:bg-neutral-700'
-                  }`}
+                  className={`w-full text-left flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-colors hover:bg-white/10 ${language === lang.code ? 'bg-[var(--drip-primary)]/10 text-[var(--drip-primary)]' : 'text-[var(--drip-text)] dark:text-neutral-200'}`}
                 >
-                  <span className="text-lg">{lang.flag}</span>
+                  <span className="text-xl shadow-sm rounded-sm">{lang.flag}</span>
                   <span>{lang.name}</span>
                 </button>
               </li>

@@ -1,13 +1,16 @@
 import * as ftp from 'basic-ftp'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 async function download() {
     const client = new ftp.Client()
     client.ftp.verbose = true // Log progress
     try {
         await client.access({
-            host: "ftp.hasiripi.com",
-            user: "siteadmin@hasiripi.com",
-            password: "ceswo4-dexnyw-vatkeD",
+            host: process.env.FTP_HOST,
+            user: process.env.FTP_USER,
+            password: process.env.FTP_PASSWORD,
             secure: false
         })
         console.log("Connected to FTP. Starting download into ./hasiripi_backup...")

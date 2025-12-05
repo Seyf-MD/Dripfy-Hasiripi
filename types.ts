@@ -8,6 +8,7 @@ export interface ScheduleEvent {
   participants: string[];
   type: 'Meeting' | 'Call' | 'Event';
   creator?: string;
+  date?: string; // ISO Date string YYYY-MM-DD
 }
 
 export interface FinancialRecord {

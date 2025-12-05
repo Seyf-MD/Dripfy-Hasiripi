@@ -210,7 +210,13 @@ const CalendarTab: React.FC<CalendarTabProps> = ({ data, canEdit, onOpenModal, o
 
     const handleAddNew = (date: Date) => {
         const day = date.toLocaleString('en-us', { weekday: 'long' }) as ScheduleEvent['day'];
-        onOpenModal({ day, time: '12:00', title: '', participants: [], type: 'Meeting' }, 'schedule', true);
+        // Format date as YYYY-MM-DD using local time
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const dayOfMonth = String(date.getDate()).padStart(2, '0');
+        const dateString = `${year}-${month}-${dayOfMonth}`;
+
+        onOpenModal({ day, date: dateString, time: '12:00', title: '', participants: [], type: 'Meeting' }, 'schedule', true);
     }
 
     const handleDateSelect = (date: Date) => {
@@ -262,7 +268,7 @@ const CalendarTab: React.FC<CalendarTabProps> = ({ data, canEdit, onOpenModal, o
                             key={day.toISOString()}
                             className={`
                                 flex flex-col min-w-[140px] transition-colors duration-300
-                                ${index > 0 ? 'border-l border-white/10' : ''} 
+                                ${index > 0 ? 'border-l border-black/5 dark:border-white/10' : ''} 
                                 ${isToday ? 'bg-white/5' : ''}
                                 ${isDragTarget ? 'bg-[var(--drip-primary)]/10 shadow-inner' : ''}
                             `}
@@ -270,7 +276,7 @@ const CalendarTab: React.FC<CalendarTabProps> = ({ data, canEdit, onOpenModal, o
                             onDragLeave={handleDragLeave}
                             onDrop={(e) => handleDrop(e, dayKey)}
                         >
-                            <div className={`p-4 font-bold text-center border-b border-white/10 transition-colors ${isToday ? 'bg-[var(--drip-primary)]/10' : ''}`}>
+                            <div className={`p-4 font-bold text-center border-b border-black/5 dark:border-white/10 transition-colors ${isToday ? 'bg-[var(--drip-primary)]/10' : ''}`}>
                                 <div className="flex flex-col items-center justify-center gap-1">
                                     <span className={`text-xs uppercase tracking-widest ${isToday ? 'text-[var(--drip-primary)]' : 'opacity-60'}`}>{dayName}</span>
                                     <span className={`text-2xl font-light ${isToday ? 'text-[var(--drip-primary)]' : ''}`}>{day.getDate()}</span>
@@ -284,7 +290,7 @@ const CalendarTab: React.FC<CalendarTabProps> = ({ data, canEdit, onOpenModal, o
                                         onDragStart={(e) => handleDragStart(e, event.id)}
                                         onClick={() => onOpenModal(event, 'schedule')}
                                         className={`
-                                            ios-card relative bg-white/40 dark:bg-black/20 backdrop-blur-sm p-3 rounded-2xl border border-white/10 
+                                            ios-card relative bg-white/40 dark:bg-black/20 backdrop-blur-sm p-3 rounded-2xl border border-black/5 dark:border-white/10 
                                             hover:bg-white/60 dark:hover:bg-white/10 transition-all text-left group
                                             ${canEdit ? 'cursor-grab active:cursor-grabbing hover:shadow-lg hover:-translate-y-0.5' : 'cursor-default'}
                                         `}
@@ -330,7 +336,7 @@ const CalendarTab: React.FC<CalendarTabProps> = ({ data, canEdit, onOpenModal, o
         const monthDayLabels = [t('daysShort.mon'), t('daysShort.tue'), t('daysShort.wed'), t('daysShort.thu'), t('daysShort.fri'), t('daysShort.sat'), t('daysShort.sun')];
         return (
             <div className="ios-glass rounded-3xl overflow-hidden p-6">
-                <div className="grid grid-cols-7 text-center font-bold opacity-60 border-b border-white/10 pb-4 mb-4">
+                <div className="grid grid-cols-7 text-center font-bold opacity-60 border-b border-black/5 dark:border-white/10 pb-4 mb-4">
                     {monthDayLabels.map(day => (
                         <div key={day} className="text-sm uppercase tracking-wide">{day}</div>
                     ))}
@@ -345,8 +351,8 @@ const CalendarTab: React.FC<CalendarTabProps> = ({ data, canEdit, onOpenModal, o
                         return (
                             <div key={index}
                                 className={`
-                                    relative min-h-[120px] p-2 rounded-2xl border border-white/5 transition-all
-                                    ${!day ? 'border-none' : 'hover:bg-white/5 hover:border-white/10 hover:shadow-lg hover:-translate-y-1'} 
+                                    relative min-h-[120px] p-2 rounded-2xl border border-black/5 dark:border-white/5 transition-all
+                                    ${!day ? 'border-none' : 'hover:bg-white/5 hover:border-black/10 dark:hover:border-white/10 hover:shadow-lg hover:-translate-y-1'} 
                                     ${isToday ? 'bg-[var(--drip-primary)]/5 border-[var(--drip-primary)]/20 shadow-inner' : ''}
                                     ${isDragTarget ? 'bg-[var(--drip-primary)]/10 shadow-inner scale-[1.02]' : ''}
                                 `}

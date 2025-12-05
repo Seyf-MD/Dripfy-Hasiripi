@@ -34,8 +34,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = React.useCallback(async (email: string, password: string) => {
     // Mock Login for Demo & Local Dev
+    // NOTE: In production, ensure these ENV variables are NOT set or logic is stripped.
+    const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
+    const adminPass = import.meta.env.VITE_ADMIN_PASSWORD;
+
     if ((email === 'demo@dripfy.com' && password === '123456') ||
-      (email === 'dripfy@hasiripi.com' && password === 'fykciw-9busgI-nosgem')) {
+      (adminEmail && adminPass && email === adminEmail && password === adminPass)) {
       const mockUser: AuthUser = {
         id: email === 'demo@dripfy.com' ? '1' : '2',
         email: email,

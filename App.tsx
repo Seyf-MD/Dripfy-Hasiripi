@@ -21,7 +21,7 @@ import { WebsiteCopyProvider } from './context/WebsiteCopyContext';
 import { LegalPageKey } from './data/legalContent';
 
 import { mockData } from './data/mockData';
-import { DashboardData, DataItem, SignupRequest, ScheduleEvent, FinancialRecord, Challenge, Advantage, Contact, Task, User, UserPermission, AdminSubTab, NotificationSettings } from './types';
+import { DashboardData, DataItem, SignupRequest, ScheduleEvent, FinancialRecord, Challenge, Advantage, Contact, Task, User, UserPermission, AdminSubTab, NotificationSettings, UserRole } from './types';
 import { useLanguage } from './i18n/LanguageContext';
 import { useTheme } from './context/ThemeContext';
 import { finalizeSignup, fetchSignupRequests, resolveSignupRequest, SignupFinalizePayload } from './services/signupService';
@@ -157,7 +157,23 @@ function App() {
       const key = type as keyof DashboardData;
       if (!Array.isArray(prevData[key])) return prevData;
 
-      const updatedList = (prevData[key] as DataItem[]).map(item =>
+      let updatedList = (prevData[key] as DataItem[]);
+
+      // --- SPECIAL LOGIC: DATE ASSIGNMENT DEDUPLICATION ---
+      // If a schedule event is updated with a specific date, remove other events with the same title.
+      // This prevents recurring/duplicate entries when "finalizing" a date.
+      if (type === 'schedule' && (updatedItem as ScheduleEvent).date) {
+        const scheduleItem = updatedItem as ScheduleEvent;
+        updatedList = updatedList.filter(item =>
+          // Keep the item being updated
+          item.id === scheduleItem.id ||
+          // Keep items with DIFFERENT titles (remove same title)
+          (item as ScheduleEvent).title !== scheduleItem.title
+        );
+      }
+      // ----------------------------------------------------
+
+      updatedList = updatedList.map(item =>
         item.id === updatedItem.id ? updatedItem : item
       );
       return { ...prevData, [key]: updatedList };

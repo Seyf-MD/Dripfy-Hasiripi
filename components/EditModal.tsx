@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { DataItem, ScheduleEvent, FinancialRecord, Challenge, Advantage, Contact, Task, User } from '../types';
-import { X, Save } from 'lucide-react';
+import { X, Save, Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
 import { locationData } from '../data/locationData';
 
@@ -13,6 +13,151 @@ interface EditModalProps {
     onClose: () => void;
     onSave: (item: DataItem | Omit<DataItem, 'id'>, type: ModalType) => void;
 }
+
+const getMonthGrid = (date: Date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startDay = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1; // Mon=0
+
+    const grid: (Date | null)[] = Array(startDay).fill(null);
+    for (let i = 1; i <= daysInMonth; i++) grid.push(new Date(year, month, i));
+    return grid;
+};
+
+const IOSDatePicker: React.FC<{
+    value: string,
+    onChange: (val: string) => void,
+    className?: string
+}> = ({ value, onChange, className }) => {
+    const [isOpen, setIsOpen] = React.useState(false);
+    const [viewDate, setViewDate] = React.useState(new Date());
+    const containerRef = React.useRef<HTMLDivElement>(null);
+    const [inputValue, setInputValue] = React.useState('');
+
+    // Format YYYY-MM-DD to "15 Aralık 2025"
+    const formatDatePretty = (dateStr: string) => {
+        if (!dateStr) return '';
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) return dateStr;
+        return date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+    };
+
+    React.useEffect(() => {
+        // Sync internal input value when external value changes
+        if (value && !isNaN(new Date(value).getTime())) {
+            setViewDate(new Date(value));
+            setInputValue(formatDatePretty(value));
+        } else {
+            setInputValue('');
+        }
+    }, [value]);
+
+    React.useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const handleDateSelect = (date: Date) => {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        const isoDate = `${y}-${m}-${d}`;
+        onChange(isoDate);
+        setInputValue(formatDatePretty(isoDate)); // Update immediately for responsiveness
+        setIsOpen(false);
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = e.target.value;
+        setInputValue(val);
+
+        // Try parsing DD.MM.YYYY
+        const match = val.match(/^(\d{1,2})[./](\d{1,2})[./](\d{4})$/);
+        if (match) {
+            const d = match[1].padStart(2, '0');
+            const m = match[2].padStart(2, '0');
+            const y = match[3];
+            onChange(`${y}-${m}-${d}`);
+        }
+    };
+
+    const changeMonth = (delta: number) => {
+        setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + delta, 1));
+    };
+
+    const grid = getMonthGrid(viewDate);
+    const weekDays = ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'];
+
+    return (
+        <div className="relative" ref={containerRef}>
+            <div className="relative">
+                <input
+                    type="text"
+                    value={inputValue}
+                    onChange={handleInputChange}
+                    placeholder="GG.AA.YYYY"
+                    className={`${className} pr-10 hover:bg-white/5 focus:bg-white/10 cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden font-medium`}
+                    onFocus={() => setIsOpen(true)}
+                />
+                <button
+                    type="button"
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--drip-muted)] hover:text-[var(--drip-primary)] transition-colors"
+                >
+                    <CalendarIcon size={18} />
+                </button>
+            </div>
+
+            {isOpen && (
+                <div className="absolute top-full left-0 mt-2 w-72 ios-glass bg-[#1a1a1a]/95 backdrop-blur-3xl rounded-2xl p-4 shadow-2xl border border-white/10 z-50 animate-fade-in-up origin-top-left">
+                    <div className="flex items-center justify-between mb-4">
+                        <button type="button" onClick={() => changeMonth(-1)} className="p-1.5 rounded-full hover:bg-white/10 text-white transition-colors"><ChevronLeft size={18} /></button>
+                        <span className="font-bold text-white text-sm tracking-wide capitalize">
+                            {viewDate.toLocaleString('tr-TR', { month: 'long', year: 'numeric' })}
+                        </span>
+                        <button type="button" onClick={() => changeMonth(1)} className="p-1.5 rounded-full hover:bg-white/10 text-white transition-colors"><ChevronRight size={18} /></button>
+                    </div>
+                    <div className="grid grid-cols-7 gap-1 mb-2 border-b border-white/10 pb-2">
+                        {weekDays.map(d => <div key={d} className="text-center text-[11px] text-white/50 font-bold uppercase">{d}</div>)}
+                    </div>
+                    <div className="grid grid-cols-7 gap-1">
+                        {grid.map((d, i) => {
+                            if (!d) return <div key={i} />;
+                            // Check YYYY-MM-DD match
+                            const dString = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                            const isSelected = value === dString;
+                            const isToday = new Date().toDateString() === d.toDateString();
+                            return (
+                                <button
+                                    key={i}
+                                    type="button"
+                                    onClick={() => handleDateSelect(d)}
+                                    className={`
+                                        h-8 w-8 rounded-full flex items-center justify-center text-sm transition-all duration-200
+                                        ${isSelected
+                                            ? 'bg-[var(--drip-primary)] text-white shadow-lg shadow-[var(--drip-primary)]/30 scale-105 font-bold'
+                                            : 'text-white/90 hover:bg-white/10 hover:scale-110 active:scale-95'}
+                                        ${isToday && !isSelected ? 'border border-[var(--drip-primary)] text-[var(--drip-primary)]' : ''}
+                                    `}
+                                >
+                                    {d.getDate()}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
 
 const FormField: React.FC<{ label: string; children: React.ReactNode; className?: string }> = ({ label, children, className }) => (
     <div className={className}>
@@ -70,28 +215,61 @@ const EditModal: React.FC<EditModalProps> = ({ item, type, isNew, onClose, onSav
 
     const inputClass = "w-full px-4 py-3 bg-white/10 dark:bg-black/20 border border-white/20 rounded-2xl focus:ring-2 focus:ring-[var(--drip-primary)] focus:border-[var(--drip-primary)] focus:outline-none text-[var(--drip-text)] dark:text-white placeholder:text-[var(--drip-muted)]/40 transition-all backdrop-blur-sm shadow-inner hover:bg-white/20";
 
+    const handleScheduleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = e.target;
+        const date = new Date(value);
+        if (!isNaN(date.getTime())) {
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const dayName = days[date.getDay()];
+            setFormData(prev => ({ ...prev, date: value, day: dayName as any }));
+        } else {
+            setFormData(prev => ({ ...prev, date: value }));
+        }
+    };
+
     const renderFormFields = () => {
         switch (type) {
             case 'schedule':
                 const event = formData as Partial<ScheduleEvent>;
+                const showDateWarning = !isNew && !event.date;
                 return (
                     <>
-                        <FormField label={t('schedule.title')}><input name="title" value={event.title || ''} onChange={handleChange} className={inputClass} required placeholder="Meeting title" /></FormField>
+                        {showDateWarning && (
+                            <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 mb-2 flex items-start gap-3">
+                                <span className="text-xl">📅</span>
+                                <div>
+                                    <p className="text-sm font-bold text-amber-500">Tarih Belirle</p>
+                                    <p className="text-xs text-[var(--drip-muted)] dark:text-neutral-400 mt-0.5">
+                                        Bu etkinlik şu an tekrarlı görünüyor. Belirli bir tarih atayarak tek seferlik hale getirin.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+                        <FormField label={t('schedule.title')}><input name="title" value={event.title || ''} onChange={handleChange} className={inputClass} required placeholder={t('schedule.titlePlaceholder')} /></FormField>
                         <div className="grid grid-cols-2 gap-4">
+                            <FormField label={t('schedule.date')}>
+                                <IOSDatePicker
+                                    value={event.date || ''}
+                                    onChange={(val) => handleScheduleDateChange({ target: { value: val } } as any)}
+                                    className={inputClass}
+                                />
+                            </FormField>
                             <FormField label={t('schedule.day')}>
                                 <select name="day" value={event.day || 'Monday'} onChange={handleChange} className={inputClass}>
                                     {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(d => <option key={d} value={d} className="bg-white dark:bg-neutral-800">{t(`days.${d.toLowerCase()}`)}</option>)}
                                 </select>
                             </FormField>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
                             <FormField label={t('schedule.time')}><input type="time" name="time" value={event.time || ''} onChange={handleChange} className={inputClass} required /></FormField>
+                            <FormField label={t('schedule.type')}>
+                                <select name="type" value={event.type || 'Meeting'} onChange={handleChange} className={inputClass}>
+                                    <option value="Meeting" className="bg-white dark:bg-neutral-800">Meeting</option><option value="Call" className="bg-white dark:bg-neutral-800">Call</option><option value="Event" className="bg-white dark:bg-neutral-800">Event</option>
+                                </select>
+                            </FormField>
                         </div>
                         <FormField label={t('schedule.participants')}>
                             <input name="participants" value={(event.participants || []).join(', ')} onChange={handleParticipantsChange} className={inputClass} placeholder={t('editModal.participantsPlaceholder')} />
-                        </FormField>
-                        <FormField label={t('schedule.type')}>
-                            <select name="type" value={event.type || 'Meeting'} onChange={handleChange} className={inputClass}>
-                                <option value="Meeting" className="bg-white dark:bg-neutral-800">Meeting</option><option value="Call" className="bg-white dark:bg-neutral-800">Call</option><option value="Event" className="bg-white dark:bg-neutral-800">Event</option>
-                            </select>
                         </FormField>
                     </>
                 );

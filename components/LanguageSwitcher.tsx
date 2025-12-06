@@ -42,7 +42,7 @@ const LanguageSwitcher: React.FC = () => {
       {isOpen && (
         <div
           className="absolute top-full right-0 mt-2 w-48 ios-glass rounded-2xl shadow-xl z-20 animate-fade-in-up origin-top-right border border-white/20 overflow-hidden backdrop-blur-xl"
-          style={{ backgroundColor: theme === 'dark' ? 'rgba(22, 22, 24, 0.9)' : 'rgba(255, 255, 255, 0.9)' }}
+          style={{ backgroundColor: theme === 'dark' ? 'rgba(22, 22, 24, 0.95)' : 'rgba(255, 255, 255, 0.9)' }}
         >
           <ul className="py-2">
             {languages.map(lang => (

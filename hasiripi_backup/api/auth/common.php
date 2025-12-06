@@ -30,13 +30,6 @@ function getDefaultAuthUsers(): array
     return [
         [
             'id' => 'admin-1',
-            'email' => 'admin@dripfy.de',
-            'name' => 'Admin User',
-            'role' => 'admin',
-            'passwordHash' => '$2b$10$aiF.e7qzax.4QtWYewOTxemUR35BpAb4Twdy8jZAYHVZXrwA.SL/K',
-        ],
-        [
-            'id' => 'admin-2',
             'email' => 'dripfy@hasiripi.com',
             'name' => 'Dripfy Admin',
             'role' => 'admin',

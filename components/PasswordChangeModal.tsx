@@ -5,14 +5,15 @@ import { useLanguage } from '../i18n/LanguageContext';
 interface PasswordChangeModalProps {
     isOpen: boolean;
     onClose: () => void;
+    email: string;
 }
 
 const MOCK_VERIFICATION_CODE = "123456";
 
-const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({ isOpen, onClose }) => {
+const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({ isOpen, onClose, email: initialEmail }) => {
     const { t } = useLanguage();
     const [step, setStep] = React.useState<'email' | 'verify' | 'success'>('email');
-    const [email, setEmail] = React.useState('demo@dripfy.com');
+    const [email, setEmail] = React.useState(initialEmail);
     const [code, setCode] = React.useState('');
     const [newPassword, setNewPassword] = React.useState('');
     const [confirmPassword, setConfirmPassword] = React.useState('');
@@ -22,7 +23,7 @@ const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({ isOpen, onClo
         if (isOpen) {
             // Reset state when modal opens
             setStep('email');
-            setEmail('demo@dripfy.com');
+            setEmail(initialEmail);
             setCode('');
             setNewPassword('');
             setConfirmPassword('');

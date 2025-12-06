@@ -44,7 +44,7 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ userName, userEmail, 
             </button>
 
             {isOpen && (
-                <div className="absolute top-full right-0 mt-2 w-72 ios-glass bg-white/90 dark:bg-neutral-900/90 rounded-2xl shadow-2xl z-50 animate-fade-in-up origin-top-right border border-white/20 overflow-hidden backdrop-blur-3xl">
+                <div className="absolute top-full right-0 mt-2 w-72 ios-glass bg-white/90 dark:bg-neutral-900/95 rounded-2xl shadow-2xl z-50 animate-fade-in-up origin-top-right border border-white/20 overflow-hidden backdrop-blur-3xl">
                     <div className="p-5 border-b border-white/10 bg-white/5">
                         <p className="font-bold text-[var(--drip-text)] dark:text-white truncate text-lg">{userName}</p>
                         <p className="text-sm text-[var(--drip-muted)] dark:text-neutral-400 truncate font-medium">{userEmail}</p>

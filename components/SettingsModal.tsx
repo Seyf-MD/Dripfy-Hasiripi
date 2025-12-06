@@ -18,6 +18,7 @@ interface SettingsModalProps {
     onViewAuditLog: () => void;
     onExportData: () => void;
     onDeleteAccount: () => void;
+    onCheckUpdates: () => void;
 }
 
 const Toggle: React.FC<{ label: string; enabled: boolean; onToggle: () => void }> = ({ label, enabled, onToggle }) => (

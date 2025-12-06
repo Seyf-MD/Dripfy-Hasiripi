@@ -82,7 +82,7 @@ const DatePicker: React.FC<DatePickerProps> = ({ selectedDate, onDateSelect, onC
 
     // DatePicker now uses iOS glass style
     return (
-        <div className="absolute top-full mt-4 left-0 z-50 ios-glass rounded-2xl p-4 w-80 shadow-2xl animate-fade-in-up">
+        <div className="absolute top-full mt-4 left-0 z-[1000] ios-glass rounded-2xl p-4 w-80 shadow-2xl animate-fade-in-up border border-white/20 overflow-hidden backdrop-blur-3xl" style={{ backgroundColor: theme === 'dark' ? 'rgba(22, 22, 24, 0.925)' : 'rgba(255, 255, 255, 0.9)' }}>
             <div className="flex justify-between items-center mb-4">
                 <button onClick={handlePrevYear} className="p-1.5 rounded-full hover:bg-white/20 transition-colors"><ChevronsLeft size={16} /></button>
                 <button onClick={handlePrevMonth} className="p-1.5 rounded-full hover:bg-white/20 transition-colors"><ChevronLeft size={16} /></button>
@@ -402,7 +402,7 @@ const CalendarTab: React.FC<CalendarTabProps> = ({ data, canEdit, onOpenModal, o
 
     return (
         <div className="animate-fade-in w-full">
-            <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4 relative z-50">
                 <div className="flex items-center gap-6 p-2 rounded-2xl ios-glass">
                     <div className="flex items-center gap-1">
                         <button onClick={handlePrev} className="p-2 rounded-full hover:bg-white/20 transition-all active:scale-95"><ChevronLeft size={20} /></button>

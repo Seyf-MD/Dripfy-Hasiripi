@@ -33,25 +33,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = React.useState<string | null>(null);
 
   const login = React.useCallback(async (email: string, password: string) => {
-    // Mock Login for Demo & Local Dev
-    // NOTE: In production, ensure these ENV variables are NOT set or logic is stripped.
-    const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
-    const adminPass = import.meta.env.VITE_ADMIN_PASSWORD;
 
-    if ((email === 'demo@dripfy.com' && password === '123456') ||
-      (adminEmail && adminPass && email === adminEmail && password === adminPass)) {
-      const mockUser: AuthUser = {
-        id: email === 'demo@dripfy.com' ? '1' : '2',
-        email: email,
-        name: email === 'demo@dripfy.com' ? 'Demo User' : 'Dripfy Admin',
-        role: 'admin',
-        lastLogin: new Date().toISOString()
-      };
-      await new Promise(resolve => setTimeout(resolve, 800)); // Fake delay
-      setUser(mockUser);
-      setToken('mock-token');
-      return mockUser;
-    }
 
     const response = await fetch(LOGIN_ENDPOINT, {
       method: 'POST',

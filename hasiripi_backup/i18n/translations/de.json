@@ -1,4 +1,3 @@
-
 {
     "login": {
         "welcome": "Willkommen bei",
@@ -268,7 +267,8 @@
         "close": "Schließen",
         "save": "Speichern",
         "cancel": "Abbrechen",
-        "retry": "Erneut versuchen"
+        "retry": "Erneut versuchen",
+        "view": "Ansehen"
     },
     "chatbot": {
         "toggle": "Chatbot umschalten",
@@ -325,7 +325,8 @@
             "language": "Sprache",
             "darkMode": "Dunkelmodus",
             "emailNotifications": "E-Mail-Benachrichtigungen",
-            "pushNotifications": "Push-Benachrichtigungen"
+            "pushNotifications": "Push-Benachrichtigungen",
+            "checkUpdates": "Versionshinweise"
         },
         "privacy": {
             "title": "Datenschutz und Sicherheit",
@@ -352,7 +353,9 @@
     },
     "schedule": {
         "title": "Titel",
+        "titlePlaceholder": "Besprechungstitel",
         "day": "Tag",
+        "date": "Datum",
         "time": "Uhrzeit",
         "participants": "Teilnehmer",
         "type": "Typ"

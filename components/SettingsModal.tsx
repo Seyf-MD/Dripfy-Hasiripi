@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { X, UserCircle, Settings as SettingsIcon, Shield, Key } from 'lucide-react';
+import { X, UserCircle, Settings as SettingsIcon, Shield, Key, Sparkles } from 'lucide-react';
 import { useLanguage, Language } from '../i18n/LanguageContext';
 import { NotificationSettings } from '../types';
 import { useTheme } from '../context/ThemeContext';
@@ -40,7 +40,7 @@ const FormField: React.FC<{ label: string; children: React.ReactNode }> = ({ lab
 );
 
 
-const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, activeTab, setActiveTab, notificationSettings, onSaveSettings, onChangePasswordClick, onViewAuditLog, onExportData, onDeleteAccount }) => {
+const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, activeTab, setActiveTab, notificationSettings, onSaveSettings, onChangePasswordClick, onViewAuditLog, onExportData, onDeleteAccount, onCheckUpdates }) => {
     const { t, language, setLanguage } = useLanguage();
     const { theme, setTheme } = useTheme();
     const { user, isAdmin } = useAuth();
@@ -141,6 +141,23 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, activeTa
                                 <Toggle label={t('settings.settings.emailNotifications')} enabled={localNotifications.email} onToggle={() => handleNotificationToggle('email')} />
                                 <Toggle label={t('settings.settings.pushNotifications')} enabled={localNotifications.push} onToggle={() => handleNotificationToggle('push')} />
                             </div>
+                            <button
+                                onClick={onCheckUpdates}
+                                className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-[var(--drip-primary)]/10 to-transparent rounded-2xl border border-[var(--drip-primary)]/20 hover:border-[var(--drip-primary)]/40 hover:bg-[var(--drip-primary)]/20 transition-all group"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 rounded-lg bg-[var(--drip-primary)]/20 text-[var(--drip-primary)]">
+                                        <Sparkles size={20} />
+                                    </div>
+                                    <div className="text-left">
+                                        <p className="font-bold text-[var(--drip-text)] dark:text-white">{t('settings.settings.checkUpdates')}</p>
+                                        <p className="text-xs text-[var(--drip-muted)] dark:text-neutral-400">v2.0.0 (iOS 28 Redesign)</p>
+                                    </div>
+                                </div>
+                                <span className="text-xs font-bold px-3 py-1 rounded-full bg-[var(--drip-primary)] text-white group-hover:scale-105 transition-transform">
+                                    {t('actions.view')}
+                                </span>
+                            </button>
                         </div>
                     </div>
                 );

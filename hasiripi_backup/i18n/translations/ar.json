@@ -1,4 +1,3 @@
-
 {
     "login": {
         "welcome": "أهلاً بك في",
@@ -268,7 +267,8 @@
         "save": "حفظ",
         "cancel": "إلغاء",
         "close": "إغلاق",
-        "retry": "إعادة المحاولة"
+        "retry": "إعادة المحاولة",
+        "view": "عرض"
     },
     "chatbot": {
         "toggle": "تبديل الشات بوت",
@@ -325,7 +325,8 @@
             "language": "اللغة",
             "darkMode": "الوضع الداكن",
             "emailNotifications": "إشعارات البريد الإلكتروني",
-            "pushNotifications": "الإشعارات الفورية"
+            "pushNotifications": "الإشعارات الفورية",
+            "checkUpdates": "ملاحظات الإصدار"
         },
         "privacy": {
             "title": "الخصوصية والأمان",
@@ -352,7 +353,9 @@
     },
     "schedule": {
         "title": "العنوان",
+        "titlePlaceholder": "عنوان الاجتماع",
         "day": "اليوم",
+        "date": "التاريخ",
         "time": "الوقت",
         "participants": "المشاركون",
         "type": "النوع"

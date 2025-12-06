@@ -15,7 +15,7 @@ require_once __DIR__ . '/../vendor/PHPMailer/SMTP.php';
  */
 
 const AUTH_DEFAULT_COOKIE = 'dripfy_admin_token';
-const AUTH_DEFAULT_SECRET = 'change-this-secret';
+
 const AUTH_DEFAULT_EXPIRY = '15m';
 const AUTH_RUNTIME_DIR = __DIR__ . '/../runtime';
 const AUTH_USERS_FILE = AUTH_RUNTIME_DIR . '/auth_users.json';
@@ -96,9 +96,11 @@ function base64urlDecode(string $input): string
 
 function getAuthSecret(): string
 {
-    return getEnvValue('JWT_SECRET')
-        ?? getEnvValue('AUTH_SECRET')
-        ?? AUTH_DEFAULT_SECRET;
+    $secret = getEnvValue('JWT_SECRET') ?? getEnvValue('AUTH_SECRET');
+    if ($secret === null || $secret === '') {
+        throw new \RuntimeException('Secure configuration error: JWT_SECRET or AUTH_SECRET environment variable is required.');
+    }
+    return $secret;
 }
 
 function ensureAuthRuntimeDir(): void

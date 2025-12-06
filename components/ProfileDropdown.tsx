@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { User, Settings, LogOut, Shield, UserCircle, FileText } from 'lucide-react';
+import { User, Settings, LogOut, Shield, UserCircle, FileText, Sparkles } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
 
 type SettingsTab = 'profile' | 'settings' | 'privacy';

@@ -15,6 +15,8 @@ import DetailModal from './components/DetailModal';
 import EditModal from './components/EditModal';
 import SettingsModal from './components/SettingsModal';
 import PasswordChangeModal from './components/PasswordChangeModal';
+import ReleaseNotesModal from './components/ReleaseNotesModal';
+import { releaseNotes, LATEST_VERSION } from './data/releaseNotes';
 import LegalPage from './components/LegalPage';
 import LegalEditorModal from './components/LegalEditorModal';
 import { WebsiteCopyProvider } from './context/WebsiteCopyContext';
@@ -83,7 +85,37 @@ function App() {
   const [editModalItem, setEditModalItem] = React.useState<{ item: Partial<DataItem>, type: ModalType, isNew: boolean } | null>(null);
   const [settingsModalOpen, setSettingsModalOpen] = React.useState(false);
   const [settingsActiveTab, setSettingsActiveTab] = React.useState<SettingsPanelTab>('profile');
-  const [passwordChangeModalOpen, setPasswordChangeModalOpen] = React.useState(false);
+  const [isPasswordChangeModalOpen, setIsPasswordChangeModalOpen] = React.useState(false);
+  const [releaseNoteModalOpen, setReleaseNoteModalOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    const version = LATEST_VERSION;
+    const neverShow = window.localStorage.getItem(`dripfy_release_note_v${version}_nevershow`);
+    const countStr = window.localStorage.getItem(`dripfy_release_note_v${version}_count`);
+    const count = parseInt(countStr || '0', 10);
+
+    if (!neverShow && count < 5) {
+      setTimeout(() => {
+        setReleaseNoteModalOpen(true);
+      }, 1500);
+    }
+  }, []);
+
+  const handleCloseReleaseNotes = (dontShowAgain: boolean) => {
+    const version = LATEST_VERSION;
+    const countStr = window.localStorage.getItem(`dripfy_release_note_v${version}_count`);
+    const count = parseInt(countStr || '0', 10);
+
+    // Increment view count
+    window.localStorage.setItem(`dripfy_release_note_v${version}_count`, (count + 1).toString());
+
+    if (dontShowAgain) {
+      window.localStorage.setItem(`dripfy_release_note_v${version}_nevershow`, 'true');
+    }
+    setReleaseNoteModalOpen(false);
+  };
+
+
 
   const [financialsDateFilter, setFinancialsDateFilter] = React.useState<'week' | 'month' | null>(null);
 
@@ -512,6 +544,11 @@ function App() {
                 onSave={editModalItem.isNew ? handleCreateItem as any : handleUpdateItem as any}
               />
             )}
+            <ReleaseNotesModal
+              isOpen={releaseNoteModalOpen}
+              onClose={handleCloseReleaseNotes}
+              note={releaseNotes[0]}
+            />
             <SettingsModal
               isOpen={settingsModalOpen}
               onClose={() => setSettingsModalOpen(false)}
@@ -519,17 +556,19 @@ function App() {
               setActiveTab={setSettingsActiveTab}
               notificationSettings={notificationSettings}
               onSaveSettings={handleSaveSettings}
+              onCheckUpdates={() => setReleaseNoteModalOpen(true)}
               onChangePasswordClick={() => {
                 setSettingsModalOpen(false);
-                setPasswordChangeModalOpen(true);
+                setIsPasswordChangeModalOpen(true);
               }}
               onViewAuditLog={handleViewAuditLog}
               onExportData={handleExportData}
               onDeleteAccount={handleDeleteAccount}
             />
             <PasswordChangeModal
-              isOpen={passwordChangeModalOpen}
-              onClose={() => setPasswordChangeModalOpen(false)}
+              isOpen={isPasswordChangeModalOpen}
+              email={user?.email || ''}
+              onClose={() => setIsPasswordChangeModalOpen(false)}
             />
           </div>
         </>

@@ -17,29 +17,52 @@ interface StatCardProps {
 const StatCard: React.FC<StatCardProps> = ({ icon, title, value, subValue, children, delay, onClick }) => {
   const { theme } = useTheme();
 
-  const containerClasses = theme === 'light'
-    ? 'bg-[var(--drip-card)] border-[var(--drip-border)] hover:border-[var(--drip-primary)] hover:shadow-[0_18px_36px_-24px_rgba(75,165,134,0.65)]'
-    : 'bg-neutral-800 border-neutral-700 hover:border-[var(--drip-primary)] hover:shadow-2xl hover:shadow-black/20';
-
-  const labelColor = theme === 'light' ? 'text-[var(--drip-muted)]' : 'text-neutral-400';
-  const valueColor = theme === 'light' ? 'text-[var(--drip-text)]' : 'text-white';
-  const subValueColor = theme === 'light' ? 'text-[var(--drip-muted)]' : 'text-neutral-400';
+  // iOS 26 Card Styles
+  const containerClasses = `
+    ios-glass ios-card relative overflow-hidden
+    ${theme === 'light'
+      ? 'hover:shadow-[0_20px_40px_-12px_rgba(75,165,134,0.25)]'
+      : 'hover:shadow-[0_20px_40px_-12px_rgba(75,165,134,0.4)]'}
+  `;
 
   return (
-    <div 
+    <div
       onClick={onClick}
-      className={`p-5 rounded-xl border flex flex-col justify-between h-full transition-all duration-300 hover:-translate-y-1 animate-slide-in-up ${containerClasses} ${onClick ? 'cursor-pointer' : ''}`}
+      className={`p-6 flex flex-col justify-between h-full transition-all duration-500 hover:-translate-y-2 animate-slide-in-up ${containerClasses} ${onClick ? 'cursor-pointer group' : ''}`}
       style={{ animationDelay: `${delay}ms` }}
     >
-      <div>
-        <div className={`flex justify-between items-center ${labelColor}`}>
-          <span className="text-sm font-medium">{title}</span>
-          {icon}
-        </div>
-        <p className={`text-3xl font-bold mt-2 ${valueColor}`}>{value}</p>
-        {subValue && <p className={`text-xs mt-1 ${subValueColor}`}>{subValue}</p>}
+      {/* Glowing Edge Effect */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+        <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--drip-primary)] to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-[var(--drip-primary)] to-transparent" />
       </div>
-      {children && <div className="mt-4">{children}</div>}
+
+      <div className="relative z-10">
+        <div className="flex justify-between items-start mb-4">
+          <span className={`text-sm font-semibold tracking-wide uppercase opacity-70 ${theme === 'light' ? 'text-[var(--drip-muted)]' : 'text-neutral-400'}`}>
+            {title}
+          </span>
+          <div className={`p-2 rounded-xl ${theme === 'light' ? 'bg-[rgba(75,165,134,0.1)] text-[var(--drip-primary)]' : 'bg-white/10 text-[var(--drip-primary)]'}`}>
+            {icon}
+          </div>
+        </div>
+
+        <div className="space-y-1">
+          <p className={`text-4xl font-bold tracking-tight ${theme === 'light' ? 'text-[var(--drip-text)]' : 'text-[var(--drip-dark-text)]'}`}>
+            {value}
+          </p>
+          {subValue && (
+            <p className={`text-xs font-medium ${theme === 'light' ? 'text-[var(--drip-muted)]' : 'text-neutral-500'}`}>
+              {subValue}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {children && <div className="mt-6 relative z-10">{children}</div>}
+
+      {/* Background Gradient Blob */}
+      <div className={`absolute -bottom-10 -right-10 w-32 h-32 rounded-full blur-3xl opacity-20 pointer-events-none transition-transform duration-700 group-hover:scale-150 ${theme === 'light' ? 'bg-[var(--drip-primary)]' : 'bg-[var(--drip-primary)]'}`} />
     </div>
   );
 };
@@ -56,7 +79,7 @@ interface StatCardsProps {
 const StatCards: React.FC<StatCardsProps> = ({ schedule, contacts, tasks, financials, setActiveTab, onPendingPaymentsClick }) => {
   const { t } = useLanguage();
   const { theme } = useTheme();
-  
+
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter(task => task.status === 'Done').length;
   const completionPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
@@ -72,9 +95,9 @@ const StatCards: React.FC<StatCardsProps> = ({ schedule, contacts, tasks, financ
   const pendingPaymentsValue = `€${formattedPendingPayments}`;
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8 px-2">
       <StatCard
-        delay={200}
+        delay={100}
         icon={<Briefcase size={20} />}
         title={t('statCards.totalMeetings')}
         value={totalMeetingsCount.toString()}
@@ -82,7 +105,7 @@ const StatCards: React.FC<StatCardsProps> = ({ schedule, contacts, tasks, financ
         onClick={() => setActiveTab('Calendar')}
       />
       <StatCard
-        delay={300}
+        delay={200}
         icon={<Euro size={20} />}
         title={t('statCards.pendingPayments')}
         value={pendingPaymentsValue}
@@ -90,7 +113,7 @@ const StatCards: React.FC<StatCardsProps> = ({ schedule, contacts, tasks, financ
         onClick={onPendingPaymentsClick}
       />
       <StatCard
-        delay={400}
+        delay={300}
         icon={<Users size={20} />}
         title={t('statCards.activePartners')}
         value={activePartnersCount.toString()}
@@ -98,20 +121,17 @@ const StatCards: React.FC<StatCardsProps> = ({ schedule, contacts, tasks, financ
         onClick={() => setActiveTab('Contacts')}
       />
       <StatCard
-        delay={500}
+        delay={400}
         icon={<BarChart2 size={20} />}
         title={t('statCards.taskCompletion')}
         value={`${completionPercentage}%`}
         onClick={() => setActiveTab('Tasks')}
       >
-        <div
-          className="w-full rounded-full h-2 bg-slate-200 dark:bg-neutral-700"
-          style={{ backgroundColor: theme === 'light' ? 'rgba(75, 165, 134, 0.25)' : undefined }}
-        >
+        <div className="w-full rounded-full h-1.5 bg-gray-200/20 overflow-hidden">
           <div
-            className="h-2 rounded-full bg-[var(--drip-primary)]"
+            className="h-full rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)] transition-all duration-1000 ease-out"
             style={{ width: `${completionPercentage}%` }}
-          ></div>
+          />
         </div>
       </StatCard>
     </div>

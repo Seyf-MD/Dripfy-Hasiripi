@@ -1,4 +1,3 @@
-
 {
     "login": {
         "welcome": "Welcome to",
@@ -268,7 +267,8 @@
         "close": "Close",
         "save": "Save",
         "cancel": "Cancel",
-        "retry": "Retry"
+        "retry": "Retry",
+        "view": "View"
     },
     "chatbot": {
         "toggle": "Toggle Chatbot",
@@ -325,7 +325,8 @@
             "language": "Language",
             "darkMode": "Dark Mode",
             "emailNotifications": "Email Notifications",
-            "pushNotifications": "Push Notifications"
+            "pushNotifications": "Push Notifications",
+            "checkUpdates": "Release Notes"
         },
         "privacy": {
             "title": "Privacy and Security",
@@ -352,7 +353,9 @@
     },
     "schedule": {
         "title": "Title",
+        "titlePlaceholder": "Meeting title",
         "day": "Day",
+        "date": "Date",
         "time": "Time",
         "participants": "Participants",
         "type": "Type"

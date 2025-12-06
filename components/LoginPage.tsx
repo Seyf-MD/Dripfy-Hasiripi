@@ -12,6 +12,7 @@ import ForgotPasswordDialog from './ForgotPasswordDialog';
 
 const REMEMBER_EMAIL_STORAGE_KEY = 'dripfy_remember_email';
 const REMEMBER_PASSWORD_STORAGE_KEY = 'dripfy_remember_password';
+const LOGGED_OUT_KEY = 'dripfy-logged-out';
 
 interface LoginPageProps {
     onSignupRequest: (payload: { email: string; code: string }) => Promise<SignupFinalizePayload>;
@@ -30,7 +31,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSignupRequest, onOpenLegal }) =
     const handleThemeToggle = () => {
         setTheme(theme === 'dark' ? 'light' : 'dark');
     };
-    
+
     // Login state
     const [loginEmail, setLoginEmail] = React.useState('');
     const [loginPassword, setLoginPassword] = React.useState('');
@@ -44,7 +45,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSignupRequest, onOpenLegal }) =
     const [isForgotPasswordOpen, setIsForgotPasswordOpen] = React.useState(false);
     const [showPassword, setShowPassword] = React.useState(false);
     const [rememberMe, setRememberMe] = React.useState(false);
-    const [autoLoginAttempted, setAutoLoginAttempted] = React.useState(false);
     const [isAutoLoggingIn, setIsAutoLoggingIn] = React.useState(false);
 
     // Populate saved email/password when available
@@ -52,23 +52,35 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSignupRequest, onOpenLegal }) =
         if (typeof window === 'undefined') return;
         const storedEmail = window.localStorage.getItem(REMEMBER_EMAIL_STORAGE_KEY);
         const storedPassword = window.localStorage.getItem(REMEMBER_PASSWORD_STORAGE_KEY);
+        const justLoggedOut = window.localStorage.getItem(LOGGED_OUT_KEY) === 'true';
+
         if (storedEmail) {
             setLoginEmail(storedEmail);
             setRememberMe(true);
         }
-        if (storedEmail && storedPassword) {
-            setAutoLoginAttempted(true);
+
+        // Only auto-login if credentials exist AND user didn't just log out
+        if (storedEmail && storedPassword && !justLoggedOut) {
             const decodedPassword = atob(storedPassword);
+            // Autofill password just in case
+            setLoginPassword(decodedPassword);
+
             (async () => {
                 setIsAutoLoggingIn(true);
                 try {
                     await login(storedEmail, decodedPassword);
                 } catch (error) {
                     setLoginErrorKey('login.errors.invalidCredentials');
+                    // If auto login fails, maybe clear stored password?
+                    // window.localStorage.removeItem(REMEMBER_PASSWORD_STORAGE_KEY);
                 } finally {
                     setIsAutoLoggingIn(false);
                 }
             })();
+        } else if (storedEmail && storedPassword && justLoggedOut) {
+            // If just logged out, prefill password too for convenience, but don't submit
+            const decodedPassword = atob(storedPassword);
+            setLoginPassword(decodedPassword);
         }
     }, [login]);
 
@@ -81,7 +93,11 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSignupRequest, onOpenLegal }) =
         try {
             const trimmedEmail = loginEmail.trim();
             await login(trimmedEmail, loginPassword);
+
             if (typeof window !== 'undefined') {
+                // Clear the logged-out flag since we are logging in explicitly
+                window.localStorage.removeItem(LOGGED_OUT_KEY);
+
                 if (rememberMe) {
                     window.localStorage.setItem(REMEMBER_EMAIL_STORAGE_KEY, trimmedEmail);
                     window.localStorage.setItem(REMEMBER_PASSWORD_STORAGE_KEY, btoa(loginPassword));
@@ -115,6 +131,15 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSignupRequest, onOpenLegal }) =
     }, []);
 
     const renderContent = () => {
+        if (isAutoLoggingIn) {
+            return (
+                <div className="flex flex-col items-center justify-center space-y-4 py-8">
+                    <div className="w-12 h-12 border-4 border-white/20 border-t-[var(--drip-primary)] rounded-full animate-spin"></div>
+                    <p className="text-sm font-medium text-[var(--drip-muted)] dark:text-neutral-400 animate-pulse">{t('login.autoLoggingIn', 'Giriş yapılıyor...')}</p>
+                </div>
+            );
+        }
+
         if (view === 'login') {
             return (
                 <>
@@ -207,7 +232,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSignupRequest, onOpenLegal }) =
                     </form>
                     <div className="text-sm text-center">
                         <button onClick={() => setView('signup')} className="font-medium text-[var(--drip-primary)] hover:text-[var(--drip-primary-dark)] dark:text-[var(--drip-primary)] dark:hover:text-[rgba(75,165,134,0.8)]">
-                           {t('signup.prompt')}
+                            {t('signup.prompt')}
                         </button>
                     </div>
                 </>
@@ -255,71 +280,76 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSignupRequest, onOpenLegal }) =
 
     return (
         <>
-        <div className="min-h-screen bg-slate-100 dark:bg-neutral-900 flex items-center justify-center animate-fade-in p-2 sm:p-4 w-full">
-            {renderNotification()}
-             <div className="absolute top-6 right-6 flex items-center gap-3">
-                <LanguageSwitcher />
-                <button
-                    onClick={handleThemeToggle}
-                    className={`flex items-center justify-center w-10 h-10 rounded-full transition-colors border ${theme === 'light'
-                        ? 'bg-[color:rgba(75,165,134,0.1)] border-[var(--drip-primary)] text-[var(--drip-primary)] hover:bg-[var(--drip-primary)] hover:text-white shadow-sm'
-                        : 'bg-[color:rgba(36,65,55,0.6)] border-[var(--drip-primary)] text-[var(--drip-dark-text)] hover:bg-[var(--drip-primary)] hover:text-white shadow-sm'
-                    }`}
-                    aria-label={theme === 'dark' ? 'Activate light mode' : 'Activate dark mode'}
-                >
-                    {theme === 'dark' ? (
-                        <Sun size={18} />
-                    ) : (
-                        <Moon size={18} />
-                    )}
-                </button>
-            </div>
-            <div className="w-full max-w-md p-8 space-y-6 bg-white dark:bg-neutral-800 rounded-xl border border-slate-200 dark:border-neutral-700 shadow-2xl">
-                <div className="flex flex-col items-center text-center">
-                    <BrandLogo className="h-12 w-auto" />
-                    <p className="mt-2 text-sm text-[var(--drip-muted)] dark:text-neutral-400 tracking-wide">
-                        {t('login.subtitle')}
-                    </p>
+            <div className="min-h-screen flex items-center justify-center animate-fade-in p-4 w-full relative overflow-hidden bg-[var(--drip-surface)] dark:bg-[var(--drip-dark-surface)] transition-colors duration-500">
+                {/* Background Elements */}
+                <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-[var(--drip-primary)]/20 blur-[120px] pointer-events-none" />
+                <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-[var(--drip-accent)]/20 blur-[120px] pointer-events-none" />
+
+                {renderNotification()}
+                <div className="absolute top-6 right-6 flex items-center gap-3 z-50">
+                    <LanguageSwitcher />
+                    <button
+                        onClick={handleThemeToggle}
+                        className={`flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 border ${theme === 'light'
+                            ? 'bg-[var(--drip-card)] border-[var(--drip-border)] text-[var(--drip-text)] hover:bg-[var(--drip-surface)] hover:shadow-lg'
+                            : 'bg-black/20 border-white/10 text-[var(--drip-dark-text)] hover:bg-white/10 hover:shadow-lg'
+                            }`}
+                        aria-label={theme === 'dark' ? 'Activate light mode' : 'Activate dark mode'}
+                    >
+                        {theme === 'dark' ? (
+                            <Sun size={18} />
+                        ) : (
+                            <Moon size={18} />
+                        )}
+                    </button>
                 </div>
 
-                {renderContent()}
-
-                <div className="pt-4 border-t border-slate-200 dark:border-neutral-700">
-                    <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-[var(--drip-muted)]/80 dark:text-neutral-500">
-                        <button
-                            type="button"
-                            onClick={() => onOpenLegal('impressum')}
-                            className="hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
-                        >
-                            {t('footer.imprint')}
-                        </button>
-                        <span aria-hidden="true">•</span>
-                        <button
-                            type="button"
-                            onClick={() => onOpenLegal('privacy')}
-                            className="hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
-                        >
-                            {t('footer.privacy')}
-                        </button>
-                        <span aria-hidden="true">•</span>
-                        <button
-                            type="button"
-                            onClick={() => onOpenLegal('terms')}
-                            className="hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
-                        >
-                            {t('footer.terms')}
-                        </button>
+                <div className="w-full max-w-md p-8 space-y-8 ios-glass rounded-3xl shadow-2xl relative z-10">
+                    <div className="flex flex-col items-center text-center">
+                        <BrandLogo className="h-14 w-auto mb-2" />
+                        <p className="text-sm font-medium tracking-wide opacity-60">
+                            {t('login.subtitle')}
+                        </p>
                     </div>
-                </div>
 
+                    {renderContent()}
+
+                    <div className="pt-6 border-t border-gray-200/20">
+                        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs opacity-50 hover:opacity-80 transition-opacity">
+                            <button
+                                type="button"
+                                onClick={() => onOpenLegal('impressum')}
+                                className="hover:underline transition-all"
+                            >
+                                {t('footer.imprint')}
+                            </button>
+                            <span aria-hidden="true">•</span>
+                            <button
+                                type="button"
+                                onClick={() => onOpenLegal('privacy')}
+                                className="hover:underline transition-all"
+                            >
+                                {t('footer.privacy')}
+                            </button>
+                            <span aria-hidden="true">•</span>
+                            <button
+                                type="button"
+                                onClick={() => onOpenLegal('terms')}
+                                className="hover:underline transition-all"
+                            >
+                                {t('footer.terms')}
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
             </div>
-        </div>
-        <ForgotPasswordDialog
-            isOpen={isForgotPasswordOpen}
-            defaultEmail={loginEmail}
-            onClose={() => setIsForgotPasswordOpen(false)}
-            onCompleted={handlePasswordResetSuccess}
-        />
+            <ForgotPasswordDialog
+                isOpen={isForgotPasswordOpen}
+                defaultEmail={loginEmail}
+                onClose={() => setIsForgotPasswordOpen(false)}
+                onCompleted={handlePasswordResetSuccess}
+            />
         </>
     );
 };

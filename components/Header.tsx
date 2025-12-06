@@ -26,43 +26,51 @@ const Header: React.FC<HeaderProps> = ({ onLogout, onOpenSettings, onOpenLegalEd
         setTheme(theme === 'dark' ? 'light' : 'dark');
     };
 
-    const headerClasses = theme === 'light'
-        ? 'bg-[rgba(250,249,246,0.92)] border-[var(--drip-border)]'
-        : 'bg-neutral-900/80 border-neutral-800';
-
-    const themeToggleClasses = theme === 'light'
-        ? 'bg-[color:rgba(75,165,134,0.1)] border-[var(--drip-primary)] text-[var(--drip-primary)] hover:bg-[var(--drip-primary)] hover:text-white shadow-sm'
-        : 'bg-[color:rgba(36,65,55,0.6)] border-[var(--drip-primary)] text-[var(--drip-dark-text)] hover:bg-[var(--drip-primary)] hover:text-white shadow-sm';
+    // iOS 26 Header Styles
+    const headerClasses = 'ios-glass sticky top-4 z-50 mx-4 sm:mx-auto max-w-7xl rounded-2xl transition-all duration-300';
 
     return (
-        <header className={`${headerClasses} backdrop-blur-sm sticky top-0 z-30 border-b py-2 sm:py-3`}>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-16">
-                    <div className="flex flex-col">
-                        <BrandLogo className="h-10 w-auto sm:h-12" />
-                        <p className={`text-sm tracking-wide mt-1 ${theme === 'light' ? 'text-[var(--drip-muted)]' : 'text-neutral-400'}`}>{t('login.subtitle')}</p>
+        <header className={headerClasses}>
+            <div className="px-4 sm:px-6 lg:px-8">
+                <div className="flex items-center justify-between h-20">
+                    <div className="flex flex-col justify-center">
+                        <BrandLogo className="h-8 w-auto sm:h-10 transition-transform hover:scale-105" />
+                        <p className={`text-xs font-medium tracking-wider mt-1 opacity-70 ${theme === 'light' ? 'text-gray-600' : 'text-gray-300'}`}>
+                            {t('login.subtitle')}
+                        </p>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3 sm:gap-5">
                         <LanguageSwitcher />
+
                         <button
                             onClick={handleThemeToggle}
-                            className={`flex items-center justify-center w-10 h-10 rounded-full transition-colors border ${themeToggleClasses}`}
+                            className={`
+                                relative group flex items-center justify-center w-10 h-10 rounded-full 
+                                transition-all duration-300 hover:scale-110 active:scale-95
+                                ${theme === 'light'
+                                    ? 'bg-[var(--drip-card)] hover:bg-[var(--drip-surface)] text-[var(--drip-text)] shadow-sm hover:shadow-md'
+                                    : 'bg-white/10 hover:bg-white/20 text-[var(--drip-dark-text)] shadow-inner'}
+                            `}
                             aria-label={theme === 'dark' ? 'Activate light mode' : 'Activate dark mode'}
                         >
+                            <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[var(--drip-primary)]/20 to-[var(--drip-accent)]/20 opacity-0 group-hover:opacity-100 transition-opacity" />
                             {theme === 'dark' ? (
-                                <Sun size={20} className="text-[var(--drip-dark-text)]" />
+                                <Sun size={20} className="relative z-10" />
                             ) : (
-                                <Moon size={20} className="text-[var(--drip-muted)]" />
+                                <Moon size={20} className="relative z-10" />
                             )}
                         </button>
-                        <ProfileDropdown 
-                            userName={userName}
-                            userEmail={userEmail}
-                            onLogout={onLogout}
-                            onOpenSettings={onOpenSettings}
-                            isAdmin={isAdmin}
-                            onOpenLegalEditor={onOpenLegalEditor}
-                        />
+
+                        <div className="pl-2 border-l border-gray-200/20">
+                            <ProfileDropdown
+                                userName={userName}
+                                userEmail={userEmail}
+                                onLogout={onLogout}
+                                onOpenSettings={onOpenSettings}
+                                isAdmin={isAdmin}
+                                onOpenLegalEditor={onOpenLegalEditor}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

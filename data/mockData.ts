@@ -2,11 +2,11 @@ import { DashboardData } from '../types';
 
 export const mockData: DashboardData = {
   schedule: [
-    { id: 's1', day: 'Monday', time: '10:00', title: 'German Medical ile Press Release Toplantısı', participants: ['Marcus', 'PR Team'], type: 'Meeting' },
-    { id: 's2', day: 'Tuesday', time: '14:00', title: 'David Lyodds Club ile Wellness Entegrasyon Görüşmesi', participants: ['Gabriel'], type: 'Call' },
-    { id: 's3', day: 'Wednesday', time: '11:30', title: 'Dr. Adeel Khan ile Plazmaferez Cihazı Görüşmesi', participants: ['Dr. Adeel Khan'], type: 'Meeting' },
-    { id: 's4', day: 'Thursday', time: '16:00', title: 'Frankfurt Healthexpo Katılımcı Listesi Talebi', participants: ['Event Team'], type: 'Event' },
-    { id: 's5', day: 'Friday', time: '15:00', title: 'Kliwla Family Office ile Dripfy Flagship Görüşmesi', participants: ['Dt. Moritz Breitenbach', 'Osman Altinisik'], type: 'Meeting' },
+    { id: 's1', day: 'Monday', time: '10:00', title: 'German Medical ile Press Release Toplantısı', participants: ['Marcus', 'PR Team'], type: 'Meeting', creator: 'Ömer Hasırıpi' },
+    { id: 's2', day: 'Tuesday', time: '14:00', title: 'David Lyodds Club ile Wellness Entegrasyon Görüşmesi', participants: ['Gabriel'], type: 'Call', creator: 'Marcus' },
+    { id: 's3', day: 'Wednesday', time: '11:30', title: 'Dr. Adeel Khan ile Plazmaferez Cihazı Görüşmesi', participants: ['Dr. Adeel Khan'], type: 'Meeting', creator: 'Gabriel' },
+    { id: 's4', day: 'Thursday', time: '16:00', title: 'Frankfurt Healthexpo Katılımcı Listesi Talebi', participants: ['Event Team'], type: 'Event', creator: 'Event Team' },
+    { id: 's5', day: 'Friday', time: '15:00', title: 'Kliwla Family Office ile Dripfy Flagship Görüşmesi', participants: ['Dt. Moritz Breitenbach', 'Osman Altinisik'], type: 'Meeting', creator: 'Osman Altinisik' },
   ],
   financials: [
     { id: 'f1', description: 'Ibo Ödemesi', amount: -500, status: 'Pending', dueDate: '2024-10-07', type: 'Outgoing' },
@@ -100,28 +100,28 @@ export const mockData: DashboardData = {
     { id: 't42', title: 'Marstem (Prof. Tunc Hoca) ile Exosome Üretimi Görüşmesi (Istanbul)', priority: 'High', status: 'To Do', dueDate: '2024-10-17', assignee: 'Prof. Tunc Hoca' },
   ],
   users: [
-      { id: 'u1', name: 'Demo User', email: 'demo@dripfy.com', role: 'user', lastLogin: '2024-07-26 10:00' },
-      { id: 'u2', name: 'Admin User', email: 'admin@dripfy.de', role: 'admin', lastLogin: '2024-07-26 11:30' },
+    { id: 'u1', name: 'Demo User', email: 'demo@dripfy.com', role: 'user', lastLogin: '2024-07-26 10:00' },
+    { id: 'u2', name: 'Admin User', email: 'admin@dripfy.de', role: 'admin', lastLogin: '2024-07-26 11:30' },
   ],
   auditLog: [
     { id: 'l1', user: 'Admin User', action: 'Updated', targetType: 'Task', targetId: 't17', timestamp: '2024-07-26 11:32', details: 'Status changed to Done' },
     { id: 'l2', user: 'Admin User', action: 'Created', targetType: 'Contact', targetId: 'ct25', timestamp: '2024-07-26 11:35', details: 'Added new company: Hair Chefs' },
   ],
   userPermissions: [
-      {
-          userId: 'u1',
-          userName: 'Demo User',
-          permissions: {
-              schedule: { view: true, edit: true },
-              financials: { view: true, edit: true },
-              challenges: { view: true, edit: true },
-              advantages: { view: true, edit: true },
-              contacts: { view: true, edit: true },
-              tasks: { view: true, edit: true },
-          }
+    {
+      userId: 'u1',
+      userName: 'Demo User',
+      permissions: {
+        schedule: { view: true, edit: true },
+        financials: { view: true, edit: true },
+        challenges: { view: true, edit: true },
+        advantages: { view: true, edit: true },
+        contacts: { view: true, edit: true },
+        tasks: { view: true, edit: true },
       }
+    }
   ],
   signupRequests: [
-      { id: 'sr1', name: 'Laura Schmidt', email: 'laura.s@example.com', phone: '+49123456789', position: 'Team Lead', status: 'pending', timestamp: '2024-07-27 09:15:00' }
+    { id: 'sr1', name: 'Laura Schmidt', email: 'laura.s@example.com', phone: '+49123456789', position: 'Team Lead', status: 'pending', timestamp: '2024-07-27 09:15:00' }
   ]
 };

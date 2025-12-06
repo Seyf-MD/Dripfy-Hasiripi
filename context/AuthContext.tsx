@@ -33,6 +33,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = React.useState<string | null>(null);
 
   const login = React.useCallback(async (email: string, password: string) => {
+
+
     const response = await fetch(LOGIN_ENDPOINT, {
       method: 'POST',
       headers: {
@@ -67,6 +69,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } finally {
       setUser(null);
       setToken(null);
+      localStorage.setItem('dripfy-logged-out', 'true');
     }
   }, []);
 

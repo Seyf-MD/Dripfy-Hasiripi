@@ -2,6 +2,7 @@ import * as React from 'react';
 import { ScheduleEvent } from '../../types';
 import { Clock, Users, Calendar as CalendarIcon, PlusCircle, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { useLanguage } from '../../i18n/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 
 // Helper functions for date manipulation
 const getWeekDays = (date: Date): Date[] => {
@@ -22,34 +23,39 @@ const getMonthGrid = (date: Date): (Date | null)[] => {
     const firstDayOfMonth = new Date(year, month, 1);
     const lastDayOfMonth = new Date(year, month + 1, 0);
     const daysInMonth = lastDayOfMonth.getDate();
-    
+
     const startDayOfWeek = firstDayOfMonth.getDay() === 0 ? 6 : firstDayOfMonth.getDay() - 1; // Monday as 0
-    
+
     const grid: (Date | null)[] = [];
-    
+
     for (let i = 0; i < startDayOfWeek; i++) {
         grid.push(null);
     }
-    
+
     for (let i = 1; i <= daysInMonth; i++) {
         grid.push(new Date(year, month, i));
     }
-    
+
     while (grid.length % 7 !== 0 || grid.length < 35) {
-         grid.push(null);
+        grid.push(null);
     }
 
     return grid;
 };
 
-const isSameDay = (d1: Date, d2: Date) => 
+const isSameDay = (d1: Date, d2: Date) =>
     d1.getFullYear() === d2.getFullYear() &&
     d1.getMonth() === d2.getMonth() &&
     d1.getDate() === d2.getDate();
 
 // Component-specific helpers
+const getCreatorInitials = (name?: string) => {
+    if (!name) return '';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+}
+
 const getTypeIcon = (type: string) => {
-    const icons = { Meeting: <CalendarIcon size={14} className="text-blue-400 flex-shrink-0"/>, Call: <Users size={14} className="text-green-400 flex-shrink-0"/>, Event: <Clock size={14} className="text-purple-400 flex-shrink-0"/> };
+    const icons = { Meeting: <CalendarIcon size={14} className="text-blue-500 flex-shrink-0" />, Call: <Users size={14} className="text-green-500 flex-shrink-0" />, Event: <Clock size={14} className="text-purple-500 flex-shrink-0" /> };
     return icons[type as keyof typeof icons] || null;
 }
 
@@ -62,6 +68,7 @@ interface DatePickerProps {
 const DatePicker: React.FC<DatePickerProps> = ({ selectedDate, onDateSelect, onClose }) => {
     const [viewDate, setViewDate] = React.useState(new Date(selectedDate));
     const { language, t } = useLanguage();
+    const { theme } = useTheme();
 
     const handlePrevMonth = () => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1));
     const handleNextMonth = () => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1));
@@ -73,21 +80,22 @@ const DatePicker: React.FC<DatePickerProps> = ({ selectedDate, onDateSelect, onC
 
     const weekDayLabels = [t('daysShort.mon'), t('daysShort.tue'), t('daysShort.wed'), t('daysShort.thu'), t('daysShort.fri'), t('daysShort.sat'), t('daysShort.sun')];
 
+    // DatePicker now uses iOS glass style
     return (
-        <div className="absolute top-full mt-2 left-0 z-10 bg-white dark:bg-neutral-800 border border-slate-200 dark:border-neutral-600 rounded-lg shadow-xl p-4 w-80">
-            <div className="flex justify-between items-center mb-2">
-                <button onClick={handlePrevYear} className="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-neutral-700"><ChevronsLeft size={16}/></button>
-                <button onClick={handlePrevMonth} className="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-neutral-700"><ChevronLeft size={16}/></button>
-                <div className="font-bold text-center">
+        <div className="absolute top-full mt-4 left-0 z-[1000] ios-glass rounded-2xl p-4 w-80 shadow-2xl animate-fade-in-up border border-white/20 overflow-hidden backdrop-blur-3xl" style={{ backgroundColor: theme === 'dark' ? 'rgba(22, 22, 24, 0.925)' : 'rgba(255, 255, 255, 0.9)' }}>
+            <div className="flex justify-between items-center mb-4">
+                <button onClick={handlePrevYear} className="p-1.5 rounded-full hover:bg-white/20 transition-colors"><ChevronsLeft size={16} /></button>
+                <button onClick={handlePrevMonth} className="p-1.5 rounded-full hover:bg-white/20 transition-colors"><ChevronLeft size={16} /></button>
+                <div className="font-bold text-center tracking-wide">
                     {viewDate.toLocaleString(language, { month: 'long', year: 'numeric' })}
                 </div>
-                <button onClick={handleNextMonth} className="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-neutral-700"><ChevronRight size={16}/></button>
-                <button onClick={handleNextYear} className="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-neutral-700"><ChevronsRight size={16}/></button>
+                <button onClick={handleNextMonth} className="p-1.5 rounded-full hover:bg-white/20 transition-colors"><ChevronRight size={16} /></button>
+                <button onClick={handleNextYear} className="p-1.5 rounded-full hover:bg-white/20 transition-colors"><ChevronsRight size={16} /></button>
             </div>
-            <div className="grid grid-cols-7 text-center text-xs text-[var(--drip-muted)] dark:text-neutral-400 mb-2">
+            <div className="grid grid-cols-7 text-center text-xs font-semibold opacity-60 mb-2">
                 {weekDayLabels.map(day => <div key={day}>{day}</div>)}
             </div>
-            <div className="grid grid-cols-7 text-center text-sm">
+            <div className="grid grid-cols-7 text-center text-sm gap-y-1">
                 {monthGrid.map((day, index) => {
                     if (!day) return <div key={index} className="w-9 h-9" />;
 
@@ -99,9 +107,11 @@ const DatePicker: React.FC<DatePickerProps> = ({ selectedDate, onDateSelect, onC
                             key={index}
                             onClick={() => { onDateSelect(day); onClose(); }}
                             className={`
-                                w-9 h-9 flex items-center justify-center rounded-full transition-colors
-                                ${isSelected ? 'bg-[var(--drip-primary)] text-white font-bold' : 'hover:bg-slate-100 dark:hover:bg-neutral-700'}
-                                ${isToday && !isSelected ? 'border border-slate-400 dark:border-neutral-500' : ''}
+                                w-9 h-9 flex items-center justify-center rounded-full transition-all duration-300
+                                ${isSelected
+                                    ? 'bg-[var(--drip-primary)] text-white shadow-lg scale-105'
+                                    : 'hover:bg-white/20 hover:scale-110 active:scale-95'}
+                                ${isToday && !isSelected ? 'border-2 border-[var(--drip-primary)]/50' : ''}
                             `}
                         >
                             {day.getDate()}
@@ -118,14 +128,17 @@ interface CalendarTabProps {
     data: ScheduleEvent[];
     canEdit: boolean;
     onOpenModal: (item: ScheduleEvent | Partial<ScheduleEvent>, type: 'schedule', isNew?: boolean) => void;
+    onUpdateEvent: (eventId: string, newDay: string) => void;
 }
 
-const CalendarTab: React.FC<CalendarTabProps> = ({ data, canEdit, onOpenModal }) => {
+const CalendarTab: React.FC<CalendarTabProps> = ({ data, canEdit, onOpenModal, onUpdateEvent }) => {
     const { t, language } = useLanguage();
+    const { theme } = useTheme();
     const [view, setView] = React.useState<'week' | 'month'>('week');
     const [currentDate, setCurrentDate] = React.useState(new Date());
     const [isDatePickerOpen, setIsDatePickerOpen] = React.useState(false);
     const datePickerRef = React.useRef<HTMLDivElement>(null);
+    const [dragOverDay, setDragOverDay] = React.useState<string | null>(null);
 
     React.useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -136,6 +149,33 @@ const CalendarTab: React.FC<CalendarTabProps> = ({ data, canEdit, onOpenModal })
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
+
+    const handleDragStart = (e: React.DragEvent<HTMLDivElement>, eventId: string) => {
+        e.dataTransfer.setData("eventId", eventId);
+        e.dataTransfer.effectAllowed = "move";
+    };
+
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>, dayKey: string) => {
+        e.preventDefault();
+        if (canEdit) {
+            e.dataTransfer.dropEffect = "move";
+            setDragOverDay(dayKey);
+        }
+    };
+
+    const handleDragLeave = () => {
+        setDragOverDay(null);
+    }
+
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>, dayKey: string) => {
+        e.preventDefault();
+        setDragOverDay(null);
+        const eventId = e.dataTransfer.getData("eventId");
+        if (canEdit && eventId) {
+            onUpdateEvent(eventId, dayKey);
+        }
+    };
+
 
     const weekDays = React.useMemo(() => getWeekDays(currentDate), [currentDate]);
     const monthGrid = React.useMemo(() => getMonthGrid(currentDate), [currentDate]);
@@ -163,33 +203,39 @@ const CalendarTab: React.FC<CalendarTabProps> = ({ data, canEdit, onOpenModal })
             return newDate;
         });
     };
-    
+
     const handleToday = () => {
         setCurrentDate(new Date());
     }
-    
+
     const handleAddNew = (date: Date) => {
         const day = date.toLocaleString('en-us', { weekday: 'long' }) as ScheduleEvent['day'];
-        onOpenModal({ day, time: '12:00', title: '', participants: [], type: 'Meeting' }, 'schedule', true);
+        // Format date as YYYY-MM-DD using local time
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const dayOfMonth = String(date.getDate()).padStart(2, '0');
+        const dateString = `${year}-${month}-${dayOfMonth}`;
+
+        onOpenModal({ day, date: dateString, time: '12:00', title: '', participants: [], type: 'Meeting' }, 'schedule', true);
     }
-    
+
     const handleDateSelect = (date: Date) => {
         setCurrentDate(date);
     };
 
     const today = new Date();
-    
+
     const getEventsForDay = (day: Date): ScheduleEvent[] => {
-         const dayOfWeek = day.toLocaleString('en-us', { weekday: 'long' });
-         return data
+        const dayOfWeek = day.toLocaleString('en-us', { weekday: 'long' });
+        return data
             .filter(event => event.day === dayOfWeek)
-            .sort((a,b) => a.time.localeCompare(b.time));
+            .sort((a, b) => a.time.localeCompare(b.time));
     }
-    
+
     const weeklyEvents = React.useMemo(() => {
         const dayMap = {} as Record<ScheduleEvent['day'], ScheduleEvent[]>;
         const daysOfWeek: ScheduleEvent['day'][] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-        
+
         daysOfWeek.forEach(day => {
             dayMap[day] = [];
         });
@@ -209,41 +255,73 @@ const CalendarTab: React.FC<CalendarTabProps> = ({ data, canEdit, onOpenModal })
 
 
     const renderWeekView = () => (
-        <div className="overflow-x-auto bg-white dark:bg-neutral-800/50 rounded-lg border border-slate-200 dark:border-neutral-700">
+        <div className="overflow-x-auto ios-glass rounded-3xl pb-2">
             <div className="grid grid-cols-7 min-w-[980px] lg:min-w-full">
                 {weekDays.map((day, index) => {
                     const dayName = day.toLocaleString(language, { weekday: 'long' });
                     const dayKey = day.toLocaleString('en-us', { weekday: 'long' }) as ScheduleEvent['day'];
                     const isToday = isSameDay(day, today);
+                    const isDragTarget = dragOverDay === dayKey;
+
                     return (
-                        <div key={day.toISOString()} className={`flex flex-col min-w-[140px] ${index > 0 ? 'border-l border-slate-200 dark:border-neutral-700' : ''} ${isToday ? 'bg-slate-50 dark:bg-neutral-700/20' : ''}`}>
-                            <div className={`p-3 font-bold text-center border-b border-slate-200 dark:border-neutral-700 transition-colors ${isToday ? 'bg-[color:rgba(75,165,134,0.12)]' : 'bg-white dark:bg-neutral-800'}`}>
-                                <div className="flex items-center justify-center gap-2">
-                                    <span className={isToday ? 'text-[var(--drip-primary)]' : 'text-[var(--drip-text)] dark:text-neutral-300'}>{dayName}</span>
-                                    <span className={`text-sm ${isToday ? 'text-[var(--drip-text)] dark:text-white' : 'text-neutral-500'}`}>{day.getDate()}</span>
+                        <div
+                            key={day.toISOString()}
+                            className={`
+                                flex flex-col min-w-[140px] transition-colors duration-300
+                                ${index > 0 ? 'border-l border-black/5 dark:border-white/10' : ''} 
+                                ${isToday ? 'bg-white/5' : ''}
+                                ${isDragTarget ? 'bg-[var(--drip-primary)]/10 shadow-inner' : ''}
+                            `}
+                            onDragOver={(e) => handleDragOver(e, dayKey)}
+                            onDragLeave={handleDragLeave}
+                            onDrop={(e) => handleDrop(e, dayKey)}
+                        >
+                            <div className={`p-4 font-bold text-center border-b border-black/5 dark:border-white/10 transition-colors ${isToday ? 'bg-[var(--drip-primary)]/10' : ''}`}>
+                                <div className="flex flex-col items-center justify-center gap-1">
+                                    <span className={`text-xs uppercase tracking-widest ${isToday ? 'text-[var(--drip-primary)]' : 'opacity-60'}`}>{dayName}</span>
+                                    <span className={`text-2xl font-light ${isToday ? 'text-[var(--drip-primary)]' : ''}`}>{day.getDate()}</span>
                                 </div>
                             </div>
-                            <div className="p-2 space-y-2 flex-grow min-h-[300px]">
+                            <div className="p-3 space-y-3 flex-grow min-h-[300px]">
                                 {(weeklyEvents[dayKey] || []).map(event => (
-                                    <div 
-                                        key={event.id} 
-                                        onClick={() => onOpenModal(event, 'schedule')} 
-                                        className="bg-slate-50 dark:bg-neutral-900/50 p-3 rounded-md border border-slate-200 dark:border-neutral-700 cursor-pointer hover:bg-slate-100 dark:hover:bg-neutral-700/50 hover:border-[color:rgba(75,165,134,0.45)] transition-all text-left shadow"
+                                    <div
+                                        key={event.id}
+                                        draggable={canEdit}
+                                        onDragStart={(e) => handleDragStart(e, event.id)}
+                                        onClick={() => onOpenModal(event, 'schedule')}
+                                        className={`
+                                            ios-card relative bg-white/40 dark:bg-black/20 backdrop-blur-sm p-3 rounded-2xl border border-black/5 dark:border-white/10 
+                                            hover:bg-white/60 dark:hover:bg-white/10 transition-all text-left group
+                                            ${canEdit ? 'cursor-grab active:cursor-grabbing hover:shadow-lg hover:-translate-y-0.5' : 'cursor-default'}
+                                        `}
                                     >
-                                        <p className="text-sm font-bold text-[var(--drip-text)] dark:text-white leading-tight break-words">{event.title}</p>
-                                        <div className="flex items-center gap-1.5 mt-2 text-xs text-[var(--drip-muted)] dark:text-neutral-400">
+                                        <p className="text-sm font-semibold leading-tight break-words group-hover:text-[var(--drip-primary)] transition-colors pr-4">{event.title}</p>
+                                        <div className="flex items-center gap-1.5 mt-2 text-xs opacity-70">
                                             {getTypeIcon(event.type)}
                                             <span>{event.time}</span>
                                         </div>
+                                        {event.creator && (
+                                            <div className="absolute bottom-2 right-2 group/tooltip z-10">
+                                                <div className="w-6 h-6 rounded-full flex items-center justify-center bg-gradient-to-br from-white/40 to-white/10 dark:from-white/10 dark:to-transparent border border-white/20 shadow-sm backdrop-blur-md transition-transform hover:scale-110 cursor-help">
+                                                    <span className="text-[9px] font-extrabold text-[var(--drip-primary)] tracking-tight">
+                                                        {getCreatorInitials(event.creator)}
+                                                    </span>
+                                                </div>
+
+                                                <div className="absolute bottom-full right-0 mb-2 px-3 py-1.5 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border border-white/20 text-[var(--drip-text)] dark:text-white text-xs font-medium rounded-xl shadow-xl whitespace-nowrap opacity-0 translate-y-2 scale-95 group-hover/tooltip:opacity-100 group-hover/tooltip:translate-y-0 group-hover/tooltip:scale-100 transition-all duration-300 origin-bottom-right pointer-events-none">
+                                                    {event.creator}
+                                                    <div className="absolute -bottom-1 right-2 w-2 h-2 bg-white/80 dark:bg-neutral-900/80 border-r border-b border-white/20 transform rotate-45"></div>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 ))}
                                 {canEdit && (
-                                     <button 
+                                    <button
                                         onClick={() => handleAddNew(day)}
-                                        className="w-full flex items-center justify-center text-neutral-400 dark:text-neutral-600 hover:bg-slate-100 dark:hover:bg-neutral-700/50 hover:text-[var(--drip-primary)] rounded-md transition-colors py-2 group mt-2"
-                                        aria-label={`${t('calendar.addEventTo')} ${dayName}`}
+                                        className="w-full flex items-center justify-center opacity-40 hover:opacity-100 hover:text-[var(--drip-primary)] rounded-xl transition-all py-3 group mt-auto hover:bg-white/10"
                                     >
-                                         <PlusCircle size={16} className="opacity-50 group-hover:opacity-100 transition-opacity" />
+                                        <PlusCircle size={20} className="transition-transform group-hover:scale-110" />
                                     </button>
                                 )}
                             </div>
@@ -256,29 +334,57 @@ const CalendarTab: React.FC<CalendarTabProps> = ({ data, canEdit, onOpenModal })
 
     const renderMonthView = () => {
         const monthDayLabels = [t('daysShort.mon'), t('daysShort.tue'), t('daysShort.wed'), t('daysShort.thu'), t('daysShort.fri'), t('daysShort.sat'), t('daysShort.sun')];
-        return(
-            <div className="bg-white dark:bg-neutral-800/50 rounded-lg border border-slate-200 dark:border-neutral-700">
-                <div className="grid grid-cols-7 text-center font-bold text-[var(--drip-muted)] dark:text-neutral-400 border-b border-slate-200 dark:border-neutral-700">
+        return (
+            <div className="ios-glass rounded-3xl overflow-hidden p-6">
+                <div className="grid grid-cols-7 text-center font-bold opacity-60 border-b border-black/5 dark:border-white/10 pb-4 mb-4">
                     {monthDayLabels.map(day => (
-                        <div key={day} className="py-2">{day}</div>
+                        <div key={day} className="text-sm uppercase tracking-wide">{day}</div>
                     ))}
                 </div>
-                <div className="grid grid-cols-7 grid-rows-6">
+                <div className="grid grid-cols-7 gap-2">
                     {monthGrid.map((day, index) => {
                         const isToday = day ? isSameDay(day, today) : false;
                         const dayEvents = day ? getEventsForDay(day) : [];
+                        const dayWeekName = day ? day.toLocaleString('en-us', { weekday: 'long' }) : null;
+                        const isDragTarget = dayWeekName && dragOverDay === dayWeekName;
+
                         return (
-                            <div key={index} className={`relative h-32 p-2 border-b border-r border-slate-200 dark:border-neutral-700 ${!day ? 'bg-slate-50 dark:bg-neutral-800/30' : 'hover:bg-slate-50 dark:hover:bg-neutral-700/30'} transition-colors`}>
+                            <div key={index}
+                                className={`
+                                    relative min-h-[120px] p-2 rounded-2xl border border-black/5 dark:border-white/5 transition-all
+                                    ${!day ? 'border-none' : 'hover:bg-white/5 hover:border-black/10 dark:hover:border-white/10 hover:shadow-lg hover:-translate-y-1'} 
+                                    ${isToday ? 'bg-[var(--drip-primary)]/5 border-[var(--drip-primary)]/20 shadow-inner' : ''}
+                                    ${isDragTarget ? 'bg-[var(--drip-primary)]/10 shadow-inner scale-[1.02]' : ''}
+                                `}
+                                onDragOver={(e) => dayWeekName && handleDragOver(e, dayWeekName)}
+                                onDragLeave={handleDragLeave}
+                                onDrop={(e) => dayWeekName && handleDrop(e, dayWeekName)}
+                            >
                                 {day && (
                                     <>
-                                        <span className={`text-sm ${isToday ? 'bg-[var(--drip-primary)] text-white rounded-full w-6 h-6 flex items-center justify-center font-bold' : 'text-neutral-800 dark:text-neutral-200'}`}>{day.getDate()}</span>
-                                        <div className="mt-1 space-y-1 overflow-y-auto max-h-20">
+                                        <div className={`text-sm font-medium mb-2 ${isToday ? 'text-[var(--drip-primary)]' : 'opacity-80'}`}>
+                                            {day.getDate()}
+                                        </div>
+                                        <div className="space-y-1 overflow-y-auto max-h-[80px] scrollbar-hide">
                                             {dayEvents.map(event => (
-                                                <div key={event.id} onClick={() => onOpenModal(event, 'schedule')} className="text-xs text-left px-1 py-0.5 bg-blue-500/20 text-blue-500 dark:text-blue-300 rounded truncate cursor-pointer hover:bg-blue-500/40">{event.title}</div>
+                                                <div
+                                                    key={event.id}
+                                                    draggable={canEdit}
+                                                    onDragStart={(e) => handleDragStart(e, event.id)}
+                                                    onClick={() => onOpenModal(event, 'schedule')}
+                                                    className={`
+                                                        text-[10px] px-2 py-1 bg-[var(--drip-primary)]/10 text-[var(--drip-primary)] rounded-lg truncate transition-colors
+                                                        ${canEdit ? 'cursor-grab active:cursor-grabbing hover:bg-[var(--drip-primary)]/30' : 'cursor-pointer hover:bg-[var(--drip-primary)]/20'}
+                                                    `}
+                                                >
+                                                    {event.title}
+                                                </div>
                                             ))}
                                         </div>
                                         {canEdit && (
-                                            <button onClick={() => handleAddNew(day)} className="absolute bottom-1 right-1 text-neutral-400 dark:text-neutral-600 hover:text-[var(--drip-primary)] opacity-0 hover:opacity-100 transition-opacity"><PlusCircle size={16}/></button>
+                                            <button onClick={() => handleAddNew(day)} className="absolute bottom-2 right-2 opacity-0 hover:opacity-100 text-[var(--drip-primary)] transition-all transform hover:scale-110">
+                                                <PlusCircle size={18} />
+                                            </button>
                                         )}
                                     </>
                                 )}
@@ -289,28 +395,27 @@ const CalendarTab: React.FC<CalendarTabProps> = ({ data, canEdit, onOpenModal })
             </div>
         )
     };
-    
-    const currentRangeLabel = view === 'week' 
+
+    const currentRangeLabel = view === 'week'
         ? `${weekDays[0].toLocaleDateString(language, { month: 'short', day: 'numeric' })} - ${weekDays[6].toLocaleDateString(language, { month: 'short', day: 'numeric', year: 'numeric' })}`
         : currentDate.toLocaleDateString(language, { month: 'long', year: 'numeric' });
 
     return (
-        <div className="animate-fade-in">
-             <div className="flex flex-wrap justify-between items-center mb-4 gap-4">
-                <div className="flex items-center gap-4">
+        <div className="animate-fade-in w-full">
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4 relative z-50">
+                <div className="flex items-center gap-6 p-2 rounded-2xl ios-glass">
                     <div className="flex items-center gap-1">
-                        <button onClick={handlePrev} className="p-2 rounded-md hover:bg-slate-100 dark:hover:bg-neutral-700"><ChevronLeft size={20}/></button>
-                         <button onClick={handleNext} className="p-2 rounded-md hover:bg-slate-100 dark:hover:bg-neutral-700"><ChevronRight size={20}/></button>
+                        <button onClick={handlePrev} className="p-2 rounded-full hover:bg-white/20 transition-all active:scale-95"><ChevronLeft size={20} /></button>
+                        <button onClick={handleNext} className="p-2 rounded-full hover:bg-white/20 transition-all active:scale-95"><ChevronRight size={20} /></button>
                     </div>
-                    <button onClick={handleToday} className="px-3 py-1.5 border border-slate-300 dark:border-neutral-600 rounded-md text-sm font-semibold hover:bg-slate-100 dark:hover:bg-neutral-700">{t('calendar.today')}</button>
-                    
+                    <button onClick={handleToday} className="px-4 py-1.5 rounded-full text-sm font-semibold hover:bg-white/20 transition-colors bg-white/5 border border-white/10 shadow-sm">{t('calendar.today')}</button>
+
                     <div className="relative" ref={datePickerRef}>
-                        <button 
-                            onClick={() => setIsDatePickerOpen(prev => !prev)} 
-                            className="text-xl font-bold p-1 rounded-md hover:bg-slate-100 dark:hover:bg-neutral-700 transition-colors"
-                            aria-label={t('calendar.openPicker')}
+                        <button
+                            onClick={() => setIsDatePickerOpen(prev => !prev)}
+                            className="text-lg font-bold px-3 py-1 rounded-xl hover:bg-white/20 transition-all flex items-center gap-2"
                         >
-                           {currentRangeLabel}
+                            {currentRangeLabel}
                         </button>
                         {isDatePickerOpen && (
                             <DatePicker
@@ -322,19 +427,19 @@ const CalendarTab: React.FC<CalendarTabProps> = ({ data, canEdit, onOpenModal })
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                    <div className="flex items-center bg-slate-100 dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 rounded-lg p-1">
-                        <button onClick={() => setView('month')} className={`px-3 py-1 text-sm font-semibold rounded-md ${view === 'month' ? 'bg-[var(--drip-primary)] text-white' : 'hover:bg-slate-200 dark:hover:bg-neutral-700'}`}>{t('calendar.month')}</button>
-                        <button onClick={() => setView('week')} className={`px-3 py-1 text-sm font-semibold rounded-md ${view === 'week' ? 'bg-[var(--drip-primary)] text-white' : 'hover:bg-slate-200 dark:hover:bg-neutral-700'}`}>{t('calendar.week')}</button>
+                <div className="flex items-center gap-3">
+                    <div className="flex items-center p-1 rounded-full ios-glass">
+                        <button onClick={() => setView('month')} className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-all duration-300 ${view === 'month' ? 'bg-[var(--drip-primary)] text-white shadow-md' : 'hover:bg-white/10'}`}>{t('calendar.month')}</button>
+                        <button onClick={() => setView('week')} className={`px-4 py-1.5 text-sm font-semibold rounded-full transition-all duration-300 ${view === 'week' ? 'bg-[var(--drip-primary)] text-white shadow-md' : 'hover:bg-white/10'}`}>{t('calendar.week')}</button>
                     </div>
-                     {canEdit && (
-                        <button onClick={() => handleAddNew(new Date())} className="flex items-center gap-2 px-4 py-2 bg-[var(--drip-primary)] text-white text-sm font-semibold rounded-lg hover:bg-[var(--drip-primary-dark)] transition-colors">
-                            <PlusCircle size={18}/> {t('calendar.newEvent')}
+                    {canEdit && (
+                        <button onClick={() => handleAddNew(new Date())} className="flex items-center gap-2 px-5 py-2.5 bg-[var(--drip-primary)] text-white text-sm font-bold rounded-full shadow-lg shadow-[var(--drip-primary)]/30 hover:shadow-[var(--drip-primary)]/50 hover:-translate-y-0.5 transition-all">
+                            <PlusCircle size={18} /> {t('calendar.newEvent')}
                         </button>
                     )}
                 </div>
             </div>
-            
+
             {view === 'week' ? renderWeekView() : renderMonthView()}
 
         </div>

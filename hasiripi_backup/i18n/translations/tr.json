@@ -1,0 +1,389 @@
+{
+    "login": {
+        "welcome": "Hoş geldiniz",
+        "subtitle": "longevity by infusions",
+        "emailPlaceholder": "E-posta adresi",
+        "passwordPlaceholder": "Şifre",
+        "signInButton": "Giriş Yap",
+        "forgotPassword": "Şifremi unuttum",
+        "rememberMe": "Beni hatırla",
+        "showPassword": "Şifreyi göster",
+        "hidePassword": "Şifreyi gizle",
+        "errors": {
+            "invalidCredentials": "E-posta veya parola hatalı.",
+            "generic": "Giriş işlemi tamamlanamadı. Lütfen tekrar deneyin.",
+            "hint": "Bilgilerinizin doğru olduğundan eminseniz, lütfen sistem yöneticisiyle iletişime geçin."
+        }
+    },
+    "passwordReset": {
+        "title": "Şifreyi Sıfırla",
+        "subtitleEmail": "E-posta adresinizi girin, size doğrulama kodu gönderelim.",
+        "subtitleVerify": "{email} adresine gönderilen doğrulama kodunu girip yeni parolanızı belirleyin.",
+        "emailLabel": "E-posta adresi",
+        "sendCode": "Kodu gönder",
+        "sending": "Gönderiliyor...",
+        "codeLabel": "Doğrulama kodu",
+        "passwordLabel": "Yeni parola",
+        "confirmPasswordLabel": "Yeni parolayı doğrula",
+        "back": "Geri dön",
+        "resetPassword": "Parolayı güncelle",
+        "submitting": "Güncelleniyor...",
+        "successTitle": "Parola güncellendi",
+        "successBody": "Parolanız değiştirildi. Artık yeni bilgilerinizle giriş yapabilirsiniz.",
+        "messages": {
+            "codeSent": "{email} adresine doğrulama kodu gönderdik. Lütfen gelen kutunuzu kontrol edin."
+        },
+        "errors": {
+            "emailRequired": "Lütfen e-posta adresinizi girin.",
+            "requestFailed": "Sıfırlama işlemi başlatılamadı. Lütfen tekrar deneyin.",
+            "codeAndPasswordRequired": "Doğrulama kodu ve yeni parola zorunludur.",
+            "passwordLength": "Parolanız en az 8 karakter olmalıdır.",
+            "passwordMismatch": "Parolalar birbiriyle eşleşmiyor.",
+            "resetFailed": "Parolanız güncellenemedi. Lütfen kodu kontrol edip tekrar deneyin."
+        }
+    },
+    "signup": {
+        "prompt": "Hesabınız yok mu? Kayıt olun",
+        "loginPrompt": "Zaten bir hesabınız var mı? Giriş yapın",
+        "firstNamePlaceholder": "Ad",
+        "lastNamePlaceholder": "Soyad",
+        "emailPlaceholder": "E-posta adresi",
+        "phonePlaceholder": "Telefon numarası",
+        "companyPlaceholder": "Firma (opsiyonel)",
+        "countryCodeLabel": "Ülke kodu",
+        "passwordPlaceholder": "Şifre Oluştur",
+        "signUpButton": "Kayıt Ol",
+        "requestReceived": "Kayıt talebiniz alındı! Bir yönetici yakında inceleyecektir.",
+        "requestError": "Kayıt talebi gönderilemedi. Lütfen kısa bir süre sonra tekrar deneyin.",
+        "errors": {
+            "firstName": "Lütfen ad bölümüne en az 2 karakter girin.",
+            "lastName": "Lütfen soyad bölümüne en az 2 karakter girin.",
+            "email": "Geçerli bir e-posta adresi girin.",
+            "phone": "Geçerli bir telefon numarası girin.",
+            "countryCode": "Lütfen ülke kodu seçin.",
+            "position": "Lütfen pozisyon seçin.",
+            "badRequest": "Bilgilerinizi işleyemedik. Lütfen formu gözden geçirip tekrar deneyin.",
+            "unauthorized": "Devam etmeden önce oturum açmanız gerekiyor.",
+            "forbidden": "Bu işlemi gerçekleştirme izniniz yok.",
+            "notFound": "Bilgilerinize uygun bir kayıt talebi bulunamadı.",
+            "conflict": "Bu e-posta ile kayıtlı bir hesap zaten var.",
+            "validation": "Bazı bilgiler hatalı görünüyor. Lütfen formu kontrol edip tekrar deneyin.",
+            "rateLimited": "Çok fazla deneme yaptınız. Lütfen biraz bekleyip tekrar deneyin.",
+            "server": "Sunucularımızda bir sorun var. Lütfen daha sonra tekrar deneyin.",
+            "generic": "Kaydınızı şu anda tamamlayamadık. Lütfen tekrar deneyin.",
+            "network": "Sunucuya ulaşılamadı. Bağlantınızı kontrol edip tekrar deneyin.",
+            "sessionRequired": "Yönetici oturumunuzun süresi doldu. Lütfen yeniden giriş yapın.",
+            "unexpectedResponse": "Sunucudan beklenmeyen bir yanıt alındı."
+        },
+        "notification": {
+            "codeSentTitle": "Doğrulama kodu gönderildi",
+            "codeSentBody": "Lütfen e-postanızı kontrol edin ve 6 haneli kodu girin.",
+            "successTitle": "Kayıt talebiniz alındı",
+            "successBody": "Yönetici talebinizi inceleyip kısa sürede erişiminizi açacaktır.",
+            "errorTitle": "Bir sorun oluştu",
+            "errorBody": "Lütfen tekrar deneyin veya sorun devam ederse destekle iletişime geçin."
+        }
+    },
+    "verify": {
+        "title": "E-postanızı doğrulayın",
+        "subtitle": "{email} adresine bir doğrulama kodu gönderdik. Lütfen aşağıya girin.",
+        "codePlaceholder": "Doğrulama Kodu",
+        "button": "Doğrula ve Kaydol",
+        "backButton": "Geri dön",
+        "invalidCode": "Geçersiz doğrulama kodu. Lütfen tekrar deneyin."
+    },
+    "positions": {
+        "CEO": "CEO",
+        "CTO": "CTO",
+        "CFO": "CFO",
+        "COO": "COO",
+        "HeadofDepartment": "Departman Başkanı",
+        "TeamLead": "Takım Lideri",
+        "ProjectManager": "Proje Yöneticisi",
+        "SeniorSpecialist": "Kıdemli Uzman",
+        "JuniorSpecialist": "Uzman",
+        "Intern": "Stajyer"
+    },
+    "dashboard": {
+        "title": "Kontrol Paneli"
+    },
+    "statCards": {
+        "totalMeetings": "Toplam Toplantılar",
+        "meetingsThisWeek": "Bu hafta başlayan toplantılar",
+        "pendingPayments": "Bekleyen Ödemeler",
+        "startThisWeek": "Bu hafta başla",
+        "activePartners": "Aktif Partnerler",
+        "acrossAllRegions": "Tüm bölgelerde",
+        "taskCompletion": "Görev Tamamlama",
+        "progress": "İlerleme"
+    },
+    "tabs": {
+        "calendar": "Takvim",
+        "financials": "Finansallar",
+        "challenges": "Zorluklar & Avantajlar",
+        "contacts": "Kişiler",
+        "tasks": "Görevler",
+        "adminPanel": "Yönetici Paneli"
+    },
+    "calendar": {
+        "today": "Bugün",
+        "month": "Ay",
+        "week": "Hafta",
+        "newEvent": "Yeni Etkinlik",
+        "openPicker": "Tarih seçiciyi aç",
+        "addEventTo": "Şuraya etkinlik ekle:"
+    },
+    "days": {
+        "monday": "Pazartesi",
+        "tuesday": "Salı",
+        "wednesday": "Çarşamba",
+        "thursday": "Perşembe",
+        "friday": "Cuma",
+        "saturday": "Cumartesi",
+        "sunday": "Pazar"
+    },
+    "daysShort": {
+        "mon": "Pzt",
+        "tue": "Sal",
+        "wed": "Çar",
+        "thu": "Per",
+        "fri": "Cum",
+        "sat": "Cmt",
+        "sun": "Paz"
+    },
+    "financials": {
+        "description": "Açıklama",
+        "amount": "Miktar",
+        "status": "Durum",
+        "dueDate": "Vade Tarihi",
+        "type": "Tür",
+        "newRecord": "Yeni Kayıt",
+        "incoming": "Gelen",
+        "outgoing": "Giden"
+    },
+    "challenges": {
+        "title": "Zorluklar",
+        "add": "Zorluk Ekle",
+        "description": "Açıklama",
+        "severity": "Önem Derecesi",
+        "severities": {
+            "high": "Yüksek",
+            "medium": "Orta",
+            "low": "Düşük"
+        }
+    },
+    "advantages": {
+        "title": "Avantajlar",
+        "add": "Avantaj Ekle",
+        "description": "Açıklama"
+    },
+    "contacts": {
+        "searchPlaceholder": "İsim, rol, şehir ara...",
+        "newContact": "Yeni Kişi",
+        "sort": {
+            "firstNameAsc": "Ad (A-Z)",
+            "firstNameDesc": "Ad (Z-A)",
+            "lastNameAsc": "Soyad (A-Z)",
+            "lastNameDesc": "Soyad (Z-A)",
+            "countryAsc": "Ülke (A-Z)",
+            "cityAsc": "Şehir (A-Z)",
+            "roleAsc": "Rol (A-Z)"
+        },
+        "firstName": "Ad",
+        "lastName": "Soyad",
+        "email": "E-posta",
+        "role": "Rol",
+        "type": "Tür",
+        "country": "Ülke",
+        "city": "Şehir",
+        "phone": "Telefon",
+        "address": "Adres"
+    },
+    "tasks": {
+        "newTask": "Yeni Görev",
+        "title": "Başlık",
+        "priority": "Öncelik",
+        "status": "Durum",
+        "dueDate": "Bitiş Tarihi",
+        "assignee": "Atanan"
+    },
+    "status": {
+        "paid": "Ödendi",
+        "pending": "Beklemede",
+        "overdue": "Gecikmiş",
+        "todo": "Yapılacak",
+        "inprogress": "Devam Ediyor",
+        "done": "Tamamlandı"
+    },
+    "admin": {
+        "userPermissions": "Kullanıcı İzinleri",
+        "auditLog": "Denetim Kaydı",
+        "signupRequests": "Kayıt Talepleri",
+        "approve": "Onayla",
+        "deny": "Reddet",
+        "noRequests": "Bekleyen kayıt talebi yok.",
+        "by": "tarafından"
+    },
+    "userRoles": {
+        "admin": "Yönetici",
+        "user": "Kullanıcı"
+    },
+    "dataTypes": {
+        "schedule": "Takvim Etkinliği",
+        "financials": "Finansal Kayıt",
+        "challenges": "Zorluk",
+        "advantages": "Avantaj",
+        "contacts": "Kişi",
+        "tasks": "Görev",
+        "users": "Kullanıcı",
+        "SignupRequest": "Kayıt Talebi"
+    },
+    "auditLogActions": {
+        "Created": "Oluşturuldu",
+        "Updated": "Güncellendi",
+        "Deleted": "Silindi",
+        "Approved": "Onaylandı",
+        "Denied": "Reddedildi"
+    },
+    "detailModal": {
+        "details": "Detaylar"
+    },
+    "editModal": {
+        "editTitle": "{type} Düzenle",
+        "new": {
+            "schedule": "Yeni Takvim Etkinliği",
+            "financials": "Yeni Finansal Kayıt",
+            "challenges": "Yeni Zorluk",
+            "advantages": "Yeni Avantaj",
+            "contacts": "Yeni Kişi",
+            "tasks": "Yeni Görev",
+            "users": "Yeni Kullanıcı"
+        },
+        "participantsPlaceholder": "Virgülle ayrılmış isimler"
+    },
+    "actions": {
+        "edit": "Düzenle",
+        "delete": "Sil",
+        "close": "Kapat",
+        "save": "Kaydet",
+        "cancel": "İptal",
+        "retry": "Tekrar dene",
+        "view": "Görüntüle"
+    },
+    "chatbot": {
+        "toggle": "Chatbot'u Aç/Kapat",
+        "header": "Dripfy AI Asistanı",
+        "subtitle": "Ekranınızdaki veriler hakkında sorun",
+        "initialMessage": "Merhaba! Ben Dripfy AI. Bugün kontrol paneli verilerinizi analiz etmenize nasıl yardımcı olabilirim?",
+        "placeholder": "Bir soru sorun...",
+        "send": "Gönder",
+        "error": "Üzgünüm, bağlantı kurarken bir sorun yaşıyorum. Lütfen daha sonra tekrar deneyin.",
+        "clear": "Sohbeti Temizle",
+        "examplePrompts": "Örnek Sorular",
+        "prompt1": "Gelecek haftanın takvimini özetle.",
+        "prompt2": "Yakında teslim edilmesi gereken yüksek öncelikli görevler var mı?",
+        "prompt3": "Almanya'daki tüm kişileri listele.",
+        "prompt4": "Karşılaştığımız en büyük zorluklar nelerdir?"
+    },
+    "footer": {
+        "links": "Bağlantılar",
+        "imprint": "Künye",
+        "privacy": "Gizlilik Politikası",
+        "terms": "Şartlar ve Koşullar",
+        "followUs": "Bizi Takip Edin",
+        "copyright": "© 2024 Dripfy GmbH. Tüm Hakları Saklıdır."
+    },
+    "profile": {
+        "menu": {
+            "profile": "Profil",
+            "releaseNotes": "Sürüm Notları v2.0",
+            "settings": "Ayarlar",
+            "privacy": "Gizlilik ve Güvenlik",
+            "legalEditor": "Yasal içeriği düzenle",
+            "logout": "Çıkış Yap"
+        }
+    },
+    "settings": {
+        "title": "Ayarlar",
+        "closeButton": "Kapat",
+        "saveButton": "Değişiklikleri Kaydet",
+        "tabs": {
+            "profile": "Profil",
+            "settings": "Genel",
+            "privacy": "Gizlilik"
+        },
+        "profile": {
+            "title": "Profil Bilgileri",
+            "subtitle": "Kişisel bilgilerinizi buradan güncelleyin.",
+            "name": "Ad Soyad",
+            "email": "E-posta Adresi",
+            "password": "Şifre",
+            "changePassword": "Şifreyi Değiştir"
+        },
+        "settings": {
+            "title": "Genel Ayarlar",
+            "subtitle": "Uygulama deneyiminizi özelleştirin.",
+            "language": "Dil",
+            "darkMode": "Karanlık Mod",
+            "emailNotifications": "E-posta Bildirimleri",
+            "pushNotifications": "Anlık Bildirimler",
+            "checkUpdates": "Sürüm Notları"
+        },
+        "privacy": {
+            "title": "Gizlilik ve Güvenlik",
+            "subtitle": "Verilerinizi ve hesap güvenliğinizi yönetin.",
+            "auditLog": "Aktivite Kaydını Görüntüle",
+            "exportData": "Verilerimi Dışa Aktar",
+            "deleteAccount": "Hesabımı Sil",
+            "deleteAccountConfirm": "Hesabınızı silmek istediğinizden emin misiniz? Bu işlem kalıcıdır ve geri alınamaz."
+        }
+    },
+    "passwordChange": {
+        "title": "Şifreyi Değiştir",
+        "subtitleEmail": "Kimliğinizi doğrulamak için e-postanıza bir doğrulama kodu göndereceğiz.",
+        "subtitleCode": "{email} adresine gönderdiğimiz kodu ve yeni şifrenizi girin.",
+        "sendCodeButton": "Doğrulama Kodu Gönder",
+        "updateButton": "Şifreyi Güncelle",
+        "newPassword": "Yeni Şifre",
+        "confirmPassword": "Yeni Şifreyi Onayla",
+        "success": "Şifre başarıyla güncellendi!",
+        "error": {
+            "code": "Geçersiz doğrulama kodu.",
+            "match": "Şifreler eşleşmiyor."
+        }
+    },
+    "schedule": {
+        "title": "Başlık",
+        "titlePlaceholder": "Toplantı başlığı ve detayları",
+        "day": "Gün",
+        "time": "Saat",
+        "participants": "Katılımcılar",
+        "type": "Tür",
+        "date": "Tarih"
+    },
+    "legal": {
+        "title": {
+            "impressum": "Künye",
+            "privacy": "Gizlilik Politikası",
+            "terms": "Şartlar ve Koşullar"
+        },
+        "lightMode": "Aydınlık mod",
+        "darkMode": "Karanlık mod",
+        "backToDashboard": "Kontrol paneline dön"
+    },
+    "legalEditor": {
+        "title": "Yasal İçerik Düzenleyici",
+        "subtitle": "Tüm yasal sayfa ve footer metinlerini buradan güncelleyin.",
+        "footerSection": "Footer içeriği",
+        "footerCompany": "Şirket adı",
+        "footerEmail": "İletişim e-postası",
+        "footerPhone": "Telefon numarası",
+        "footerAddress": "Adres (satır satır)",
+        "footerAddressPlaceholder": "Her adres satırını ayrı satıra yazın.",
+        "legalSection": "Yasal sayfa içeriği",
+        "cancelButton": "İptal",
+        "saveButton": "Değişiklikleri kaydet",
+        "saving": "Kaydediliyor...",
+        "saveError": "İçerik kaydedilirken hata oluştu, lütfen tekrar deneyin."
+    }
+}

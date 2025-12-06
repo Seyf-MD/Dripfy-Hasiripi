@@ -1,0 +1,388 @@
+{
+    "login": {
+        "welcome": "Welcome to",
+        "subtitle": "longevity by infusions",
+        "emailPlaceholder": "Email address",
+        "passwordPlaceholder": "Password",
+        "signInButton": "Sign In",
+        "forgotPassword": "Forgot password?",
+        "rememberMe": "Remember me",
+        "showPassword": "Show password",
+        "hidePassword": "Hide password",
+        "errors": {
+            "invalidCredentials": "Email or password is incorrect.",
+            "generic": "We couldn't sign you in. Please try again.",
+            "hint": "If you believe your credentials are correct, please reach out to the administrator for further assistance."
+        }
+    },
+    "passwordReset": {
+        "title": "Reset Password",
+        "subtitleEmail": "Enter your email address and we'll send you a verification code.",
+        "subtitleVerify": "Enter the verification code sent to {email} and choose a new password.",
+        "emailLabel": "Email address",
+        "sendCode": "Send reset code",
+        "sending": "Sending…",
+        "codeLabel": "Verification code",
+        "passwordLabel": "New password",
+        "confirmPasswordLabel": "Confirm new password",
+        "back": "Back",
+        "resetPassword": "Update password",
+        "submitting": "Updating…",
+        "successTitle": "Password updated",
+        "successBody": "Your password has been changed. You can now sign in with the new credentials.",
+        "messages": {
+            "codeSent": "We sent a verification code to {email}. Please check your inbox."
+        },
+        "errors": {
+            "emailRequired": "Please enter your email address.",
+            "requestFailed": "We couldn't start the reset process. Please try again.",
+            "codeAndPasswordRequired": "Verification code and new password are required.",
+            "passwordLength": "Your password must contain at least 8 characters.",
+            "passwordMismatch": "Passwords do not match.",
+            "resetFailed": "We couldn't update your password. Please verify the code and try again."
+        }
+    },
+    "signup": {
+        "prompt": "Don't have an account? Sign up",
+        "loginPrompt": "Already have an account? Log in",
+        "firstNamePlaceholder": "First name",
+        "lastNamePlaceholder": "Last name",
+        "emailPlaceholder": "Email address",
+        "phonePlaceholder": "Phone number",
+        "companyPlaceholder": "Company (optional)",
+        "countryCodeLabel": "Country code",
+        "passwordPlaceholder": "Create Password",
+        "signUpButton": "Sign Up",
+        "requestReceived": "Signup request received! An admin will review it shortly.",
+        "requestError": "We couldn’t send your signup request. Please try again in a moment.",
+        "errors": {
+            "firstName": "Please enter at least 2 characters for the first name.",
+            "lastName": "Please enter at least 2 characters for the last name.",
+            "email": "Enter a valid email address.",
+            "phone": "Enter a valid phone number.",
+            "countryCode": "Select a country code.",
+            "position": "Select a position.",
+            "badRequest": "We couldn't process your information. Please review the form and try again.",
+            "unauthorized": "You need to sign in before continuing.",
+            "forbidden": "You don't have permission to complete this action.",
+            "notFound": "We couldn't find a signup request matching your details.",
+            "conflict": "An account with this email already exists.",
+            "validation": "Some details look incorrect. Please review the form and try again.",
+            "rateLimited": "Too many attempts. Please wait a moment and try again.",
+            "server": "Our servers are having trouble. Please try again later.",
+            "generic": "We couldn't complete your signup right now. Please try again.",
+            "network": "We couldn't reach the server. Check your connection and try again.",
+            "sessionRequired": "Your admin session has expired. Please sign in again.",
+            "unexpectedResponse": "We received an unexpected response from the server."
+        },
+        "notification": {
+            "codeSentTitle": "Verification code sent",
+            "codeSentBody": "Please check your inbox and enter the 6-digit code to continue.",
+            "successTitle": "Signup request received",
+            "successBody": "An administrator will review your request and activate access soon.",
+            "errorTitle": "Something went wrong",
+            "errorBody": "Please try again or contact support if the problem persists."
+        }
+    },
+    "verify": {
+        "title": "Verify your email",
+        "subtitle": "We sent a verification code to {email}. Please enter it below.",
+        "codePlaceholder": "Verification Code",
+        "button": "Verify & Sign Up",
+        "backButton": "Back",
+        "invalidCode": "Invalid verification code. Please try again."
+    },
+    "positions": {
+        "CEO": "CEO",
+        "CTO": "CTO",
+        "CFO": "CFO",
+        "COO": "COO",
+        "HeadofDepartment": "Head of Department",
+        "TeamLead": "Team Lead",
+        "ProjectManager": "Project Manager",
+        "SeniorSpecialist": "Senior Specialist",
+        "JuniorSpecialist": "Junior Specialist",
+        "Intern": "Intern"
+    },
+    "dashboard": {
+        "title": "Dashboard"
+    },
+    "statCards": {
+        "totalMeetings": "Total Meetings",
+        "meetingsThisWeek": "Meetings starting this week",
+        "pendingPayments": "Pending Payments",
+        "startThisWeek": "Start this week",
+        "activePartners": "Active Partners",
+        "acrossAllRegions": "Across all regions",
+        "taskCompletion": "Task Completion",
+        "progress": "Progress"
+    },
+    "tabs": {
+        "calendar": "Calendar",
+        "financials": "Financials",
+        "challenges": "Challenges & Advantages",
+        "contacts": "Contacts",
+        "tasks": "Tasks",
+        "adminPanel": "Admin Panel"
+    },
+    "calendar": {
+        "today": "Today",
+        "month": "Month",
+        "week": "Week",
+        "newEvent": "New Event",
+        "openPicker": "Open date picker",
+        "addEventTo": "Add event to"
+    },
+    "days": {
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday",
+        "sunday": "Sunday"
+    },
+    "daysShort": {
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat",
+        "sun": "Sun"
+    },
+    "financials": {
+        "description": "Description",
+        "amount": "Amount",
+        "status": "Status",
+        "dueDate": "Due Date",
+        "type": "Type",
+        "newRecord": "New Record",
+        "incoming": "Incoming",
+        "outgoing": "Outgoing"
+    },
+    "challenges": {
+        "title": "Challenges",
+        "add": "Add Challenge",
+        "description": "Description",
+        "severity": "Severity",
+        "severities": {
+            "high": "High",
+            "medium": "Medium",
+            "low": "Low"
+        }
+    },
+    "advantages": {
+        "title": "Advantages",
+        "add": "Add Advantage",
+        "description": "Description"
+    },
+    "contacts": {
+        "searchPlaceholder": "Search by name, role, city...",
+        "newContact": "New Contact",
+        "sort": {
+            "firstNameAsc": "First Name (A-Z)",
+            "firstNameDesc": "First Name (Z-A)",
+            "lastNameAsc": "Last Name (A-Z)",
+            "lastNameDesc": "Last Name (Z-A)",
+            "countryAsc": "Country (A-Z)",
+            "cityAsc": "City (A-Z)",
+            "roleAsc": "Role (A-Z)"
+        },
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "email": "Email",
+        "role": "Role",
+        "type": "Type",
+        "country": "Country",
+        "city": "City",
+        "phone": "Phone",
+        "address": "Address"
+    },
+    "tasks": {
+        "newTask": "New Task",
+        "title": "Title",
+        "priority": "Priority",
+        "status": "Status",
+        "dueDate": "Due Date",
+        "assignee": "Assignee"
+    },
+    "status": {
+        "paid": "Paid",
+        "pending": "Pending",
+        "overdue": "Overdue",
+        "todo": "To Do",
+        "inprogress": "In Progress",
+        "done": "Done"
+    },
+    "admin": {
+        "userPermissions": "User Permissions",
+        "auditLog": "Audit Log",
+        "signupRequests": "Signup Requests",
+        "approve": "Approve",
+        "deny": "Deny",
+        "noRequests": "No pending signup requests.",
+        "by": "by"
+    },
+    "userRoles": {
+        "admin": "Admin",
+        "user": "User"
+    },
+    "dataTypes": {
+        "schedule": "Schedule Event",
+        "financials": "Financial Record",
+        "challenges": "Challenge",
+        "advantages": "Advantage",
+        "contacts": "Contact",
+        "tasks": "Task",
+        "users": "User",
+        "SignupRequest": "Signup Request"
+    },
+    "auditLogActions": {
+        "Created": "Created",
+        "Updated": "Updated",
+        "Deleted": "Deleted",
+        "Approved": "Approved",
+        "Denied": "Denied"
+    },
+    "detailModal": {
+        "details": "Details"
+    },
+    "editModal": {
+        "editTitle": "Edit {type}",
+        "new": {
+            "schedule": "New Schedule Event",
+            "financials": "New Financial Record",
+            "challenges": "New Challenge",
+            "advantages": "New Advantage",
+            "contacts": "New Contact",
+            "tasks": "New Task",
+            "users": "New User"
+        },
+        "participantsPlaceholder": "Comma-separated names"
+    },
+    "actions": {
+        "edit": "Edit",
+        "delete": "Delete",
+        "close": "Close",
+        "save": "Save",
+        "cancel": "Cancel",
+        "retry": "Retry",
+        "view": "View"
+    },
+    "chatbot": {
+        "toggle": "Toggle Chatbot",
+        "header": "Dripfy AI Assistant",
+        "subtitle": "Ask about the data on your screen",
+        "initialMessage": "Hi! I'm Dripfy AI. How can I help you analyze your dashboard data today?",
+        "placeholder": "Ask a question...",
+        "send": "Send",
+        "error": "Sorry, I'm having trouble connecting. Please try again later.",
+        "clear": "Clear Chat",
+        "examplePrompts": "Example Prompts",
+        "prompt1": "Summarize next week's schedule.",
+        "prompt2": "Are there any high-priority tasks due soon?",
+        "prompt3": "List all contacts from Germany.",
+        "prompt4": "What are the biggest challenges we're facing?"
+    },
+    "footer": {
+        "links": "Links",
+        "imprint": "Imprint",
+        "privacy": "Privacy Policy",
+        "terms": "Terms & Conditions",
+        "followUs": "Follow Us",
+        "copyright": "© 2024 Dripfy GmbH. All Rights Reserved."
+    },
+    "profile": {
+        "menu": {
+            "profile": "Profile",
+            "settings": "Settings",
+            "privacy": "Privacy & Security",
+            "legalEditor": "Edit legal copy",
+            "logout": "Logout"
+        }
+    },
+    "settings": {
+        "title": "Settings",
+        "closeButton": "Close",
+        "saveButton": "Save Changes",
+        "tabs": {
+            "profile": "Profile",
+            "settings": "General",
+            "privacy": "Privacy"
+        },
+        "profile": {
+            "title": "Profile Information",
+            "subtitle": "Update your personal details here.",
+            "name": "Full Name",
+            "email": "Email Address",
+            "password": "Password",
+            "changePassword": "Change Password"
+        },
+        "settings": {
+            "title": "General Settings",
+            "subtitle": "Customize your application experience.",
+            "language": "Language",
+            "darkMode": "Dark Mode",
+            "emailNotifications": "Email Notifications",
+            "pushNotifications": "Push Notifications",
+            "checkUpdates": "Release Notes"
+        },
+        "privacy": {
+            "title": "Privacy and Security",
+            "subtitle": "Manage your data and account security.",
+            "auditLog": "View Activity Log",
+            "exportData": "Export My Data",
+            "deleteAccount": "Delete My Account",
+            "deleteAccountConfirm": "Are you sure you want to delete your account? This action is permanent and cannot be undone."
+        }
+    },
+    "passwordChange": {
+        "title": "Change Password",
+        "subtitleEmail": "We'll send a verification code to your email to confirm your identity.",
+        "subtitleCode": "Enter the code we sent to {email} and your new password.",
+        "sendCodeButton": "Send Verification Code",
+        "updateButton": "Update Password",
+        "newPassword": "New Password",
+        "confirmPassword": "Confirm New Password",
+        "success": "Password updated successfully!",
+        "error": {
+            "code": "Invalid verification code.",
+            "match": "Passwords do not match."
+        }
+    },
+    "schedule": {
+        "title": "Title",
+        "titlePlaceholder": "Meeting title",
+        "day": "Day",
+        "date": "Date",
+        "time": "Time",
+        "participants": "Participants",
+        "type": "Type"
+    },
+    "legal": {
+        "title": {
+            "impressum": "Imprint",
+            "privacy": "Privacy Policy",
+            "terms": "Website Terms & Conditions"
+        },
+        "lightMode": "Light mode",
+        "darkMode": "Dark mode",
+        "backToDashboard": "Back to dashboard"
+    },
+    "legalEditor": {
+        "title": "Legal Content Editor",
+        "subtitle": "Update every legal page and footer copy in one place.",
+        "footerSection": "Footer content",
+        "footerCompany": "Company name",
+        "footerEmail": "Contact email",
+        "footerPhone": "Phone number",
+        "footerAddress": "Address (line by line)",
+        "footerAddressPlaceholder": "Add each line of the address on its own line.",
+        "legalSection": "Legal page content",
+        "cancelButton": "Cancel",
+        "saveButton": "Save changes",
+        "saving": "Saving...",
+        "saveError": "Unable to save the updated content, please try again."
+    }
+}

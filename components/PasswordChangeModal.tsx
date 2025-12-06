@@ -5,14 +5,15 @@ import { useLanguage } from '../i18n/LanguageContext';
 interface PasswordChangeModalProps {
     isOpen: boolean;
     onClose: () => void;
+    email: string;
 }
 
 const MOCK_VERIFICATION_CODE = "123456";
 
-const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({ isOpen, onClose }) => {
+const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({ isOpen, onClose, email: initialEmail }) => {
     const { t } = useLanguage();
     const [step, setStep] = React.useState<'email' | 'verify' | 'success'>('email');
-    const [email, setEmail] = React.useState('demo@dripfy.com');
+    const [email, setEmail] = React.useState(initialEmail);
     const [code, setCode] = React.useState('');
     const [newPassword, setNewPassword] = React.useState('');
     const [confirmPassword, setConfirmPassword] = React.useState('');
@@ -22,7 +23,7 @@ const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({ isOpen, onClo
         if (isOpen) {
             // Reset state when modal opens
             setStep('email');
-            setEmail('demo@dripfy.com');
+            setEmail(initialEmail);
             setCode('');
             setNewPassword('');
             setConfirmPassword('');
@@ -30,7 +31,7 @@ const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({ isOpen, onClo
         }
     }, [isOpen]);
 
-     React.useEffect(() => {
+    React.useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
                 onClose();
@@ -76,37 +77,44 @@ const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({ isOpen, onClo
 
     if (!isOpen) return null;
 
-    const inputClass = "w-full px-3 py-2 bg-neutral-100 dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-600 rounded-md focus:ring-2 focus:ring-[var(--drip-primary)] focus:border-[var(--drip-primary)] focus:outline-none text-[var(--drip-text)] dark:text-white placeholder:text-neutral-500";
+    const inputClass = "w-full px-4 py-3 bg-white/10 dark:bg-black/20 border border-white/20 rounded-xl focus:ring-2 focus:ring-[var(--drip-primary)] focus:outline-none focus:border-[var(--drip-primary)] text-[var(--drip-text)] dark:text-white placeholder:text-[var(--drip-muted)]/40 transition-all backdrop-blur-sm shadow-inner hover:bg-white/20 text-center";
     const modalTitleId = 'password-change-modal-title';
 
     const renderContent = () => {
         if (step === 'success') {
             return (
-                <div className="text-center p-8 flex flex-col items-center justify-center">
-                    <CheckCircle size={48} className="text-green-400 mb-4" />
-                    <h3 className="text-xl font-bold text-[var(--drip-text)] dark:text-white">{t('passwordChange.success')}</h3>
+                <div className="text-center p-8 flex flex-col items-center justify-center animate-fade-in-up">
+                    <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center mb-6 ring-4 ring-green-500/10">
+                        <CheckCircle size={48} className="text-green-500" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-[var(--drip-text)] dark:text-white mb-2">{t('passwordChange.success')}</h3>
                 </div>
             )
         }
         if (step === 'verify') {
             return (
-                <form onSubmit={handleUpdatePassword} className="space-y-4">
-                    <p className="text-sm text-center text-[var(--drip-muted)] dark:text-neutral-400 -mt-2 mb-4">{t('passwordChange.subtitleCode').replace('{email}', email)}</p>
-                    <input type="text" placeholder={t('verify.codePlaceholder')} value={code} onChange={e => setCode(e.target.value)} required className={`${inputClass} text-center`} />
+                <form onSubmit={handleUpdatePassword} className="space-y-5 animate-fade-in-up">
+                    <p className="text-sm text-center text-[var(--drip-muted)] dark:text-neutral-400 font-medium">{t('passwordChange.subtitleCode').replace('{email}', email)}</p>
+                    <input type="text" placeholder={t('verify.codePlaceholder')} value={code} onChange={e => setCode(e.target.value)} required className={`${inputClass} tracking-widest text-lg font-bold`} maxLength={6} />
                     <input type="password" placeholder={t('passwordChange.newPassword')} value={newPassword} onChange={e => setNewPassword(e.target.value)} required className={inputClass} />
                     <input type="password" placeholder={t('passwordChange.confirmPassword')} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required className={inputClass} />
-                    {error && <p className="text-red-500 text-xs text-center">{error}</p>}
-                    <button type="submit" className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-[var(--drip-primary)] text-white text-sm font-semibold rounded-lg hover:bg-[var(--drip-primary-dark)] transition-colors">
-                        <Key size={16} /> {t('passwordChange.updateButton')}
+                    {error && <p className="text-red-500 text-sm text-center font-bold bg-red-500/10 py-2 rounded-xl border border-red-500/20">{error}</p>}
+                    <button type="submit" className="w-full flex items-center justify-center gap-2 px-4 py-3.5 bg-[var(--drip-primary)] text-white text-sm font-bold rounded-xl shadow-lg shadow-[var(--drip-primary)]/30 hover:shadow-[var(--drip-primary)]/50 hover:-translate-y-0.5 transition-all active:scale-95">
+                        <Key size={18} /> {t('passwordChange.updateButton')}
                     </button>
                 </form>
             )
         }
         return ( // step === 'email'
-            <form onSubmit={handleSendCode} className="space-y-4">
-                 <p className="text-sm text-center text-[var(--drip-muted)] dark:text-neutral-400 -mt-2 mb-4">{t('passwordChange.subtitleEmail')}</p>
-                 <input type="email" placeholder={t('login.emailPlaceholder')} value={email} onChange={e => setEmail(e.target.value)} required className={inputClass} />
-                 <button type="submit" className="w-full flex items-center justify-center px-4 py-2 bg-neutral-200 dark:bg-neutral-700 text-[var(--drip-text)] dark:text-white text-sm font-semibold rounded-lg hover:bg-neutral-300 dark:hover:bg-neutral-600 transition-colors">
+            <form onSubmit={handleSendCode} className="space-y-6 animate-fade-in-up">
+                <div className="text-center space-y-2">
+                    <div className="w-16 h-16 rounded-full bg-[var(--drip-primary)]/10 flex items-center justify-center mx-auto mb-4">
+                        <Key size={32} className="text-[var(--drip-primary)]" />
+                    </div>
+                    <p className="text-sm text-center text-[var(--drip-muted)] dark:text-neutral-400 font-medium px-4">{t('passwordChange.subtitleEmail')}</p>
+                </div>
+                <input type="email" placeholder={t('login.emailPlaceholder')} value={email} onChange={e => setEmail(e.target.value)} required className={inputClass} />
+                <button type="submit" className="w-full flex items-center justify-center px-4 py-3.5 bg-white/10 text-[var(--drip-text)] dark:text-white text-sm font-bold rounded-xl hover:bg-white/20 transition-all border border-white/10 hover:border-white/20">
                     {t('passwordChange.sendCodeButton')}
                 </button>
             </form>
@@ -114,21 +122,21 @@ const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({ isOpen, onClo
     };
 
     return (
-        <div 
-            className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 animate-fade-in" 
+        <div
+            className="fixed inset-0 bg-black/40 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in"
             onClick={onClose}
             role="dialog"
             aria-modal="true"
             aria-labelledby={modalTitleId}
         >
-            <div className="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 w-full max-w-sm flex flex-col" onClick={(e) => e.stopPropagation()}>
-                <header className="p-4 flex justify-between items-center border-b border-neutral-200 dark:border-neutral-700">
+            <div className="ios-glass p-0 rounded-3xl w-full max-w-sm flex flex-col shadow-2xl relative overflow-hidden border border-white/20 animate-scale-in" onClick={(e) => e.stopPropagation()}>
+                <header className="p-5 flex justify-between items-center border-b border-white/10 bg-white/5">
                     <h2 id={modalTitleId} className="text-xl font-bold text-[var(--drip-text)] dark:text-white">{t('passwordChange.title')}</h2>
-                    <button onClick={onClose} className="text-[var(--drip-muted)] dark:text-neutral-400 hover:text-[var(--drip-text)] dark:hover:text-white transition-colors">
+                    <button onClick={onClose} className="p-2 rounded-full hover:bg-white/10 text-[var(--drip-muted)] hover:text-[var(--drip-text)] dark:text-neutral-400 dark:hover:text-white transition-all">
                         <X size={24} />
                     </button>
                 </header>
-                <main className="p-6">
+                <main className="p-8">
                     {renderContent()}
                 </main>
             </div>

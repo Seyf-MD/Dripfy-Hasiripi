@@ -33,6 +33,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = React.useState<string | null>(null);
 
   const login = React.useCallback(async (email: string, password: string) => {
+    // TEMPORARY: Mock Login for Local Dev Testing (frontend only)
+    if (email === 'demo@dripfy.com' && password === '123456') {
+      const mockUser: AuthUser = {
+        id: '1',
+        email: email,
+        name: 'Demo User',
+        role: 'admin',
+        lastLogin: new Date().toISOString()
+      };
+      await new Promise(resolve => setTimeout(resolve, 800)); // Fake delay
+      setUser(mockUser);
+      setToken('mock-token');
+      return mockUser;
+    }
+
+
     const response = await fetch(LOGIN_ENDPOINT, {
       method: 'POST',
       headers: {
@@ -67,6 +83,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } finally {
       setUser(null);
       setToken(null);
+      localStorage.setItem('dripfy-logged-out', 'true');
     }
   }, []);
 

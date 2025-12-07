@@ -7,6 +7,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
+// Authentication Check
+$userPayload = verifyAuthCookie();
+if (!$userPayload || ($userPayload['role'] ?? '') !== 'admin') {
+    sendJson(401, ['ok' => false, 'error' => 'Unauthorized']);
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     exit;

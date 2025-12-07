@@ -8,6 +8,14 @@ declare(strict_types=1);
  * şekilde yan etkilerini yalnızca `public/api/runtime` klasörü altına yazar.
  */
 
+// PRODUCTION CONFIGURATION
+if (!getenv('SMTP_HOST')) putenv('SMTP_HOST=mail.hasiripi.com');
+if (!getenv('SMTP_USER')) putenv('SMTP_USER=dripfy@hasiripi.com');
+if (!getenv('SMTP_PASS')) putenv('SMTP_PASS=7nT*VXH-eq,U');
+if (!getenv('SMTP_SECURE')) putenv('SMTP_SECURE=true');
+if (!getenv('SMTP_PORT')) putenv('SMTP_PORT=465');
+if (!getenv('MAIL_FROM')) putenv('MAIL_FROM=dripfy@hasiripi.com');
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 

@@ -222,7 +222,19 @@
         "approve": "Onayla",
         "deny": "Reddet",
         "noRequests": "Bekleyen kayıt talebi yok.",
-        "by": "tarafından"
+        "by": "tarafından",
+        "inviteUser": "Kullanıcı Davet Et",
+        "backups": "Yedeklemeler",
+        "createBackup": "Yedek Oluştur",
+        "restoreBackup": "Yedeği Geri Yükle",
+        "downloadData": "Tüm Verileri İndir",
+        "backupReason": "Yedekleme Nedeni",
+        "restoreConfirm": "Bu yedeği geri yüklemek istediğinize emin misiniz? Mevcut veriler silinecektir.",
+        "backupCreated": "Yedek başarıyla oluşturuldu.",
+        "backupRestored": "Yedek başarıyla geri yüklendi.",
+        "actions": {
+            "send": "Gönder"
+        }
     },
     "userRoles": {
         "admin": "Yönetici",
@@ -363,7 +375,9 @@
         "time": "Saat",
         "participants": "Katılımcılar",
         "type": "Tür",
-        "date": "Tarih"
+        "date": "Tarih",
+        "fixDateTitle": "Tarih Belirle",
+        "fixDateDesc": "Bu etkinlik şu an tekrarlı görünüyor. Belirli bir tarih atayarak tek seferlik hale getirin."
     },
     "legal": {
         "title": {

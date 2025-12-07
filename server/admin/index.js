@@ -1,4 +1,5 @@
 import express from 'express';
+import { randomUUID } from 'crypto';
 import {
   createUser,
   deleteUser,
@@ -18,6 +19,7 @@ import {
   getCollectionSnapshot,
 } from '../services/storageService.js';
 import { authenticate } from '../auth/middleware.js';
+import { sendInviteEmail } from '../services/emailService.js';
 
 const router = express.Router();
 const PRIMARY_ADMIN_EMAIL = 'dripfy@hasiripi.com';
@@ -56,6 +58,62 @@ router.post('/users', async (req, res) => {
     res.status(400).json({ ok: false, error: error.message || 'Failed to create user' });
   }
 });
+
+router.post('/users/invite', async (req, res) => {
+  const { firstName, lastName, email, phone, position, country, language } = req.body;
+
+  if (!email || !firstName || !lastName || !position) {
+    return res.status(400).json({ ok: false, error: 'Missing required fields' });
+  }
+
+  try {
+    // 1. Create User
+    const name = `${firstName} ${lastName}`.trim();
+    // Generate a secure random password if not provided
+    const password = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-4);
+
+    // Determine role/permissions based on position (logic can be enhanced)
+    const isAdmin = position.toLowerCase().includes('admin') || position.toLowerCase().includes('yönetici');
+    const role = isAdmin ? 'admin' : 'user';
+
+    const user = await createUser({
+      email,
+      name,
+      role,
+      password,
+    });
+
+    // 2. Add to Contacts (People)
+    const people = await readCollection('people');
+    const newPerson = {
+      id: randomUUID(),
+      firstName,
+      lastName,
+      email,
+      phone,
+      role: position,
+      country,
+      type: 'Individual', // Default type
+    };
+    people.push(newPerson);
+    await writeCollection('people', people);
+
+    // 3. Send Email
+    await sendInviteEmail({
+      email,
+      name,
+      password,
+      position,
+      lang: language || 'tr'
+    });
+
+    res.json({ ok: true, user, person: newPerson });
+  } catch (error) {
+    console.error('[admin] Failed to invite user:', error);
+    res.status(500).json({ ok: false, error: error.message || 'Failed to invite user' });
+  }
+});
+
 
 router.patch('/users/:id', async (req, res) => {
   try {

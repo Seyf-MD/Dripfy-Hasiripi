@@ -46,8 +46,14 @@ const TaskCard: React.FC<{ task: Task; onOpenModal: () => void; onDragStart: (e:
                     <p>{task.assignee}</p>
                     <p className="mt-0.5 opacity-80">{new Date(task.dueDate).toLocaleDateString()}</p>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-white/20 dark:bg-white/10 flex items-center justify-center text-xs font-bold text-[var(--drip-text)] dark:text-white border border-white/10 shadow-inner">
-                    {task.assignee.substring(0, 2).toUpperCase()}
+                <div className="relative group/tooltip">
+                    <div className="w-8 h-8 rounded-full bg-white/20 dark:bg-white/10 flex items-center justify-center text-xs font-bold text-[var(--drip-text)] dark:text-white border border-white/10 shadow-inner cursor-help">
+                        {task.assignee.substring(0, 2).toUpperCase()}
+                    </div>
+                    <div className="absolute bottom-full right-0 mb-2 px-3 py-1.5 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border border-white/20 text-[var(--drip-text)] dark:text-white text-xs font-medium rounded-xl shadow-xl whitespace-nowrap opacity-0 translate-y-2 scale-95 group-hover/tooltip:opacity-100 group-hover/tooltip:translate-y-0 group-hover/tooltip:scale-100 transition-all duration-300 origin-bottom-right pointer-events-none z-50">
+                        {task.assignee}
+                        <div className="absolute -bottom-1 right-2 w-2 h-2 bg-white/80 dark:bg-neutral-900/80 border-r border-b border-white/20 transform rotate-45"></div>
+                    </div>
                 </div>
             </div>
         </div>

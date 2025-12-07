@@ -238,9 +238,9 @@ const EditModal: React.FC<EditModalProps> = ({ item, type, isNew, onClose, onSav
                             <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 mb-2 flex items-start gap-3">
                                 <span className="text-xl">📅</span>
                                 <div>
-                                    <p className="text-sm font-bold text-amber-500">Tarih Belirle</p>
+                                    <p className="text-sm font-bold text-amber-500">{t('schedule.fixDateTitle')}</p>
                                     <p className="text-xs text-[var(--drip-muted)] dark:text-neutral-400 mt-0.5">
-                                        Bu etkinlik şu an tekrarlı görünüyor. Belirli bir tarih atayarak tek seferlik hale getirin.
+                                        {t('schedule.fixDateDesc')}
                                     </p>
                                 </div>
                             </div>

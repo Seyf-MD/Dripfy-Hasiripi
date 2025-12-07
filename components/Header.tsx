@@ -7,6 +7,8 @@ import { useTheme } from '../context/ThemeContext';
 import { Sun, Moon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
+import MessageButton from './MessageButton';
+
 type SettingsTab = 'profile' | 'settings' | 'privacy';
 
 interface HeaderProps {
@@ -27,7 +29,7 @@ const Header: React.FC<HeaderProps> = ({ onLogout, onOpenSettings, onOpenLegalEd
     };
 
     // iOS 26 Header Styles
-    const headerClasses = 'ios-glass sticky top-4 z-50 mx-4 sm:mx-auto max-w-7xl rounded-2xl transition-all duration-300';
+    const headerClasses = 'ios-glass sticky top-4 z-[9000] mx-4 sm:mx-auto max-w-7xl rounded-2xl transition-all duration-300';
 
     return (
         <header className={headerClasses}>
@@ -60,6 +62,8 @@ const Header: React.FC<HeaderProps> = ({ onLogout, onOpenSettings, onOpenLegalEd
                                 <Moon size={20} className="relative z-10" />
                             )}
                         </button>
+
+                        <MessageButton />
 
                         <div className="pl-2 border-l border-gray-200/20">
                             <ProfileDropdown

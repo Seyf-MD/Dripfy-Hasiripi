@@ -14,12 +14,13 @@ if (apiKey) {
   );
 }
 
-export async function* streamDashboardInsights(query: string, dataContext: { activeView: string } & DashboardData) {
+export async function* streamDashboardInsights(query: string, dataContext: { activeView: string } & DashboardData, language: string = 'en') {
 
-  const model = "gemini-2.5-flash";
+  const model = "gemini-1.5-flash";
 
   const systemInstruction = `You are 'Dripfy AI', a friendly and expert assistant for the 'Dripfy MIS Dashboard'.
     - Your primary role is to answer user questions based *only* on the JSON data context provided.
+    - reply in the language: ${language}
     - The context contains all data from the dashboard, including schedule, financials, challenges, advantages, contacts, and tasks. It also includes the 'activeView' which tells you what tab the user is currently looking at.
     - When answering, be conversational and helpful.
     - Use markdown for formatting, such as **bolding** for key terms or numbers, and bullet points (-) for lists.
@@ -37,12 +38,12 @@ export async function* streamDashboardInsights(query: string, dataContext: { act
     }
 
     const response = await ai.models.generateContentStream({
-        model: model,
-        contents: `CONTEXT: ${JSON.stringify(dataContext, null, 2)}\n\nQUESTION: ${query}`,
-        config: {
-            systemInstruction: systemInstruction,
-            temperature: 0.3,
-        }
+      model: model,
+      contents: `CONTEXT: ${JSON.stringify(dataContext, null, 2)}\n\nQUESTION: ${query}\n\nREPLY LANGUAGE: ${language}`,
+      config: {
+        systemInstruction: systemInstruction,
+        temperature: 0.3,
+      }
     });
 
     for await (const chunk of response) {

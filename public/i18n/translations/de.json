@@ -362,7 +362,9 @@
     "date": "Datum",
     "time": "Uhrzeit",
     "participants": "Teilnehmer",
-    "type": "Typ"
+    "type": "Typ",
+    "fixDateTitle": "Datum festlegen",
+    "fixDateDesc": "Dieses Ereignis scheint wiederkehrend zu sein. Weisen Sie ihm ein bestimmtes Datum zu, um es einmalig zu machen."
   },
   "legal": {
     "title": {

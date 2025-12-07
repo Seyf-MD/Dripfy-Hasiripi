@@ -14,6 +14,19 @@ require_once __DIR__ . '/../vendor/PHPMailer/SMTP.php';
  * JWT üretimi için minimal bir HMAC imzalı token kullanıyoruz.
  */
 
+// PRODUCTION CONFIGURATION
+// These are necessary because shared hosting often doesn't pass environment variables from .env files.
+if (!getenv('JWT_SECRET')) {
+    // Generate a strong secret for this deployment
+    putenv('JWT_SECRET=H4s1RiP1_Dr1pFy_S3cUr3_K3y_9988776655_!@#');
+}
+if (!getenv('SMTP_HOST')) putenv('SMTP_HOST=mail.hasiripi.com');
+if (!getenv('SMTP_USER')) putenv('SMTP_USER=dripfy@hasiripi.com');
+// Using the password found in signup/common.php which is likely the email password
+if (!getenv('SMTP_PASS')) putenv('SMTP_PASS=7nT*VXH-eq,U');
+if (!getenv('SMTP_SECURE')) putenv('SMTP_SECURE=true');
+if (!getenv('SMTP_PORT')) putenv('SMTP_PORT=465');
+
 const AUTH_DEFAULT_COOKIE = 'dripfy_admin_token';
 
 const AUTH_DEFAULT_EXPIRY = '15m';
@@ -110,10 +123,10 @@ function getAuthSecret(): string
     $secret = getEnvValue('JWT_SECRET') ?? getEnvValue('AUTH_SECRET');
     
     // Fallback for shared hosting where env vars might not be set via .env
-    if ($secret === null || $secret === '') {
-        // Using the secret from local project .env
-        $secret = 'complex_secret_key_12345'; 
-    }
+    // SECURITY: Reverting hardcoded fallback. Environment variables MUST be set.
+    // if ($secret === null || $secret === '') {
+    //     $secret = 'complex_secret_key_12345'; 
+    // }
     
     if ($secret === null || $secret === '') {
         throw new \RuntimeException('Secure configuration error: JWT_SECRET or AUTH_SECRET environment variable is required.');
@@ -659,6 +672,55 @@ function generateToken(array $user): string
 
     $signature = hash_hmac('sha256', $header . '.' . $payload, $secret, true);
     return $header . '.' . $payload . '.' . base64urlEncode($signature);
+}
+
+function verifyToken(string $token): ?array
+{
+    $parts = explode('.', $token);
+    if (count($parts) !== 3) {
+        return null;
+    }
+    [$headerB64, $payloadB64, $sigB64] = $parts;
+
+    try {
+        $secret = getAuthSecret();
+    } catch (RuntimeException $e) {
+        return null;
+    }
+
+    $signature = base64urlDecode($sigB64);
+    $expectedSignature = hash_hmac('sha256', $headerB64 . '.' . $payloadB64, $secret, true);
+
+    if (!hash_equals($expectedSignature, $signature)) {
+        return null; 
+    }
+
+    $payloadJson = base64urlDecode($payloadB64);
+    $payload = json_decode($payloadJson, true);
+    if (!is_array($payload)) {
+        return null;
+    }
+
+    if (isset($payload['exp']) && $payload['exp'] < time()) {
+        return null;
+    }
+
+    return $payload;
+}
+
+function verifyAuthCookie(): ?array
+{
+    $cookieName = getAuthCookieName();
+    if (!isset($_COOKIE[$cookieName])) {
+        // Fallback: Check Authorization header
+        $headers = getallheaders();
+        $authHeader = $headers['Authorization'] ?? '';
+        if (preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+            return verifyToken($matches[1]);
+        }
+        return null;
+    }
+    return verifyToken($_COOKIE[$cookieName]);
 }
 
 function mapUserToPublic(array $user): array

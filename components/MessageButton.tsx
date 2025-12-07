@@ -36,7 +36,7 @@ const MessageButton: React.FC = () => {
 
     const fetchMessages = async () => {
         try {
-            const res = await fetch('/api/messages', { credentials: 'include' });
+            const res = await fetch('/api/messages/index.php', { credentials: 'include' });
             const json = await res.json();
             if (json.ok) {
                 setMessages(json.messages);
@@ -57,7 +57,7 @@ const MessageButton: React.FC = () => {
         setView('detail');
         if (!msg.isRead && msg.fromId !== user?.id) {
             try {
-                await fetch(`/api/messages/${msg.id}/read`, { method: 'PATCH', credentials: 'include' });
+                await fetch(`/api/messages/read.php?id=${msg.id}`, { method: 'POST', credentials: 'include' });
                 setMessages(prev => prev.map(m => m.id === msg.id ? { ...m, isRead: true } : m));
                 setUnreadCount(prev => Math.max(0, prev - 1));
             } catch (err) { console.error(err); }
@@ -72,7 +72,7 @@ const MessageButton: React.FC = () => {
         const theme = isDark ? 'dark' : 'light';
 
         try {
-            const res = await fetch('/api/messages', {
+            const res = await fetch('/api/messages/index.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',

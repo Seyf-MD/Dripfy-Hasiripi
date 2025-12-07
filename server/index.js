@@ -420,7 +420,22 @@ app.get('/api/messages', authenticate(), async (req, res) => {
 
 app.post('/api/messages', authenticate(), async (req, res) => {
   try {
-    const { toId, content, subject, parentId } = req.body;
+    const { toId, content, subject, parentId, language, theme } = req.body;
+
+    // Save user preferences if provided
+    if (language || theme) {
+      try {
+        await import('./services/userService.js').then(m =>
+          m.updateUser(req.user.id, {
+            language: language || undefined,
+            theme: theme || undefined
+          })
+        );
+      } catch (updateErr) {
+        console.warn('[API] Failed to update user preferences during message send:', updateErr);
+      }
+    }
+
     const msg = await sendMessage({
       fromId: req.user.id,
       fromName: req.user.name,
@@ -429,6 +444,20 @@ app.post('/api/messages', authenticate(), async (req, res) => {
       subject,
       parentId
     });
+
+    // If message is to admin, send email notification
+    if (toId === 'admin') {
+      import('./services/emailService.js').then(m => {
+        m.sendAdminMessageEmail({
+          fromName: req.user.name,
+          fromEmail: req.user.email,
+          content: content,
+          lang: language || 'en',
+          theme: theme || 'light'
+        });
+      }).catch(err => console.error('Failed to trigger admin email:', err));
+    }
+
     res.json({ ok: true, message: msg });
   } catch (error) {
     console.error('Failed to send message:', error);

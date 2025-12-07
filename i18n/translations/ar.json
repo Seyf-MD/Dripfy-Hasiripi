@@ -390,5 +390,26 @@
     "saveButton": "حفظ التغييرات",
     "saving": "جاري الحفظ...",
     "saveError": "تعذّر حفظ المحتوى، يرجى المحاولة مرة أخرى."
+  },
+  "email": {
+    "inviteSubject": "لقد تمت دعوتك إلى Dripfy",
+    "inviteTitle": "مرحبًا بك في الفريق",
+    "inviteIntro": "مرحبًا {name}،<br><br>لقد تمت دعوتك للانضمام إلى <strong>Dripfy</strong>. يمكنك قبول دعوتك أدناه للوصول إلى لوحة التحكم بصفتك <strong>{role}</strong>.",
+    "inviteButton": "قبول الدعوة",
+    "inviteFooter": "إذا لم تكن تتوقع هذه الدعوة، يرجى تجاهل هذا البريد الإلكتروني.",
+    "resetSubject": "إعادة تعيين كلمة المرور",
+    "resetTitle": "إعادة تعيين كلمة المرور",
+    "resetIntro": "لقد تلقينا طلبًا لإعادة تعيين كلمة المرور لحساب Dripfy الخاص بك. استخدم الرمز أدناه:<br><br>{code}<br><br>هذا الرمز صالح لمدة {ttl} دقيقة.",
+    "resetButton": "إعادة تعيين كلمة المرور",
+    "resetFooter": "إذا لم تطلب إعادة تعيين كلمة المرور، يمكنك تجاهل هذا البريد الإلكتروني.",
+    "signupCodeSubject": "رمز التحقق الخاص بك",
+    "signupCodeTitle": "رمز التحقق",
+    "signupCodeIntro": "رمز التحقق الخاص بك للوحة إدارة Dripfy جاهز. استخدم الرمز أدناه:<br><br>{code}<br><br>هذا الرمز صالح لمدة {ttl} دقيقة.",
+    "signupCodeButton": "فتح اللوحة",
+    "signupCodeFooter": "إذا لم تطلب هذا الرمز، يرجى تجاهل هذا البريد الإلكتروني.",
+    "signupReceivedSubject": "لقد تلقينا طلبك",
+    "signupReceivedTitle": "تم استلام الطلب",
+    "signupReceivedIntro": "لقد تلقينا طلب التسجيل الخاص بك للوحة إدارة Dripfy. سيقوم فريقنا بمراجعة التفاصيل الخاصة بك والرد عليك قريباً.<br><br><strong>تفاصيلك</strong><br>{details}",
+    "signupReceivedFooter": "يمكنك الرد على هذا البريد الإلكتروني لأي أسئلة."
   }
 }

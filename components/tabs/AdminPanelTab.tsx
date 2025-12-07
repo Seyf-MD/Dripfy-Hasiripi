@@ -21,6 +21,14 @@ const AdminPanelTab: React.FC<AdminPanelTabProps> = ({ users, permissions, audit
     const [showInviteModal, setShowInviteModal] = React.useState(false);
     const [backups, setBackups] = React.useState<any[]>([]);
     const [isLoadingBackups, setIsLoadingBackups] = React.useState(false);
+    const [notification, setNotification] = React.useState<{ type: 'success' | 'error', message: string } | null>(null);
+
+    React.useEffect(() => {
+        if (notification) {
+            const timer = setTimeout(() => setNotification(null), 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [notification]);
 
     const subTabs: { id: AdminSubTab, label: string, icon: React.ReactNode, count?: number }[] = [
         { id: 'permissions', label: t('admin.userPermissions'), icon: <ShieldCheck size={18} /> },
@@ -82,15 +90,17 @@ const AdminPanelTab: React.FC<AdminPanelTabProps> = ({ users, permissions, audit
     };
 
     const handleInviteUser = async (data: any) => {
-        const res = await fetch('/api/admin/users/invite', {
+        const res = await fetch('/api/admin/users/invite/index.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify(data)
         });
         const json = await res.json();
         if (!json.ok) throw new Error(json.error);
-        alert('User invited successfully');
-        window.location.reload();
+        setNotification({ type: 'success', message: 'User invited successfully' });
+        // Don't reload immediately so user sees message
+        setTimeout(() => window.location.reload(), 2000);
     };
 
     const handleDownloadAllData = async () => {
@@ -263,7 +273,19 @@ const AdminPanelTab: React.FC<AdminPanelTabProps> = ({ users, permissions, audit
     }
 
     return (
-        <div className="animate-fade-in flex flex-col lg:flex-row gap-8">
+        <div className="animate-fade-in flex flex-col lg:flex-row gap-8 relative">
+            {notification && (
+                <div className={`fixed top-6 left-1/2 -translate-x-1/2 z-50 px-6 py-4 rounded-2xl shadow-2xl backdrop-blur-xl border flex items-center gap-3 animate-fade-in-up ${notification.type === 'success'
+                        ? 'bg-green-500/10 border-green-500/20 text-green-600 dark:text-green-300'
+                        : 'bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-300'
+                    }`}>
+                    {notification.type === 'success' ? <CheckCircle size={20} /> : <XCircle size={20} />}
+                    <span className="font-bold text-sm tracking-wide">{notification.message}</span>
+                    <button onClick={() => setNotification(null)} className="ml-2 opacity-50 hover:opacity-100 transition-opacity">
+                        <XCircle size={16} />
+                    </button>
+                </div>
+            )}
             <aside className="lg:w-1/4">
                 <nav className="flex flex-row lg:flex-col gap-3 sticky top-24">
                     {subTabs.map(tab => (

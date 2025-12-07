@@ -280,7 +280,8 @@
         "save": "Kaydet",
         "cancel": "İptal",
         "retry": "Tekrar dene",
-        "view": "Görüntüle"
+        "view": "Görüntüle",
+        "send": "Gönder"
     },
     "chatbot": {
         "toggle": "Chatbot'u Aç/Kapat",
@@ -403,5 +404,26 @@
         "saveButton": "Değişiklikleri kaydet",
         "saving": "Kaydediliyor...",
         "saveError": "İçerik kaydedilirken hata oluştu, lütfen tekrar deneyin."
+    },
+    "email": {
+        "inviteSubject": "Dripfy'a Davet Edildiniz",
+        "inviteTitle": "Aramıza Hoş Geldiniz",
+        "inviteIntro": "Merhaba {name},<br><br>Sizi <strong>Dripfy</strong> ekibine katılmaya davet ediyoruz. Yönetim panelinize erişmek ve <strong>{role}</strong> olarak işlem yapmak için aşağıdaki butonu kullanabilirsiniz.",
+        "inviteButton": "Daveti Kabul Et",
+        "inviteFooter": "Bu daveti beklemiyorsanız, lütfen bu e-postayı dikkate almayın.",
+        "resetSubject": "Şifre Yenileme İsteği",
+        "resetTitle": "Şifrenizi Yenileyin",
+        "resetIntro": "Dripfy hesabınız için şifre yenileme talebi aldık. İşleme devam etmek için aşağıdaki kodu kullanın:<br><br>{code}<br><br>Bu kod {ttl} dakika boyunca geçerlidir.",
+        "resetButton": "Şifreyi Yenile",
+        "resetFooter": "Bu talebi siz oluşturmadıysanız, bu e-postayı görmezden gelebilirsiniz.",
+        "signupCodeSubject": "Dripfy Yönetim Paneli | Doğrulama Kodunuz",
+        "signupCodeTitle": "Doğrulama kodunuz",
+        "signupCodeIntro": "Dripfy Yönetim Paneli'ne güvenle erişebilmeniz için doğrulama kodunuz hazır:<br><br>{code}<br><br>Kod {ttl} dakika boyunca geçerlidir.",
+        "signupCodeButton": "Paneli Aç",
+        "signupCodeFooter": "Talep size ait değilse lütfen bu mesajı görmezden gelin.",
+        "signupReceivedSubject": "Dripfy Yönetim Paneli | Talebiniz Alındı",
+        "signupReceivedTitle": "Talebiniz bize ulaştı",
+        "signupReceivedIntro": "Dripfy Yönetim Paneli kayıt talebiniz başarıyla kaydedildi. Ekibimiz bilgilerinizi inceleyerek kısa süre içerisinde dönüş yapacak.<br><br><strong>Bilgileriniz</strong><br>{details}",
+        "signupReceivedFooter": "Her türlü soru ve isteğiniz için bu e-postaya yanıt verebilirsiniz."
     }
 }

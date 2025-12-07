@@ -390,5 +390,26 @@
     "saveButton": "Änderungen speichern",
     "saving": "Speichern...",
     "saveError": "Speichern fehlgeschlagen. Bitte versuchen Sie es erneut."
+  },
+  "email": {
+    "inviteSubject": "Du wurdest zu Dripfy eingeladen",
+    "inviteTitle": "Willkommen im Team",
+    "inviteIntro": "Hallo {name},<br><br>Du wurdest eingeladen, <strong>Dripfy</strong> beizutreten. Du kannst deine Einladung unten annehmen, um als <strong>{role}</strong> auf dein Dashboard zuzugreifen.",
+    "inviteButton": "Einladung annehmen",
+    "inviteFooter": "Wenn du diese Einladung nicht erwartet hast, ignoriere diese E-Mail bitte.",
+    "resetSubject": "Passwort zurücksetzen",
+    "resetTitle": "Passwort zurücksetzen",
+    "resetIntro": "Wir haben eine Anfrage zum Zurücksetzen deines Dripfy-Passworts erhalten. Verwende den folgenden Code:<br><br>{code}<br><br>Dieser Code ist {ttl} Minuten lang gültig.",
+    "resetButton": "Passwort zurücksetzen",
+    "resetFooter": "Wenn du kein Passwort-Reset angefordert hast, kannst du diese E-Mail ignorieren.",
+    "signupCodeSubject": "Dein Bestätigungscode",
+    "signupCodeTitle": "Bestätigungscode",
+    "signupCodeIntro": "Dein Bestätigungscode für das Dripfy-Management-Panel ist bereit. Verwende den folgenden Code:<br><br>{code}<br><br>Dieser Code ist {ttl} Minuten lang gültig.",
+    "signupCodeButton": "Panel öffnen",
+    "signupCodeFooter": "Wenn du diesen Code nicht angefordert hast, ignoriere diese E-Mail bitte.",
+    "signupReceivedSubject": "Wir haben deine Anfrage erhalten",
+    "signupReceivedTitle": "Anfrage erhalten",
+    "signupReceivedIntro": "Wir haben deine Registrierungsanfrage für das Dripfy-Management-Panel erhalten. Unser Team wird deine Angaben prüfen und sich in Kürze bei dir melden.<br><br><strong>Deine Angaben</strong><br>{details}",
+    "signupReceivedFooter": "Du kannst auf diese E-Mail antworten, wenn du Fragen hast."
   }
 }

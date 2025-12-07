@@ -5,7 +5,7 @@ import { Message } from '../types';
 import { useAuth } from '../context/AuthContext';
 
 const MessageButton: React.FC = () => {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const { user } = useAuth();
     const [isOpen, setIsOpen] = React.useState(false);
     const [messages, setMessages] = React.useState<Message[]>([]);
@@ -40,9 +40,6 @@ const MessageButton: React.FC = () => {
             const json = await res.json();
             if (json.ok) {
                 setMessages(json.messages);
-                // Unread count: toId is NOT available in message unless explicitly set. 
-                // But fromId === 'admin' and !isRead is the key for user.
-                // Generic unread count: any message not read and not sent by me
                 setUnreadCount(json.messages.filter((m: Message) => !m.isRead && m.fromId !== user?.id).length);
             }
         } catch (err) {
@@ -61,7 +58,6 @@ const MessageButton: React.FC = () => {
         if (!msg.isRead && msg.fromId !== user?.id) {
             try {
                 await fetch(`/api/messages/${msg.id}/read`, { method: 'PATCH', credentials: 'include' });
-                // Update local state
                 setMessages(prev => prev.map(m => m.id === msg.id ? { ...m, isRead: true } : m));
                 setUnreadCount(prev => Math.max(0, prev - 1));
             } catch (err) { console.error(err); }
@@ -71,6 +67,10 @@ const MessageButton: React.FC = () => {
     const handleSendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
+        // Detect theme from DOM or local storage
+        const isDark = document.documentElement.classList.contains('dark');
+        const theme = isDark ? 'dark' : 'light';
+
         try {
             const res = await fetch('/api/messages', {
                 method: 'POST',
@@ -79,7 +79,9 @@ const MessageButton: React.FC = () => {
                 body: JSON.stringify({
                     toId: 'admin',
                     subject: newMsgSubject,
-                    content: newMsgContent
+                    content: newMsgContent,
+                    language: language,
+                    theme: theme
                 })
             });
             const json = await res.json();

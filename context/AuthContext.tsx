@@ -21,7 +21,8 @@ interface AuthContextValue {
 const AuthContext = React.createContext<AuthContextValue | undefined>(undefined);
 
 const API_BASE = (import.meta.env.VITE_API_BASE || '').replace(/\/+$/, '');
-const LOGIN_ENDPOINT = API_BASE ? `${API_BASE}/api/auth/login` : '/api/auth/login';
+// const LOGIN_ENDPOINT = 'http://localhost:3000/api/auth/login'; // For local Node server
+const LOGIN_ENDPOINT = 'https://hasiripi.com/api/auth/login/'; // For PHP production (Absolute to avoid mixed content/relative issues)
 const LOGOUT_ENDPOINT = API_BASE ? `${API_BASE}/api/auth/logout` : '/api/auth/logout';
 
 interface AuthProviderProps {

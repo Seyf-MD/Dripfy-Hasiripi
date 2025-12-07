@@ -71,10 +71,10 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({ onClose, onInvite }) 
                             <FormField label={t('contacts.lastName')}><input name="lastName" value={formData.lastName} onChange={handleChange} className={inputClass} required placeholder="Surname" /></FormField>
                         </div>
 
-                        <FormField label={t('contacts.email')}><input type="email" name="email" value={formData.email} onChange={handleChange} className={inputClass} required placeholder="user@company.com" /></FormField>
+                        <FormField label={t('contacts.email')}><input type="text" name="email" value={formData.email} onChange={handleChange} className={inputClass} required placeholder="user@company.com" /></FormField>
 
                         <div className="grid grid-cols-2 gap-4">
-                            <FormField label={t('contacts.phone')}><input type="tel" name="phone" value={formData.phone} onChange={handleChange} className={inputClass} required placeholder="+90..." /></FormField>
+                            <FormField label={t('contacts.phone')}><input type="text" name="phone" value={formData.phone} onChange={handleChange} className={inputClass} required placeholder="+90..." /></FormField>
                             <FormField label={t('contacts.role')}><input name="position" value={formData.position} onChange={handleChange} className={inputClass} required placeholder="Manager, Editor..." /></FormField>
                         </div>
 

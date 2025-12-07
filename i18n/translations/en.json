@@ -222,7 +222,19 @@
     "approve": "Approve",
     "deny": "Deny",
     "noRequests": "No pending signup requests.",
-    "by": "by"
+    "by": "by",
+    "inviteUser": "Invite User",
+    "backups": "Backups",
+    "createBackup": "Create Backup",
+    "restoreBackup": "Restore Backup",
+    "downloadData": "Download All Data",
+    "backupReason": "Backup Reason",
+    "restoreConfirm": "Are you sure you want to restore this backup? Current data will be overwritten.",
+    "backupCreated": "Backup created successfully.",
+    "backupRestored": "Backup restored successfully.",
+    "actions": {
+      "send": "Send"
+    }
   },
   "userRoles": {
     "admin": "Admin",
@@ -360,6 +372,8 @@
     "titlePlaceholder": "Meeting title",
     "day": "Day",
     "date": "Date",
+    "fixDateTitle": "Set Date",
+    "fixDateDesc": "This event seems to be recurring. Assign a specific date to make it a one-time event.",
     "time": "Time",
     "participants": "Participants",
     "type": "Type"

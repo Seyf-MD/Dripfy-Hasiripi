@@ -7,6 +7,8 @@ export interface ScheduleEvent {
   title: string;
   participants: string[];
   type: 'Meeting' | 'Call' | 'Event';
+  creator?: string;
+  date?: string; // ISO Date string YYYY-MM-DD
 }
 
 export interface FinancialRecord {
@@ -62,44 +64,44 @@ export interface User {
 }
 
 export interface AuditLogEntry {
-    id: string;
-    user: string;
-    action: 'Created' | 'Updated' | 'Deleted' | 'Approved' | 'Denied';
-    targetType: string;
-    targetId: string;
-    timestamp: string;
-    details: string;
+  id: string;
+  user: string;
+  action: 'Created' | 'Updated' | 'Deleted' | 'Approved' | 'Denied';
+  targetType: string;
+  targetId: string;
+  timestamp: string;
+  details: string;
 }
 
 export interface UserPermission {
-    userId: string;
-    userName: string;
-    permissions: {
-        [key: string]: {
-            view: boolean;
-            edit: boolean;
-        }
+  userId: string;
+  userName: string;
+  permissions: {
+    [key: string]: {
+      view: boolean;
+      edit: boolean;
     }
+  }
 }
 
 export interface SignupRequest {
-    id: string;
-    name: string;
-    firstName?: string;
-    lastName?: string;
-    email: string;
-    phone: string;
-    countryCode?: string;
-    country?: string;
-    company?: string;
-    position: string;
-    status: 'pending';
-    timestamp: string;
+  id: string;
+  name: string;
+  firstName?: string;
+  lastName?: string;
+  email: string;
+  phone: string;
+  countryCode?: string;
+  country?: string;
+  company?: string;
+  position: string;
+  status: 'pending';
+  timestamp: string;
 }
 
 export interface NotificationSettings {
-    email: boolean;
-    push: boolean;
+  email: boolean;
+  push: boolean;
 }
 
 export type Theme = 'light' | 'dark';

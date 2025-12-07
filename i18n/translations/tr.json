@@ -1,4 +1,3 @@
-
 {
     "login": {
         "welcome": "Hoş geldiniz",
@@ -268,7 +267,8 @@
         "close": "Kapat",
         "save": "Kaydet",
         "cancel": "İptal",
-        "retry": "Tekrar dene"
+        "retry": "Tekrar dene",
+        "view": "Görüntüle"
     },
     "chatbot": {
         "toggle": "Chatbot'u Aç/Kapat",
@@ -296,6 +296,7 @@
     "profile": {
         "menu": {
             "profile": "Profil",
+            "releaseNotes": "Sürüm Notları v2.0",
             "settings": "Ayarlar",
             "privacy": "Gizlilik ve Güvenlik",
             "legalEditor": "Yasal içeriği düzenle",
@@ -325,7 +326,8 @@
             "language": "Dil",
             "darkMode": "Karanlık Mod",
             "emailNotifications": "E-posta Bildirimleri",
-            "pushNotifications": "Anlık Bildirimler"
+            "pushNotifications": "Anlık Bildirimler",
+            "checkUpdates": "Sürüm Notları"
         },
         "privacy": {
             "title": "Gizlilik ve Güvenlik",
@@ -350,12 +352,18 @@
             "match": "Şifreler eşleşmiyor."
         }
     },
+    "releaseNotes": {
+        "dontShowAgain": "Bu sürümü tekrar gösterme",
+        "awesome": "Harika!"
+    },
     "schedule": {
         "title": "Başlık",
+        "titlePlaceholder": "Toplantı başlığı ve detayları",
         "day": "Gün",
         "time": "Saat",
         "participants": "Katılımcılar",
-        "type": "Tür"
+        "type": "Tür",
+        "date": "Tarih"
     },
     "legal": {
         "title": {

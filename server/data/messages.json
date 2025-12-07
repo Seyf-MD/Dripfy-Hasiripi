@@ -1,0 +1,57 @@
+[
+  {
+    "id": "ca65779f-f5b9-472c-97e2-ca877dbf1d73",
+    "fromId": "admin-2",
+    "fromName": "Dripfy Admin",
+    "toId": "admin",
+    "content": "sdf",
+    "subject": "sfd",
+    "timestamp": "2025-12-07T14:42:12.789Z",
+    "isRead": false,
+    "isResolved": false
+  },
+  {
+    "id": "4aafc394-e607-4d2a-8534-b15613c8336a",
+    "fromId": "demo-1",
+    "fromName": "Demo User",
+    "toId": "admin",
+    "content": "xvc",
+    "subject": "xcv",
+    "timestamp": "2025-12-07T14:44:33.145Z",
+    "isRead": true,
+    "isResolved": false
+  },
+  {
+    "id": "6dc47cbc-2e48-4de4-8764-566810ac3c87",
+    "fromId": "demo-1",
+    "fromName": "Demo User",
+    "toId": "admin",
+    "content": "sdc",
+    "subject": "dsc",
+    "timestamp": "2025-12-07T14:46:31.617Z",
+    "isRead": true,
+    "isResolved": false
+  },
+  {
+    "id": "17ff401f-2e05-4d74-a289-d36aa2c75e46",
+    "fromId": "demo-1",
+    "fromName": "Demo User",
+    "toId": "admin",
+    "content": "deneme1",
+    "subject": "a1",
+    "timestamp": "2025-12-07T14:47:15.833Z",
+    "isRead": true,
+    "isResolved": false
+  },
+  {
+    "id": "674d064a-4c0a-4771-9c11-60ca1aa24ead",
+    "fromId": "demo-1",
+    "fromName": "Demo User",
+    "toId": "admin",
+    "content": "deneme",
+    "subject": "a2",
+    "timestamp": "2025-12-07T15:04:13.545Z",
+    "isRead": true,
+    "isResolved": false
+  }
+]

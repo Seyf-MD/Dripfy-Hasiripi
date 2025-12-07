@@ -130,6 +130,14 @@ export async function updateUser(id, updates) {
     user.role = updates.role.trim();
   }
 
+  if (typeof updates.language === 'string') {
+    user.language = updates.language;
+  }
+
+  if (typeof updates.theme === 'string') {
+    user.theme = updates.theme;
+  }
+
   if (typeof updates.password === 'string') {
     if (updates.password.length < 8) {
       throw new Error('Password must be at least 8 characters');

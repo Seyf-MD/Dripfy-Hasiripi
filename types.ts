@@ -59,8 +59,21 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'user';
-  lastLogin: string;
+  role: UserRole;
+  permissions?: UserPermission[]; // Optional custom permissions
+}
+
+export interface Message {
+  id: string;
+  fromId: string;
+  fromName: string;
+  toId: string;
+  content: string;
+  subject?: string;
+  timestamp: string;
+  isRead: boolean;
+  isResolved: boolean;
+  parentId?: string;
 }
 
 export interface AuditLogEntry {
@@ -106,7 +119,7 @@ export interface NotificationSettings {
 
 export type Theme = 'light' | 'dark';
 export type UserRole = 'admin' | 'user';
-export type AdminSubTab = 'permissions' | 'audit' | 'requests';
+export type AdminSubTab = 'permissions' | 'audit' | 'requests' | 'backups';
 
 export type DataItem = ScheduleEvent | FinancialRecord | Challenge | Advantage | Contact | Task | User;
 

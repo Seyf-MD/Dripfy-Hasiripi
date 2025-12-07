@@ -19,6 +19,7 @@ export const COLLECTION_FILE_MAP = {
   calendar: 'calendar.json',
   challenges: 'challenges.json',
   advantages: 'advantages.json',
+  messages: 'messages.json',
 };
 
 const COLLECTION_DEFAULTS = {
@@ -32,6 +33,7 @@ const COLLECTION_DEFAULTS = {
   calendar: [],
   challenges: [],
   advantages: [],
+  messages: [],
 };
 
 export const COLLECTION_NAMES = Object.keys(COLLECTION_FILE_MAP);

@@ -12,7 +12,15 @@
     "email": "dripfy@hasiripi.com",
     "name": "Dripfy Admin",
     "role": "admin",
-    "lastLogin": "2025-01-01T00:00:00.000Z",
-    "passwordHash": "$2b$10$uuIEUBBcgU5LIO31tKZSoOShRrgIJHBoy//TmxIANJkl5K0Jip5Ky"
+    "lastLogin": "2025-12-07T15:22:45.635Z",
+    "passwordHash": "$2b$10$C2.MlMCQW9QIWcrNPOeQB.ujDEyIb8MILxIyimluNyak/tdyVkbVu"
+  },
+  {
+    "id": "demo-1",
+    "email": "demo@dripfy.com",
+    "name": "Demo User",
+    "role": "admin",
+    "lastLogin": "2025-12-07T15:04:05.807Z",
+    "passwordHash": "$2b$10$gdVIxhNzX0BCFLItZ.A7ReF/0eoevi01JKY.NzYmPWg9cZ8EArUHm"
   }
 ]

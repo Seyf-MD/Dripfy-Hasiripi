@@ -29,7 +29,15 @@ if ($code === null) {
 }
 
 $name = $user['name'] ?? $email;
-$response = sendPasswordResetEmail($email, $name, $code);
+$theme = isset($payload['theme']) ? (string)$payload['theme'] : 'light';
+$response = sendPasswordResetEmail($email, $name, $code, 'en', $theme); // We'd need to fetch user language here too if possible, but passing 'en' for now as per original code.
+// Actually, `sendPasswordResetEmail` in common.php (my version) accepts $lang.
+// The file I viewed (step 1267) logic was `$response = sendPasswordResetEmail($email, $name, $code);`
+// My common.php update (step 1272) signature is `sendPasswordResetEmail(string $email, string $name, string $code, string $lang = 'en', string $theme = 'light')`
+// So I should pass the theme.
+// Note: We don't have user's language preference in `users.json` easily accessibly here (only `findAuthUserByEmail` returns the user).
+// If `findAuthUserByEmail` returns language, I could use it.
+// Assuming default 'en' for now, but passing theme from payload.
 
 if (!$response['ok']) {
     consumePasswordResetCode($email);

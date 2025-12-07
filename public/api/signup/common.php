@@ -47,11 +47,28 @@ function resolveMailerSetting(string $key, string $default): string
  * @param string      $contentHtml Pre-rendered HTML body (code block, tables).
  * @param string|null $footerNote  Optional helper text shown under the body.
  */
-function buildEmailTemplate(string $title, string $intro, string $contentHtml, ?string $footerNote = null): string
+function buildEmailTemplate(string $title, string $intro, string $contentHtml, ?string $footerNote = null, string $theme = 'light'): string
 {
+    // Theme configurations
+    $isDark = ($theme === 'dark');
+
+    // Colors
+    $bodyBg = $isDark ? '#0f172a' : '#edf6ed';
+    $tableBg = $isDark ? '#020408' : '#edf6ed';
+    $containerBg = $isDark ? 'rgba(255,255,255,0.03)' : '#faf9f6';
+    $containerBorder = $isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #c8d9b9';
+    $containerShadow = $isDark ? '0 25px 50px -12px rgba(0,0,0,0.5)' : '0 22px 60px rgba(200,217,185,0.45)';
+    $mainText = $isDark ? '#ffffff' : '#1e332a';
+    $subText = $isDark ? '#cbd5e1' : 'rgba(47,74,59,0.85)';
+    $contentBoxBg = $isDark ? 'rgba(255,255,255,0.05)' : '#f3f9f3';
+    $contentBoxBorder = $isDark ? '1px solid rgba(255,255,255,0.05)' : '1px solid #c8d9b9';
+    $footerBg = $isDark ? 'rgba(0,0,0,0.2)' : '#f3f9f3';
+    $footerText = $isDark ? 'rgba(255,255,255,0.4)' : 'rgba(47,74,59,0.7)';
+    $footerLink = $isDark ? 'rgba(255,255,255,0.5)' : '#4ba586';
+
     $footerBlock = '';
     if ($footerNote !== null && $footerNote !== '') {
-        $footerBlock = '<p style="margin:24px 0 0;font-size:12px;line-height:18px;color:rgba(47,74,59,0.7);">' . $footerNote . '</p>';
+        $footerBlock = '<p style="margin:24px 0 0;font-size:12px;line-height:18px;color:' . $footerText . ';">' . $footerNote . '</p>';
     }
 
     $currentYear = date('Y');
@@ -62,44 +79,76 @@ function buildEmailTemplate(string $title, string $intro, string $contentHtml, ?
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dripfy MIS</title>
+    <title>Dripfy</title>
+    <!--[if mso]>
+    <noscript>
+      <xml>
+        <o:OfficeDocumentSettings>
+          <o:PixelsPerInch>96</o:PixelsPerInch>
+        </o:OfficeDocumentSettings>
+      </xml>
+    </noscript>
+    <![endif]-->
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap');
+    </style>
   </head>
-  <body style="margin:0;padding:0;background-color:#edf6ed;font-family:'Montserrat','Segoe UI',sans-serif;">
-    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color:#edf6ed;padding:32px 16px;">
+  <body style="margin:0;padding:0;background-color:{$bodyBg};font-family:'Outfit','Helvetica Neue','Segoe UI',sans-serif;color:{$mainText};">
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color:{$tableBg};padding:40px 10px;">
       <tr>
         <td align="center">
-          <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px;border-radius:28px;overflow:hidden;background-color:#faf9f6;border:1px solid #c8d9b9;box-shadow:0 22px 60px rgba(200,217,185,0.45);">
+          <!-- Glass Container -->
+          <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px;border-radius:32px;overflow:hidden;background-color:{$containerBg};border:{$containerBorder};box-shadow:{$containerShadow};backdrop-filter:blur(20px);">
+            
+            <!-- Header with Gradient Line -->
             <tr>
-              <td style="padding:28px 32px;background:linear-gradient(135deg,#4ba586 0%,#84a084 70%,#94a073 100%);">
-                <table role="presentation" width="100%">
-                  <tr>
-                    <td align="left">
-                      <span style="display:inline-block;font-size:13px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(245,250,244,0.9);font-weight:600;">Dripfy MIS</span>
-                    </td>
-                    <td align="right">
-                      <img src="https://hasiripi.com/assets/logo-wordmark.png" alt="Dripfy" style="height:32px;border:0;">
-                    </td>
-                  </tr>
-                </table>
+              <td style="padding:0;">
+                <div style="height:4px;width:100%;background:linear-gradient(90deg, #4ba586, #84a084);"></div>
               </td>
             </tr>
+
+            <!-- Logo Area -->
             <tr>
-              <td style="padding:36px 32px 42px;color:#1e332a;">
-                <h1 style="margin:0 0 12px;font-size:26px;color:#1e332a;line-height:32px;">{$title}</h1>
-                <p style="margin:0 0 24px;font-size:15px;line-height:24px;color:rgba(47,74,59,0.85);">{$intro}</p>
-                {$contentHtml}
-                {$footerBlock}
+              <td style="padding:40px 40px 20px;text-align:center;">
+                 <img src="https://hasiripi.com/assets/logo-wordmark.png" alt="Dripfy" style="height:40px;border:0;display:block;margin:0 auto;">
               </td>
             </tr>
+
+            <!-- Main Content -->
             <tr>
-              <td style="padding:20px 32px;background-color:#f3f9f3;border-top:1px solid #c8d9b9;">
-                <p style="margin:0;font-size:12px;line-height:18px;color:rgba(47,74,59,0.7);">
-                  © {$currentYear} Dripfy MIS. Tüm hakları saklıdır.<br>
-                  Bu mesajı <a href="mailto:info@dripfy.de" style="color:#4ba586;text-decoration:none;">info@dripfy.de</a> üzerinden yanıtlayabilirsiniz.
+              <td style="padding:10px 40px 40px;color:{$subText};text-align:left;">
+                <h1 style="margin:0 0 16px;font-size:28px;font-weight:600;color:{$mainText};text-align:center;letter-spacing:-0.02em;">{$title}</h1>
+                <p style="margin:0 0 32px;font-size:16px;line-height:26px;color:{$subText};text-align:center;font-weight:300;">{$intro}</p>
+                
+                <!-- Content Box -->
+                <div style="background-color:{$contentBoxBg};border-radius:24px;padding:32px;border:{$contentBoxBorder};">
+                    {$contentHtml}
+                </div>
+
+                <div style="text-align:center;">
+                    {$footerBlock}
+                </div>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td style="padding:32px 40px;background-color:{$footerBg};border-top:1px solid rgba(255,255,255,0.05);text-align:center;">
+                <p style="margin:0 0 12px;font-size:12px;line-height:18px;color:{$footerText};">
+                  © {$currentYear} Dripfy Inc. Tüm hakları saklıdır.
                 </p>
+                <div style="font-size:12px;color:rgba(255,255,255,0.3);">
+                  <a href="https://hasiripi.com" style="color:{$footerLink};text-decoration:none;margin:0 8px;">Web Sitesi</a> •
+                  <a href="mailto:info@dripfy.de" style="color:{$footerLink};text-decoration:none;margin:0 8px;">Destek</a> •
+                  <a href="#" style="color:{$footerLink};text-decoration:none;margin:0 8px;">Gizlilik</a>
+                </div>
               </td>
             </tr>
           </table>
+          
+          <p style="margin-top:24px;font-size:11px;color:rgba(255,255,255,0.2);text-align:center;">
+            Bu e-posta otomatik olarak oluşturulmuştur, lütfen yanıtlamayınız.
+          </p>
         </td>
       </tr>
     </table>

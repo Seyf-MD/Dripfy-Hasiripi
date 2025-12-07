@@ -10,71 +10,71 @@ interface Message {
 }
 
 interface ChatbotProps {
-    dataContext: { activeView: string } & DashboardData;
+  dataContext: { activeView: string } & DashboardData;
 }
 
 const MarkdownRenderer: React.FC<{ content: string }> = ({ content }) => {
-    // 1. Function to parse a single line for bold text
-    const parseText = (text: string) => {
-        return text.split(/(\*\*.*?\*\*)/g).filter(Boolean).map((part, index) => {
-            if (part.startsWith('**') && part.endsWith('**')) {
-                return <strong key={index} className="dark:text-white text-[var(--drip-text)]">{part.slice(2, -2)}</strong>;
-            }
-            return part;
-        });
-    };
+  // 1. Function to parse a single line for bold text
+  const parseText = (text: string) => {
+    return text.split(/(\*\*.*?\*\*)/g).filter(Boolean).map((part, index) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={index} className="dark:text-white text-[var(--drip-text)]">{part.slice(2, -2)}</strong>;
+      }
+      return part;
+    });
+  };
 
-    // 2. Split content into paragraphs and list blocks
-    const blocks = content.split('\n').reduce<Array<{ type: 'p' | 'ul'; lines: string[] }>>((acc, line) => {
-        const trimmedLine = line.trim();
-        const isListItem = trimmedLine.startsWith('- ');
-        const lastBlock = acc.length > 0 ? acc[acc.length - 1] : null;
+  // 2. Split content into paragraphs and list blocks
+  const blocks = content.split('\n').reduce<Array<{ type: 'p' | 'ul'; lines: string[] }>>((acc, line) => {
+    const trimmedLine = line.trim();
+    const isListItem = trimmedLine.startsWith('- ');
+    const lastBlock = acc.length > 0 ? acc[acc.length - 1] : null;
 
-        if (isListItem) {
-            // If it's a list item, add to the current list block or start a new one
-            if (lastBlock && lastBlock.type === 'ul') {
-                lastBlock.lines.push(trimmedLine.substring(2));
-            } else {
-                acc.push({ type: 'ul', lines: [trimmedLine.substring(2)] });
-            }
-        } else {
-            // If it's a paragraph, add it as a new paragraph block (if not empty)
-            if (trimmedLine) {
-                 acc.push({ type: 'p', lines: [line] });
-            }
+    if (isListItem) {
+      // If it's a list item, add to the current list block or start a new one
+      if (lastBlock && lastBlock.type === 'ul') {
+        lastBlock.lines.push(trimmedLine.substring(2));
+      } else {
+        acc.push({ type: 'ul', lines: [trimmedLine.substring(2)] });
+      }
+    } else {
+      // If it's a paragraph, add it as a new paragraph block (if not empty)
+      if (trimmedLine) {
+        acc.push({ type: 'p', lines: [line] });
+      }
+    }
+    return acc;
+  }, []);
+
+  // 3. Render the blocks
+  return (
+    <div className="prose prose-sm max-w-none prose-strong:text-[var(--drip-text)] dark:prose-strong:text-white text-left">
+      {blocks.map((block, index) => {
+        if (block.type === 'ul') {
+          return (
+            <ul key={index} className="list-disc pl-5 my-2 space-y-1">
+              {block.lines.map((item, itemIndex) => (
+                <li key={itemIndex}>{parseText(item)}</li>
+              ))}
+            </ul>
+          );
         }
-        return acc;
-    }, []);
-
-    // 3. Render the blocks
-    return (
-        <div className="prose prose-sm max-w-none prose-strong:text-[var(--drip-text)] dark:prose-strong:text-white text-left">
-            {blocks.map((block, index) => {
-                if (block.type === 'ul') {
-                    return (
-                        <ul key={index} className="list-disc pl-5 my-2 space-y-1">
-                            {block.lines.map((item, itemIndex) => (
-                                <li key={itemIndex}>{parseText(item)}</li>
-                            ))}
-                        </ul>
-                    );
-                }
-                return (
-                    <p key={index} className="my-2">
-                        {parseText(block.lines.join('\n'))}
-                    </p>
-                );
-            })}
-        </div>
-    );
+        return (
+          <p key={index} className="my-2">
+            {parseText(block.lines.join('\n'))}
+          </p>
+        );
+      })}
+    </div>
+  );
 };
 
 
 const Chatbot: React.FC<ChatbotProps> = ({ dataContext }) => {
-  const { t } = useLanguage();
-  
-  const initialMessage: Message = { 
-    role: 'model', 
+  const { t, language } = useLanguage();
+
+  const initialMessage: Message = {
+    role: 'model',
     content: t('chatbot.initialMessage')
   };
 
@@ -84,7 +84,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ dataContext }) => {
     t('chatbot.prompt3'),
     t('chatbot.prompt4'),
   ]
-  
+
   const [isOpen, setIsOpen] = React.useState(false);
   const [messages, setMessages] = React.useState<Message[]>([initialMessage]);
   const [input, setInput] = React.useState('');
@@ -94,14 +94,14 @@ const Chatbot: React.FC<ChatbotProps> = ({ dataContext }) => {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
-  
+
   React.useEffect(() => {
-     setMessages([initialMessage]);
+    setMessages([initialMessage]);
   }, [t])
 
   React.useEffect(() => {
     if (isOpen) {
-        setTimeout(scrollToBottom, 100);
+      setTimeout(scrollToBottom, 100);
     }
   }, [messages, isOpen]);
 
@@ -115,23 +115,23 @@ const Chatbot: React.FC<ChatbotProps> = ({ dataContext }) => {
     setIsLoading(true);
 
     try {
-        const stream = streamDashboardInsights(currentInput, dataContext);
-        for await (const chunk of stream) {
-            setMessages(prev => {
-                const newMessages = [...prev];
-                newMessages[newMessages.length - 1].content += chunk;
-                return newMessages;
-            });
-        }
+      const stream = streamDashboardInsights(currentInput, dataContext, language);
+      for await (const chunk of stream) {
+        setMessages(prev => {
+          const newMessages = [...prev];
+          newMessages[newMessages.length - 1].content += chunk;
+          return newMessages;
+        });
+      }
     } catch (error) {
-         console.error("Error streaming response:", error);
-         setMessages(prev => {
-            const newMessages = [...prev];
-            newMessages[newMessages.length - 1].content = t('chatbot.error');
-            return newMessages;
-         });
+      console.error("Error streaming response:", error);
+      setMessages(prev => {
+        const newMessages = [...prev];
+        newMessages[newMessages.length - 1].content = t('chatbot.error');
+        return newMessages;
+      });
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -140,9 +140,9 @@ const Chatbot: React.FC<ChatbotProps> = ({ dataContext }) => {
       handleSend();
     }
   };
-  
+
   const handleClearChat = () => {
-      setMessages([initialMessage]);
+    setMessages([initialMessage]);
   }
 
   return (
@@ -159,58 +159,58 @@ const Chatbot: React.FC<ChatbotProps> = ({ dataContext }) => {
         <div className="fixed bottom-20 right-6 w-full max-w-sm h-[70vh] max-h-[600px] bg-white dark:bg-neutral-900 rounded-xl shadow-2xl flex flex-col border border-slate-200 dark:border-neutral-700 overflow-hidden animate-fade-in-up z-50">
           <header className="p-4 bg-slate-50 dark:bg-neutral-800/50 border-b border-slate-200 dark:border-neutral-700 flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[rgba(75,165,134,0.95)] to-[rgba(48,122,7,0.85)] flex items-center justify-center text-white">
-                    <Bot size={24} />
-                </div>
-                <div>
-                    <h3 className="font-bold text-[var(--drip-text)] dark:text-white">{t('chatbot.header')}</h3>
-                    <p className="text-xs text-[var(--drip-muted)] dark:text-neutral-400">{t('chatbot.subtitle')}</p>
-                </div>
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[rgba(75,165,134,0.95)] to-[rgba(48,122,7,0.85)] flex items-center justify-center text-white">
+                <Bot size={24} />
+              </div>
+              <div>
+                <h3 className="font-bold text-[var(--drip-text)] dark:text-white">{t('chatbot.header')}</h3>
+                <p className="text-xs text-[var(--drip-muted)] dark:text-neutral-400">{t('chatbot.subtitle')}</p>
+              </div>
             </div>
             <button onClick={handleClearChat} className="text-[var(--drip-muted)] dark:text-neutral-400 hover:text-[var(--drip-text)] dark:hover:text-white transition-colors" aria-label={t('chatbot.clear')}>
-                <RefreshCcw size={16} />
+              <RefreshCcw size={16} />
             </button>
           </header>
-          
+
           <div className="flex-1 p-4 overflow-y-auto bg-white dark:bg-neutral-900">
             <div className="flex flex-col gap-4">
               {messages.map((msg, index) => (
                 <div key={index} className={`flex items-start gap-3 ${msg.role === 'user' ? 'justify-end' : ''}`}>
                   {msg.role === 'model' && (
                     <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-neutral-700 flex items-center justify-center flex-shrink-0">
-                      <Bot size={18} className="text-[color:var(--drip-text-soft)] dark:text-neutral-300"/>
+                      <Bot size={18} className="text-[color:var(--drip-text-soft)] dark:text-neutral-300" />
                     </div>
                   )}
                   <div className={`max-w-[80%] p-3 rounded-xl text-sm leading-6 ${msg.role === 'user' ? 'bg-slate-200 dark:bg-neutral-700 text-[var(--drip-text)] dark:text-white rounded-br-none' : 'bg-slate-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border border-slate-200 dark:border-neutral-700 rounded-bl-none'}`}>
-                    {msg.role === 'model' && index === messages.length - 1 && isLoading && msg.content === '' 
-                        ? <Loader className="animate-spin text-[var(--drip-muted)] dark:text-neutral-400" size={20}/>
-                        : <MarkdownRenderer content={msg.content} />
+                    {msg.role === 'model' && index === messages.length - 1 && isLoading && msg.content === ''
+                      ? <Loader className="animate-spin text-[var(--drip-muted)] dark:text-neutral-400" size={20} />
+                      : <MarkdownRenderer content={msg.content} />
                     }
                   </div>
-                   {msg.role === 'user' && (
+                  {msg.role === 'user' && (
                     <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-neutral-700 flex items-center justify-center flex-shrink-0">
-                      <User size={18} className="text-[color:var(--drip-text-soft)] dark:text-neutral-300"/>
+                      <User size={18} className="text-[color:var(--drip-text-soft)] dark:text-neutral-300" />
                     </div>
                   )}
                 </div>
               ))}
               {messages.length === 1 && !isLoading && (
-                  <div className="flex flex-col gap-2 items-start mt-4 p-4 bg-slate-100 dark:bg-neutral-800/50 rounded-lg border border-slate-200 dark:border-neutral-700">
-                      <div className="flex items-center gap-2 text-sm font-semibold text-[var(--drip-text)] dark:text-neutral-300">
-                          <Sparkles size={16} className="text-[var(--drip-primary)]"/>
-                          <span>{t('chatbot.examplePrompts')}</span>
-                      </div>
-                      {examplePrompts.map(prompt => (
-                        <button key={prompt} onClick={() => handleSend(prompt)} className="w-full text-left text-sm text-[var(--drip-primary)] dark:text-[var(--drip-primary)] bg-[color:rgba(75,165,134,0.12)] hover:bg-[color:rgba(75,165,134,0.22)] p-2 rounded-md transition-colors">
-                            "{prompt}"
-                        </button>
-                      ))}
+                <div className="flex flex-col gap-2 items-start mt-4 p-4 bg-slate-100 dark:bg-neutral-800/50 rounded-lg border border-slate-200 dark:border-neutral-700">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-[var(--drip-text)] dark:text-neutral-300">
+                    <Sparkles size={16} className="text-[var(--drip-primary)]" />
+                    <span>{t('chatbot.examplePrompts')}</span>
                   </div>
+                  {examplePrompts.map(prompt => (
+                    <button key={prompt} onClick={() => handleSend(prompt)} className="w-full text-left text-sm text-[var(--drip-primary)] dark:text-[var(--drip-primary)] bg-[color:rgba(75,165,134,0.12)] hover:bg-[color:rgba(75,165,134,0.22)] p-2 rounded-md transition-colors">
+                      "{prompt}"
+                    </button>
+                  ))}
+                </div>
               )}
               <div ref={messagesEndRef} />
             </div>
           </div>
-          
+
           <div className="p-4 border-t border-slate-200 dark:border-neutral-700 bg-white dark:bg-neutral-800/50">
             <div className="relative">
               <input

@@ -19,7 +19,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         return saved as Language;
       }
     }
-    return 'tr';
+    return 'en';
   });
   const [translations, setTranslations] = React.useState<{ [key in Language]: Translations } | null>(null);
   const [loadingError, setLoadingError] = React.useState<string | null>(null);

@@ -2,7 +2,6 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import nodemailer from 'nodemailer';
 import rateLimit from 'express-rate-limit';
 import authRouter from './auth/index.js';
 import { authenticate } from './auth/middleware.js';
@@ -18,6 +17,17 @@ import {
   verifySignupCodeAttempt,
 } from './signupCodesStore.js';
 import { readWebsiteCopy, writeWebsiteCopy } from './services/legalCopyService.js';
+import {
+  sendVerificationCodeEmail,
+  sendSignupReceivedEmail,
+  sendSignupAdminNotification,
+  initEmailService
+} from './services/emailService.js';
+import {
+  getMessagesForUser,
+  sendMessage,
+  markMessageAsRead
+} from './services/messageService.js';
 
 /**
  * Geliştirme sırasında çalışan mini API:
@@ -29,6 +39,9 @@ import { readWebsiteCopy, writeWebsiteCopy } from './services/legalCopyService.j
 
 const app = express();
 const port = Number(process.env.API_PORT || 4000);
+
+// Initialize email service
+initEmailService();
 
 ensureDataEnvironment()
   .then(() => {
@@ -152,37 +165,6 @@ const signupRateLimiter = rateLimit({
   },
 });
 
-const requiredEnv = ['SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS'];
-const missingEnv = requiredEnv.filter(key => !process.env[key]);
-if (missingEnv.length > 0) {
-  console.warn(`[signup-mailer] Missing required environment variables: ${missingEnv.join(', ')}`);
-}
-
-if (!process.env.JWT_SECRET) {
-  console.warn('[auth] JWT_SECRET environment variable is not set. Authentication will fail.');
-}
-
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT || 465),
-  secure: process.env.SMTP_SECURE ? process.env.SMTP_SECURE === 'true' : true,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
-
-async function verifyTransporter() {
-  try {
-    await transporter.verify();
-    console.log('[signup-mailer] SMTP connection verified');
-  } catch (error) {
-    console.error('[signup-mailer] SMTP verification failed:', error);
-  }
-}
-
-verifyTransporter();
-
 function normaliseSignupPayload(payload) {
   const safeString = (value) => (typeof value === 'string' ? value.trim() : '');
 
@@ -252,112 +234,6 @@ function formatPhone(payload) {
   return `${countryCode}${countryCode ? ' ' : ''}${phoneDigits}`.trim();
 }
 
-function buildInfoLines(payload) {
-  const lines = [
-    `İsim: ${payload.name}`,
-    `E-posta: ${payload.email}`,
-    `Telefon: ${formatPhone(payload)}`,
-    `Pozisyon: ${payload.position}`,
-  ];
-  if (payload.company) {
-    lines.push(`Firma: ${payload.company}`);
-  }
-  if (payload.country) {
-    lines.push(`Ülke: ${payload.country}`);
-  }
-  return lines;
-}
-
-// Mirrors the PHP helpers in public/api/signup/common.php so dev + prod mails match.
-function buildEmailTemplate(title, intro, contentHtml, footerNote = '') {
-  const year = new Date().getFullYear();
-  const footerBlock = footerNote
-    ? `<p style="margin:24px 0 0;font-size:12px;line-height:18px;color:rgba(47,74,59,0.7);">${footerNote}</p>`
-    : '';
-  return `<!DOCTYPE html>
-<html lang="tr">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dripfy MIS</title>
-  </head>
-  <body style="margin:0;padding:0;background-color:#edf6ed;font-family:'Montserrat','Segoe UI',sans-serif;">
-    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color:#edf6ed;padding:32px 16px;">
-      <tr>
-        <td align="center">
-          <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width:600px;border-radius:28px;overflow:hidden;background-color:#faf9f6;border:1px solid #c8d9b9;box-shadow:0 22px 60px rgba(200,217,185,0.45);">
-            <tr>
-              <td style="padding:28px 32px;background:linear-gradient(135deg,#4ba586 0%,#84a084 70%,#94a073 100%);">
-                <table role="presentation" width="100%">
-                  <tr>
-                    <td align="left">
-                      <span style="display:inline-block;font-size:13px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(245,250,244,0.9);font-weight:600;">Dripfy MIS</span>
-                    </td>
-                    <td align="right">
-                      <img src="https://hasiripi.com/assets/logo-wordmark.png" alt="Dripfy" style="height:32px;border:0;">
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:36px 32px 42px;color:#1e332a;">
-                <h1 style="margin:0 0 12px;font-size:26px;color:#1e332a;line-height:32px;">${title}</h1>
-                <p style="margin:0 0 24px;font-size:15px;line-height:24px;color:rgba(47,74,59,0.85);">${intro}</p>
-                ${contentHtml}
-                ${footerBlock}
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:20px 32px;background-color:#f3f9f3;border-top:1px solid #c8d9b9;">
-                <p style="margin:0;font-size:12px;line-height:18px;color:rgba(47,74,59,0.7);">
-                  © ${year} Dripfy MIS. Tüm hakları saklıdır.<br>
-                  Bu mesajı <a href="mailto:info@dripfy.de" style="color:#4ba586;text-decoration:none;">info@dripfy.de</a> üzerinden yanıtlayabilirsiniz.
-                </p>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  </body>
-</html>`;
-}
-
-function buildKeyValueList(pairs) {
-  const rows = Object.entries(pairs)
-    .filter(([, value]) => value !== undefined && value !== null && String(value).trim() !== '')
-    .map(([label, value]) => {
-      const safeLabel = String(label).trim();
-      const safeValue = String(value).trim();
-      return `<tr>
-        <td style="padding:10px 14px;font-size:13px;color:rgba(47,74,59,0.8);background:#f3f9f3;border-radius:14px 0 0 14px;border:1px solid #c8d9b9;border-right:0;">${safeLabel}</td>
-        <td style="padding:10px 14px;font-size:13px;color:#1e332a;background:#edf6ed;border-radius:0 14px 14px 0;border:1px solid #c8d9b9;border-left:0;">${safeValue}</td>
-      </tr>`;
-    })
-    .join('');
-
-  return `<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-spacing:0 8px;margin:0 0 12px;">${rows}</table>`;
-}
-
-function buildCodeBlock(code) {
-  return `<div style="margin:0 0 24px;">
-    <div style="display:inline-block;padding:18px 28px;border-radius:18px;background:linear-gradient(135deg,rgba(75,165,134,0.12),rgba(148,174,161,0.08));border:1px solid #c8d9b9;">
-      <span style="font-size:28px;letter-spacing:0.4em;color:#1e332a;font-weight:600;">${code}</span>
-    </div>
-  </div>`;
-}
-
-async function sendMailWithContent({ to, subject, text, html }) {
-  await transporter.sendMail({
-    from: process.env.MAIL_FROM || process.env.SMTP_USER,
-    to,
-    subject,
-    text,
-    html,
-  });
-}
-
 function generateVerificationCode() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
@@ -375,24 +251,20 @@ app.post('/api/signup/send-code', signupRateLimiter, async (req, res) => {
   data.name = data.name || `${data.firstName} ${data.lastName}`.trim();
 
   const code = generateVerificationCode();
-  const ttlMinutes = Math.ceil(SIGNUP_CODE_TTL / (60 * 1000));
   const requestId = generateRequestId();
-  const subject = 'Dripfy Yönetim Paneli | Doğrulama Kodunuz';
-  const displayName = data.firstName || data.name;
-  const text = `Merhaba ${displayName},\n\nDripfy Yönetim Paneli doğrulama kodunuz: ${code}\nKod ${ttlMinutes} dakika boyunca geçerlidir. Talep size ait değilse bu mesajı yok sayabilirsiniz.\n\nDripfy Ekibi`;
-  const html = buildEmailTemplate(
-    'Doğrulama kodunuz',
-    'Dripfy Yönetim Paneli\'ne güvenle erişebilmeniz için doğrulama kodunuz hazır.',
-    `${buildCodeBlock(code)}
-      <p style="margin:0 0 18px;font-size:14px;line-height:22px;color:#2f4a3b;">Kod ${ttlMinutes} dakika boyunca geçerlidir. Talep size ait değilse lütfen bu mesajı görmezden gelin.</p>
-      <a href="https://hasiripi.com" style="display:inline-block;padding:14px 28px;border-radius:16px;background:linear-gradient(135deg,#4ba586,#84a084);color:#0b1612;font-weight:600;text-decoration:none;font-size:14px;">Paneli Aç</a>`,
-    'Sorularınız için <a href="mailto:info@dripfy.de" style="color:#84a084;text-decoration:none;">info@dripfy.de</a> adresinden bize ulaşabilirsiniz.'
-  );
+  const lang = req.body.language || 'tr';
 
   try {
-    await sendMailWithContent({ to: data.email, subject, text, html });
+    await sendVerificationCodeEmail({
+      email: data.email,
+      name: data.firstName || data.name,
+      code,
+      lang
+    });
+
     createSignupCodeRecord({ email: data.email, code, payload: data });
     console.log(`[signup-mailer] requestId=${requestId} email=${data.email.toLowerCase()}`);
+
     if (process.env.DEBUG_SIGNUP_CODES === 'true') {
       console.debug('[signup-mailer] debug verification payload', {
         requestId,
@@ -444,9 +316,24 @@ app.post('/api/signup', signupRateLimiter, async (req, res) => {
   const payload = result.payload;
   payload.name = payload.name || `${payload.firstName} ${payload.lastName}`.trim();
 
-  const infoLines = buildInfoLines(payload);
-  const infoText = infoLines.join('\n');
-  const detailPairs = {
+  // Create Request Object
+  const createdAt = Date.now();
+  const request = {
+    id: generateRequestId(),
+    name: payload.name,
+    firstName: payload.firstName,
+    lastName: payload.lastName,
+    email: payload.email,
+    countryCode: payload.countryCode,
+    country: payload.country,
+    phone: formatPhone(payload),
+    position: payload.position,
+    company: payload.company,
+    status: 'pending',
+    timestamp: new Date(createdAt).toISOString(),
+  };
+
+  const details = {
     'Ad Soyad': payload.name,
     'E-posta': payload.email,
     'Telefon': formatPhone(payload),
@@ -454,61 +341,26 @@ app.post('/api/signup', signupRateLimiter, async (req, res) => {
     Firma: payload.company,
     Ülke: payload.country,
   };
-  const detailTable = buildKeyValueList(detailPairs);
-
-  const adminRecipient = process.env.SIGNUP_NOTIFY_TO || process.env.SMTP_USER;
-  const adminSubject = `[Dripfy] Yeni kayıt talebi - ${payload.name}`;
-  const submittedAt = new Date().toLocaleString();
-  const adminHtml = buildEmailTemplate(
-    'Yeni kayıt talebi',
-    'Merhaba, Dripfy yönetim paneline yeni bir kayıt talebi ulaştı.',
-    `${detailTable}<p style="margin:8px 0 0;font-size:13px;line-height:20px;color:#2f4a3b;">Gönderilme tarihi: ${submittedAt}</p>`,
-    'Talebi panel üzerinden inceleyebilirsiniz.'
-  );
-
-  const shouldSendWelcome = process.env.SEND_WELCOME_EMAIL !== 'false';
-  const welcomeSubject = 'Dripfy Yönetim Paneli | Talebiniz Alındı';
-  const welcomeHtml = buildEmailTemplate(
-    'Talebiniz bize ulaştı',
-    'Dripfy Yönetim Paneli kayıt talebiniz başarıyla kaydedildi. Ekibimiz bilgilerinizi inceleyerek kısa süre içerisinde dönüş yapacak.',
-    `<p style="margin:0 0 14px;font-size:14px;line-height:22px;color:#2f4a3b;"><strong>Bilgileriniz</strong></p>${detailTable}<p style="margin:12px 0 0;font-size:13px;line-height:20px;color:rgba(47,74,59,0.8);">Her türlü soru ve isteğiniz için bu e-postaya yanıt verebilirsiniz.</p>`,
-    'Saygılarımızla, Dripfy Ekibi'
-  );
 
   try {
-    await sendMailWithContent({
-      to: adminRecipient,
-      subject: adminSubject,
-      text: `Merhaba,\n\nDripfy yönetim paneline yeni bir kayıt talebi ulaştı:\n\n${infoText}\n\nGönderilme tarihi: ${submittedAt}\n\nPanel üzerinden talebi inceleyebilirsiniz.\n\nDripfy Otomasyon Hizmeti`,
-      html: adminHtml,
+    // Notify Admin
+    await sendSignupAdminNotification({
+      name: payload.name,
+      email: payload.email,
+      details
     });
 
-    if (shouldSendWelcome) {
-      await sendMailWithContent({
-        to: payload.email,
-        subject: welcomeSubject,
-        text: `Merhaba ${payload.firstName || payload.name},\n\nDripfy Yönetim Paneli kayıt talebiniz bize ulaştı. Ekibimiz bilgilerinizi inceleyerek en kısa sürede sizinle iletişime geçecek.\n\nBilgileriniz:\n${infoText}\n\nHer türlü sorunuz için bu e-postaya yanıt verebilirsiniz.\n\nSaygılarımızla,\nDripfy Ekibi`,
-        html: welcomeHtml,
+    // Notify User
+    if (process.env.SEND_WELCOME_EMAIL !== 'false') {
+      const userLang = payload.language || 'tr';
+      await sendSignupReceivedEmail({
+        email: payload.email,
+        name: payload.firstName || payload.name,
+        lang: userLang
       });
     }
 
     deleteSignupCodeRecord(email);
-
-    const createdAt = Date.now();
-    const request = {
-      id: generateRequestId(),
-      name: payload.name,
-      firstName: payload.firstName,
-      lastName: payload.lastName,
-      email: payload.email,
-      countryCode: payload.countryCode,
-      country: payload.country,
-      phone: formatPhone(payload),
-      position: payload.position,
-      company: payload.company,
-      status: 'pending',
-      timestamp: new Date(createdAt).toISOString(),
-    };
     await addSignupRequest(request);
 
     return res.json({
@@ -552,6 +404,74 @@ app.post('/api/signup/requests', async (req, res) => {
 
 app.get('/api/health', (_, res) => {
   res.json({ ok: true, uptime: process.uptime() });
+});
+
+app.get('/api/messages', authenticate(), async (req, res) => {
+  try {
+    console.log('[API] /api/messages called by user:', req.user.id, 'Role:', req.user.role);
+    const messages = await getMessagesForUser(req.user.id, req.user.role);
+    console.log('[API] Messages found:', messages.length);
+    res.json({ ok: true, messages });
+  } catch (error) {
+    console.error('Failed to get messages:', error);
+    res.status(500).json({ ok: false, error: 'Mesajlar yüklenemedi' });
+  }
+});
+
+app.post('/api/messages', authenticate(), async (req, res) => {
+  try {
+    const { toId, content, subject, parentId, language, theme } = req.body;
+
+    // Save user preferences if provided
+    if (language || theme) {
+      try {
+        await import('./services/userService.js').then(m =>
+          m.updateUser(req.user.id, {
+            language: language || undefined,
+            theme: theme || undefined
+          })
+        );
+      } catch (updateErr) {
+        console.warn('[API] Failed to update user preferences during message send:', updateErr);
+      }
+    }
+
+    const msg = await sendMessage({
+      fromId: req.user.id,
+      fromName: req.user.name,
+      toId,
+      content,
+      subject,
+      parentId
+    });
+
+    // If message is to admin, send email notification
+    if (toId === 'admin') {
+      import('./services/emailService.js').then(m => {
+        m.sendAdminMessageEmail({
+          fromName: req.user.name,
+          fromEmail: req.user.email,
+          content: content,
+          lang: language || 'en',
+          theme: theme || 'light'
+        });
+      }).catch(err => console.error('Failed to trigger admin email:', err));
+    }
+
+    res.json({ ok: true, message: msg });
+  } catch (error) {
+    console.error('Failed to send message:', error);
+    res.status(500).json({ ok: false, error: 'Mesaj gönderilemedi' });
+  }
+});
+
+app.patch('/api/messages/:id/read', authenticate(), async (req, res) => {
+  try {
+    await markMessageAsRead(req.params.id);
+    res.json({ ok: true });
+  } catch (error) {
+    res.status(500).json({ ok: false });
+  }
 });
 
 app.use((err, req, res, next) => {

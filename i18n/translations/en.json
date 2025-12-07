@@ -222,7 +222,19 @@
     "approve": "Approve",
     "deny": "Deny",
     "noRequests": "No pending signup requests.",
-    "by": "by"
+    "by": "by",
+    "inviteUser": "Invite User",
+    "backups": "Backups",
+    "createBackup": "Create Backup",
+    "restoreBackup": "Restore Backup",
+    "downloadData": "Download All Data",
+    "backupReason": "Backup Reason",
+    "restoreConfirm": "Are you sure you want to restore this backup? Current data will be overwritten.",
+    "backupCreated": "Backup created successfully.",
+    "backupRestored": "Backup restored successfully.",
+    "actions": {
+      "send": "Send"
+    }
   },
   "userRoles": {
     "admin": "Admin",
@@ -268,7 +280,8 @@
     "save": "Save",
     "cancel": "Cancel",
     "retry": "Retry",
-    "view": "View"
+    "view": "View",
+    "send": "Send"
   },
   "chatbot": {
     "toggle": "Toggle Chatbot",
@@ -360,6 +373,8 @@
     "titlePlaceholder": "Meeting title",
     "day": "Day",
     "date": "Date",
+    "fixDateTitle": "Set Date",
+    "fixDateDesc": "This event seems to be recurring. Assign a specific date to make it a one-time event.",
     "time": "Time",
     "participants": "Participants",
     "type": "Type"
@@ -388,5 +403,26 @@
     "saveButton": "Save changes",
     "saving": "Saving...",
     "saveError": "Unable to save the updated content, please try again."
+  },
+  "email": {
+    "inviteSubject": "You've been invited to Dripfy",
+    "inviteTitle": "Welcome to the Team",
+    "inviteIntro": "Hello {name},<br><br>You have been invited to join <strong>Dripfy</strong>. You can accept your invitation below to access your dashboard as a <strong>{role}</strong>.",
+    "inviteButton": "Accept Invitation",
+    "inviteFooter": "If you were not expecting this invitation, please ignore this email.",
+    "resetSubject": "Reset Your Password",
+    "resetTitle": "Reset Password",
+    "resetIntro": "We received a request to reset the password for your Dripfy account. Use the code below to proceed:<br><br>{code}<br><br>This code is valid for {ttl} minutes.",
+    "resetButton": "Reset Password",
+    "resetFooter": "If you did not request a password reset, you can safely ignore this email.",
+    "signupCodeSubject": "Your Verification Code",
+    "signupCodeTitle": "Verification Code",
+    "signupCodeIntro": "Your verification code for Dripfy Management Panel is ready. Use the code below to proceed:<br><br>{code}<br><br>This code is valid for {ttl} minutes.",
+    "signupCodeButton": "Open Panel",
+    "signupCodeFooter": "If you did not request this code, please ignore this email.",
+    "signupReceivedSubject": "We Received Your Request",
+    "signupReceivedTitle": "Request Received",
+    "signupReceivedIntro": "We received your registration request for Dripfy Management Panel. Our team will review your details and get back to you shortly.<br><br><strong>Your Details</strong><br>{details}",
+    "signupReceivedFooter": "You can reply to this email for any questions."
   }
 }

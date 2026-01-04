@@ -107,6 +107,11 @@ export const mockData: DashboardData = {
     { id: 'l1', user: 'Admin User', action: 'Updated', targetType: 'Task', targetId: 't17', timestamp: '2024-07-26 11:32', details: 'Status changed to Done' },
     { id: 'l2', user: 'Admin User', action: 'Created', targetType: 'Contact', targetId: 'ct25', timestamp: '2024-07-26 11:35', details: 'Added new company: Hair Chefs' },
   ],
+  teams: [
+    { id: 'tm1', name: 'Sales Team', memberIds: ['ct1', 'ct10', 'ct12'], description: 'Sales and business development team' },
+    { id: 'tm2', name: 'Medical Board', memberIds: ['ct2', 'ct3', 'ct13'], description: 'Medical advisory board members' },
+    { id: 'tm3', name: 'Tech Team', memberIds: ['ct7', 'ct14'], description: 'Technology and development team' },
+  ],
   userPermissions: [
     {
       userId: 'u1',
@@ -117,6 +122,7 @@ export const mockData: DashboardData = {
         challenges: { view: true, edit: true },
         advantages: { view: true, edit: true },
         contacts: { view: true, edit: true },
+        teams: { view: true, edit: true },
         tasks: { view: true, edit: true },
       }
     }

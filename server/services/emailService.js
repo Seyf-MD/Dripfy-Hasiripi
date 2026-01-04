@@ -15,8 +15,8 @@ let transporter = null;
 export async function initEmailService() {
     if (transporter) return;
 
-    if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
-        console.warn('[email-service] Missing SMTP credentials. Email sending will be disabled.');
+    if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS || process.env.SMTP_HOST === 'smtp.yourprovider.com') {
+        console.warn('[email-service] Missing or dummy SMTP credentials. Email sending will be disabled.');
         return;
     }
 

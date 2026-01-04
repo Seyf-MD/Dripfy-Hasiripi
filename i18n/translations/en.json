@@ -122,6 +122,7 @@
     "financials": "Financials",
     "challenges": "Challenges & Advantages",
     "contacts": "Contacts",
+    "teams": "Teams",
     "tasks": "Tasks",
     "adminPanel": "Admin Panel"
   },
@@ -199,13 +200,30 @@
     "phone": "Phone",
     "address": "Address"
   },
+  "teams": {
+    "newTeam": "New Team",
+    "searchPlaceholder": "Search teams...",
+    "name": "Team Name",
+    "namePlaceholder": "Enter team name",
+    "description": "Description",
+    "descriptionPlaceholder": "Team description (optional)",
+    "members": "members",
+    "teamMembers": "Team Members",
+    "selectMembers": "Select Members",
+    "membersSelected": "members selected",
+    "noContacts": "No contacts available",
+    "noTeams": "No teams yet. Create your first team!",
+    "noTeamsFound": "No teams found matching your search."
+  },
   "tasks": {
     "newTask": "New Task",
     "title": "Title",
     "priority": "Priority",
     "status": "Status",
     "dueDate": "Due Date",
-    "assignee": "Assignee"
+    "assignee": "Assignee",
+    "team": "Team",
+    "noTeam": "No Team"
   },
   "status": {
     "paid": "Paid",
@@ -246,6 +264,7 @@
     "challenges": "Challenge",
     "advantages": "Advantage",
     "contacts": "Contact",
+    "teams": "Team",
     "tasks": "Task",
     "users": "User",
     "SignupRequest": "Signup Request"
@@ -268,6 +287,7 @@
       "challenges": "New Challenge",
       "advantages": "New Advantage",
       "contacts": "New Contact",
+      "teams": "New Team",
       "tasks": "New Task",
       "users": "New User"
     },

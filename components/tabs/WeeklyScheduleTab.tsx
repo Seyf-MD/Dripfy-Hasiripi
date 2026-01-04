@@ -308,8 +308,8 @@ const CalendarTab: React.FC<CalendarTabProps> = ({ data, canEdit, onOpenModal, o
                                                     </span>
                                                 </div>
 
-                                                <div className="absolute bottom-full right-0 mb-2 px-3 py-1.5 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border border-white/20 text-[var(--drip-text)] dark:text-white text-xs font-medium rounded-xl shadow-xl whitespace-nowrap opacity-0 translate-y-2 scale-95 group-hover/tooltip:opacity-100 group-hover/tooltip:translate-y-0 group-hover/tooltip:scale-100 transition-all duration-300 origin-bottom-right pointer-events-none">
-                                                    {event.creator}
+                                                <div className="absolute bottom-full right-0 mb-2 px-3 py-1.5 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border border-white/20 text-[var(--drip-text)] dark:text-white text-xs font-medium rounded-xl shadow-xl whitespace-nowrap opacity-0 translate-y-2 scale-95 group-hover/tooltip:opacity-100 group-hover/tooltip:translate-y-0 group-hover/tooltip:scale-100 transition-all duration-300 origin-bottom-right pointer-events-none z-50">
+                                                    {t('schedule.createdBy')}: {event.creator}
                                                     <div className="absolute -bottom-1 right-2 w-2 h-2 bg-white/80 dark:bg-neutral-900/80 border-r border-b border-white/20 transform rotate-45"></div>
                                                 </div>
                                             </div>

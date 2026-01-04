@@ -122,6 +122,7 @@
         "financials": "Finansallar",
         "challenges": "Zorluklar & Avantajlar",
         "contacts": "Kişiler",
+        "teams": "Takımlar",
         "tasks": "Görevler",
         "adminPanel": "Yönetici Paneli"
     },
@@ -199,13 +200,30 @@
         "phone": "Telefon",
         "address": "Adres"
     },
+    "teams": {
+        "newTeam": "Yeni Takım",
+        "searchPlaceholder": "Takımları ara...",
+        "name": "Takım Adı",
+        "namePlaceholder": "Takım adını girin",
+        "description": "Açıklama",
+        "descriptionPlaceholder": "Takım açıklaması (isteğe bağlı)",
+        "members": "üye",
+        "teamMembers": "Takım Üyeleri",
+        "selectMembers": "Üye Seç",
+        "membersSelected": "üye seçildi",
+        "noContacts": "Mevcut kişi yok",
+        "noTeams": "Henüz takım yok. İlk takımınızı oluşturun!",
+        "noTeamsFound": "Aramanızla eşleşen takım bulunamadı."
+    },
     "tasks": {
         "newTask": "Yeni Görev",
         "title": "Başlık",
         "priority": "Öncelik",
         "status": "Durum",
         "dueDate": "Bitiş Tarihi",
-        "assignee": "Atanan"
+        "assignee": "Atanan",
+        "team": "Takım",
+        "noTeam": "Takım Yok"
     },
     "status": {
         "paid": "Ödendi",
@@ -246,6 +264,7 @@
         "challenges": "Zorluk",
         "advantages": "Avantaj",
         "contacts": "Kişi",
+        "teams": "Takım",
         "tasks": "Görev",
         "users": "Kullanıcı",
         "SignupRequest": "Kayıt Talebi"
@@ -268,6 +287,7 @@
             "challenges": "Yeni Zorluk",
             "advantages": "Yeni Avantaj",
             "contacts": "Yeni Kişi",
+            "teams": "Yeni Takım",
             "tasks": "Yeni Görev",
             "users": "Yeni Kullanıcı"
         },

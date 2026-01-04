@@ -46,6 +46,13 @@ export interface Contact {
   country?: string;
 }
 
+export interface Team {
+  id: string;
+  name: string;
+  memberIds: string[]; // Array of contact IDs
+  description?: string;
+}
+
 export interface Task {
   id: string;
   title: string;
@@ -53,6 +60,7 @@ export interface Task {
   status: 'To Do' | 'In Progress' | 'Done';
   dueDate: string;
   assignee: string;
+  teamIds?: string[]; // Optional multiple team assignments
 }
 
 export interface User {
@@ -60,6 +68,7 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
+  lastLogin?: string;
   permissions?: UserPermission[]; // Optional custom permissions
 }
 
@@ -121,7 +130,7 @@ export type Theme = 'light' | 'dark';
 export type UserRole = 'admin' | 'user';
 export type AdminSubTab = 'permissions' | 'audit' | 'requests' | 'backups';
 
-export type DataItem = ScheduleEvent | FinancialRecord | Challenge | Advantage | Contact | Task | User;
+export type DataItem = ScheduleEvent | FinancialRecord | Challenge | Advantage | Contact | Task | User | Team;
 
 export interface DashboardData {
   schedule: ScheduleEvent[];
@@ -130,6 +139,7 @@ export interface DashboardData {
   advantages: Advantage[];
   contacts: Contact[];
   tasks: Task[];
+  teams: Team[];
   users: User[];
   auditLog: AuditLogEntry[];
   userPermissions: UserPermission[];

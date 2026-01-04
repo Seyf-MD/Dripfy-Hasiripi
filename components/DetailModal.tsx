@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { DataItem, ScheduleEvent, FinancialRecord, Challenge, Advantage, Contact, Task, User } from '../types';
+import { DataItem, ScheduleEvent, FinancialRecord, Challenge, Advantage, Contact, Task, User, Team } from '../types';
 import { X, Edit, Trash2 } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
 
-type ModalType = 'schedule' | 'financials' | 'challenges' | 'advantages' | 'contacts' | 'tasks' | 'users';
+type ModalType = 'schedule' | 'financials' | 'challenges' | 'advantages' | 'contacts' | 'teams' | 'tasks' | 'users';
 
 interface DetailModalProps {
     item: DataItem;
@@ -12,6 +12,7 @@ interface DetailModalProps {
     onClose: () => void;
     onEdit: (item: DataItem, type: ModalType) => void;
     onDelete: (itemId: string, type: ModalType) => void;
+    teams?: Team[];
 }
 
 const DetailRow: React.FC<{ label: string; children: React.ReactNode; className?: string }> = ({ label, children, className }) => (
@@ -22,7 +23,7 @@ const DetailRow: React.FC<{ label: string; children: React.ReactNode; className?
 );
 
 
-const DetailModal: React.FC<DetailModalProps> = ({ item, type, canEdit, onClose, onEdit, onDelete }) => {
+const DetailModal: React.FC<DetailModalProps> = ({ item, type, canEdit, onClose, onEdit, onDelete, teams = [] }) => {
     const { t } = useLanguage();
 
     React.useEffect(() => {
@@ -118,7 +119,19 @@ const DetailModal: React.FC<DetailModalProps> = ({ item, type, canEdit, onClose,
                         </DetailRow>
                         <DetailRow label={t('tasks.status')}>{t(`status.${task.status.toLowerCase().replace(' ', '')}`)}</DetailRow>
                         <DetailRow label={t('tasks.dueDate')}>{new Date(task.dueDate).toLocaleDateString()}</DetailRow>
-                        <DetailRow label={t('tasks.assignee')}>{task.assignee}</DetailRow>
+                        <DetailRow label={t('tasks.assignee')}>{task.assignee || '-'}</DetailRow>
+                        {task.teamIds && task.teamIds.length > 0 && (
+                            <DetailRow label={t('tasks.teams')}>
+                                {task.teamIds.map((teamId, idx) => {
+                                    const team = teams.find(t => t.id === teamId);
+                                    return (
+                                        <span key={teamId}>
+                                            {team ? team.name : teamId}{idx < task.teamIds!.length - 1 ? ', ' : ''}
+                                        </span>
+                                    );
+                                })}
+                            </DetailRow>
+                        )}
                     </dl>
                 );
             }
@@ -129,6 +142,15 @@ const DetailModal: React.FC<DetailModalProps> = ({ item, type, canEdit, onClose,
                         <DetailRow label={t('users.email')}>{user.email}</DetailRow>
                         <DetailRow label={t('users.role')}>{user.role}</DetailRow>
                         <DetailRow label={t('users.lastLogin')}>{new Date(user.lastLogin).toLocaleString()}</DetailRow>
+                    </dl>
+                );
+            }
+            case 'teams': {
+                const team = item as Team;
+                return (
+                    <dl>
+                        {team.description && <DetailRow label={t('teams.description')}>{team.description}</DetailRow>}
+                        <DetailRow label={t('teams.members')}>{team.memberIds.length}</DetailRow>
                     </dl>
                 );
             }

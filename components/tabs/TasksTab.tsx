@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { Task } from '../../types';
-import { Plus, CheckCircle, Clock, Loader } from 'lucide-react';
+import { Task, Team } from '../../types';
+import { Plus, CheckCircle, Clock, Loader, Users } from 'lucide-react';
 import { useLanguage } from '../../i18n/LanguageContext';
 
 interface TasksTabProps {
     data: Task[];
+    teams?: Team[];
     canEdit: boolean;
     onOpenModal: (item: Task, type: 'tasks') => void;
     onUpdateStatus: (taskId: string, newStatus: Task['status']) => void;
@@ -12,7 +13,19 @@ interface TasksTabProps {
 
 type TaskStatus = 'To Do' | 'In Progress' | 'Done';
 
-const TaskCard: React.FC<{ task: Task; onOpenModal: () => void; onDragStart: (e: React.DragEvent<HTMLDivElement>, taskId: string) => void; canEdit: boolean; }> = ({ task, onOpenModal, onDragStart, canEdit }) => {
+const getAssigneeInitials = (name: string) => {
+    const trimmed = name.trim();
+    if (!trimmed) return '--';
+    const parts = trimmed.split(/\s+/).filter(Boolean);
+    if (parts.length === 1) {
+        return parts[0][0]?.toUpperCase() || '--';
+    }
+    const first = parts[0][0] || '';
+    const last = parts[parts.length - 1][0] || '';
+    return `${first}${last}`.toUpperCase();
+};
+
+const TaskCard: React.FC<{ task: Task; teams?: Team[]; onOpenModal: () => void; onDragStart: (e: React.DragEvent<HTMLDivElement>, taskId: string) => void; canEdit: boolean; }> = ({ task, teams = [], onOpenModal, onDragStart, canEdit }) => {
 
     const getPriorityColor = (priority: string) => {
         switch (priority) {
@@ -22,6 +35,9 @@ const TaskCard: React.FC<{ task: Task; onOpenModal: () => void; onDragStart: (e:
             default: return 'bg-neutral-500';
         }
     }
+
+    const assigneeInitials = getAssigneeInitials(task.assignee || '');
+    const assignedTeams = task.teamIds ? teams.filter(t => task.teamIds?.includes(t.id)) : [];
 
     return (
         <div
@@ -43,18 +59,32 @@ const TaskCard: React.FC<{ task: Task; onOpenModal: () => void; onDragStart: (e:
             </div>
             <div className="relative z-10 flex items-center justify-between mt-4">
                 <div className="text-xs font-medium text-[var(--drip-muted)]/70 dark:text-neutral-400">
-                    <p>{task.assignee}</p>
                     <p className="mt-0.5 opacity-80">{new Date(task.dueDate).toLocaleDateString()}</p>
+                    {assignedTeams.length > 0 && (
+                        <div className="flex flex-wrap items-center gap-1 mt-1">
+                            <Users size={10} className="text-[var(--drip-primary)] flex-shrink-0" />
+                            {assignedTeams.map((team, idx) => (
+                                <span key={team.id} className="text-[10px] text-[var(--drip-primary)]">
+                                    {team.name}{idx < assignedTeams.length - 1 ? ',' : ''}
+                                </span>
+                            ))}
+                        </div>
+                    )}
                 </div>
-                <div className="relative group/tooltip">
-                    <div className="w-8 h-8 rounded-full bg-white/20 dark:bg-white/10 flex items-center justify-center text-xs font-bold text-[var(--drip-text)] dark:text-white border border-white/10 shadow-inner cursor-help">
-                        {task.assignee.substring(0, 2).toUpperCase()}
+                {task.assignee && (
+                    <div className="relative group/tooltip z-10">
+                        <div
+                            className="w-9 h-9 rounded-full bg-white/35 dark:bg-white/10 flex items-center justify-center text-[11px] font-semibold tracking-[0.08em] text-[var(--drip-text)] dark:text-white border border-white/30 dark:border-white/15 shadow-[0_6px_16px_rgba(0,0,0,0.18)] cursor-help"
+                            aria-label={task.assignee ? `Assignee ${task.assignee}` : 'Assignee'}
+                        >
+                            {assigneeInitials}
+                        </div>
+                        <div className="absolute bottom-full right-0 mb-2 px-3 py-1.5 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border border-white/20 text-[var(--drip-text)] dark:text-white text-xs font-medium rounded-xl shadow-xl whitespace-nowrap opacity-0 translate-y-2 scale-95 group-hover/tooltip:opacity-100 group-hover/tooltip:translate-y-0 group-hover/tooltip:scale-100 transition-all duration-300 origin-bottom-right pointer-events-none z-50">
+                            {task.assignee}
+                            <div className="absolute -bottom-1 right-2 w-2 h-2 bg-white/80 dark:bg-neutral-900/80 border-r border-b border-white/20 transform rotate-45"></div>
+                        </div>
                     </div>
-                    <div className="absolute bottom-full right-0 mb-2 px-3 py-1.5 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border border-white/20 text-[var(--drip-text)] dark:text-white text-xs font-medium rounded-xl shadow-xl whitespace-nowrap opacity-0 translate-y-2 scale-95 group-hover/tooltip:opacity-100 group-hover/tooltip:translate-y-0 group-hover/tooltip:scale-100 transition-all duration-300 origin-bottom-right pointer-events-none z-50">
-                        {task.assignee}
-                        <div className="absolute -bottom-1 right-2 w-2 h-2 bg-white/80 dark:bg-neutral-900/80 border-r border-b border-white/20 transform rotate-45"></div>
-                    </div>
-                </div>
+                )}
             </div>
         </div>
     )
@@ -63,11 +93,12 @@ const TaskCard: React.FC<{ task: Task; onOpenModal: () => void; onDragStart: (e:
 const TaskColumn: React.FC<{
     status: TaskStatus;
     tasks: Task[];
+    teams?: Team[];
     onOpenModal: (task: Task) => void;
     onDragStart: (e: React.DragEvent<HTMLDivElement>, taskId: string) => void;
     onDrop: (e: React.DragEvent<HTMLDivElement>, status: TaskStatus) => void;
     canEdit: boolean;
-}> = ({ status, tasks, onOpenModal, onDragStart, onDrop, canEdit }) => {
+}> = ({ status, tasks, teams = [], onOpenModal, onDragStart, onDrop, canEdit }) => {
     const { t } = useLanguage();
     const [isDragOver, setIsDragOver] = React.useState(false);
 
@@ -130,14 +161,14 @@ const TaskColumn: React.FC<{
             </div>
             <div className="space-y-3 h-full overflow-y-auto max-h-[calc(100vh-350px)] p-1 scrollbar-hide">
                 {tasks.map(task => (
-                    <TaskCard key={task.id} task={task} onOpenModal={() => onOpenModal(task)} onDragStart={onDragStart} canEdit={canEdit} />
+                    <TaskCard key={task.id} task={task} teams={teams} onOpenModal={() => onOpenModal(task)} onDragStart={onDragStart} canEdit={canEdit} />
                 ))}
             </div>
         </div>
     )
 }
 
-const TasksTab: React.FC<TasksTabProps> = ({ data, canEdit, onOpenModal, onUpdateStatus }) => {
+const TasksTab: React.FC<TasksTabProps> = ({ data, teams = [], canEdit, onOpenModal, onUpdateStatus }) => {
     const { t } = useLanguage();
 
     const tasksByStatus = React.useMemo(() => {
@@ -186,9 +217,9 @@ const TasksTab: React.FC<TasksTabProps> = ({ data, canEdit, onOpenModal, onUpdat
                 )}
             </div>
             <div className="flex flex-col lg:flex-row gap-6 pb-4">
-                <TaskColumn status="To Do" tasks={tasksByStatus['To Do']} onOpenModal={(task) => onOpenModal(task, 'tasks')} onDragStart={handleDragStart} onDrop={handleDrop} canEdit={canEdit} />
-                <TaskColumn status="In Progress" tasks={tasksByStatus['In Progress']} onOpenModal={(task) => onOpenModal(task, 'tasks')} onDragStart={handleDragStart} onDrop={handleDrop} canEdit={canEdit} />
-                <TaskColumn status="Done" tasks={tasksByStatus['Done']} onOpenModal={(task) => onOpenModal(task, 'tasks')} onDragStart={handleDragStart} onDrop={handleDrop} canEdit={canEdit} />
+                <TaskColumn status="To Do" tasks={tasksByStatus['To Do']} teams={teams} onOpenModal={(task) => onOpenModal(task, 'tasks')} onDragStart={handleDragStart} onDrop={handleDrop} canEdit={canEdit} />
+                <TaskColumn status="In Progress" tasks={tasksByStatus['In Progress']} teams={teams} onOpenModal={(task) => onOpenModal(task, 'tasks')} onDragStart={handleDragStart} onDrop={handleDrop} canEdit={canEdit} />
+                <TaskColumn status="Done" tasks={tasksByStatus['Done']} teams={teams} onOpenModal={(task) => onOpenModal(task, 'tasks')} onDragStart={handleDragStart} onDrop={handleDrop} canEdit={canEdit} />
             </div>
         </div>
     );

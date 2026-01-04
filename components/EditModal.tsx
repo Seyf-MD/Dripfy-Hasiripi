@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { DataItem, ScheduleEvent, FinancialRecord, Challenge, Advantage, Contact, Task, User } from '../types';
+import { DataItem, ScheduleEvent, FinancialRecord, Challenge, Advantage, Contact, Task, User, Team } from '../types';
 import { X, Save, Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLanguage } from '../i18n/LanguageContext';
 import { locationData } from '../data/locationData';
 
-type ModalType = 'schedule' | 'financials' | 'challenges' | 'advantages' | 'contacts' | 'tasks' | 'users';
+type ModalType = 'schedule' | 'financials' | 'challenges' | 'advantages' | 'contacts' | 'tasks' | 'users' | 'teams';
 
 interface EditModalProps {
     item: Partial<DataItem>;
@@ -12,6 +12,8 @@ interface EditModalProps {
     isNew: boolean;
     onClose: () => void;
     onSave: (item: DataItem | Omit<DataItem, 'id'>, type: ModalType) => void;
+    teams?: Team[];
+    contacts?: Contact[];
 }
 
 const getMonthGrid = (date: Date) => {
@@ -166,10 +168,12 @@ const FormField: React.FC<{ label: string; children: React.ReactNode; className?
     </div>
 );
 
-const EditModal: React.FC<EditModalProps> = ({ item, type, isNew, onClose, onSave }) => {
+const EditModal: React.FC<EditModalProps> = ({ item, type, isNew, onClose, onSave, teams = [], contacts = [] }) => {
     const { t } = useLanguage();
     const [formData, setFormData] = React.useState<Partial<DataItem>>(item);
     const [selectedCountry, setSelectedCountry] = React.useState<string>('');
+    const [selectedMemberIds, setSelectedMemberIds] = React.useState<string[]>([]);
+    const [selectedTeamIds, setSelectedTeamIds] = React.useState<string[]>([]);
 
     React.useEffect(() => {
         setFormData(item);
@@ -177,6 +181,12 @@ const EditModal: React.FC<EditModalProps> = ({ item, type, isNew, onClose, onSav
             setSelectedCountry((item as Contact).country!);
         } else if (type === 'contacts') {
             setSelectedCountry(locationData.countries[0].name);
+        } else if (type === 'teams' && (item as Team)?.memberIds) {
+            setSelectedMemberIds((item as Team).memberIds || []);
+        } else if (type === 'tasks' && (item as Task)?.teamIds) {
+            setSelectedTeamIds((item as Task).teamIds || []);
+        } else if (type === 'tasks') {
+            setSelectedTeamIds([]);
         }
     }, [item, type]);
 
@@ -349,6 +359,15 @@ const EditModal: React.FC<EditModalProps> = ({ item, type, isNew, onClose, onSav
                 );
             case 'tasks':
                 const task = formData as Partial<Task>;
+                
+                const handleTeamToggle = (teamId: string) => {
+                    const newTeamIds = selectedTeamIds.includes(teamId)
+                        ? selectedTeamIds.filter(id => id !== teamId)
+                        : [...selectedTeamIds, teamId];
+                    setSelectedTeamIds(newTeamIds);
+                    setFormData(prev => ({ ...prev, teamIds: newTeamIds.length > 0 ? newTeamIds : undefined }));
+                };
+
                 return (
                     <>
                         <FormField label={t('tasks.title')}><input name="title" value={task.title || ''} onChange={handleChange} className={inputClass} required placeholder="Task title" /></FormField>
@@ -356,6 +375,51 @@ const EditModal: React.FC<EditModalProps> = ({ item, type, isNew, onClose, onSav
                             <FormField label={t('tasks.assignee')}><input name="assignee" value={task.assignee || ''} onChange={handleChange} className={inputClass} placeholder="Assignee Name" /></FormField>
                             <FormField label={t('tasks.dueDate')}><input type="date" name="dueDate" value={task.dueDate || ''} onChange={handleChange} className={inputClass} /></FormField>
                         </div>
+                        <FormField label={t('tasks.teams')}>
+                            <div className="max-h-60 overflow-y-auto space-y-2 p-3 bg-white/5 dark:bg-black/10 rounded-xl border border-white/10">
+                                {teams.length === 0 ? (
+                                    <p className="text-sm text-[var(--drip-muted)] dark:text-neutral-400 text-center py-4">
+                                        {t('tasks.noTeamsAvailable')}
+                                    </p>
+                                ) : (
+                                    teams.map(team => {
+                                        const isSelected = selectedTeamIds.includes(team.id);
+                                        return (
+                                            <label
+                                                key={team.id}
+                                                className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-all ${
+                                                    isSelected 
+                                                        ? 'bg-[var(--drip-primary)]/20 border border-[var(--drip-primary)]/40' 
+                                                        : 'bg-white/5 hover:bg-white/10 border border-transparent'
+                                                }`}
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    checked={isSelected}
+                                                    onChange={() => handleTeamToggle(team.id)}
+                                                    className="w-4 h-4 rounded border-white/20 bg-white/10 text-[var(--drip-primary)] focus:ring-[var(--drip-primary)]"
+                                                />
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-medium text-[var(--drip-text)] dark:text-white">
+                                                        {team.name}
+                                                    </p>
+                                                    {team.description && (
+                                                        <p className="text-xs text-[var(--drip-muted)] dark:text-neutral-400 truncate">
+                                                            {team.description}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </label>
+                                        );
+                                    })
+                                )}
+                            </div>
+                            {selectedTeamIds.length > 0 && (
+                                <p className="text-xs text-[var(--drip-muted)] dark:text-neutral-400 mt-2">
+                                    {selectedTeamIds.length} {t('tasks.teamsSelected')}
+                                </p>
+                            )}
+                        </FormField>
                         <div className="grid grid-cols-2 gap-4">
                             <FormField label={t('tasks.priority')}>
                                 <select name="priority" value={task.priority || 'Medium'} onChange={handleChange} className={inputClass}>
@@ -380,6 +444,85 @@ const EditModal: React.FC<EditModalProps> = ({ item, type, isNew, onClose, onSav
                             <select name="role" value={user.role || 'user'} onChange={handleChange} className={inputClass}>
                                 <option value="user" className="bg-white dark:bg-neutral-800">{t('userRoles.user')}</option><option value="admin" className="bg-white dark:bg-neutral-800">{t('userRoles.admin')}</option>
                             </select>
+                        </FormField>
+                    </>
+                );
+            case 'teams':
+                const team = formData as Partial<Team>;
+                const handleMemberToggle = (contactId: string) => {
+                    const newMemberIds = selectedMemberIds.includes(contactId)
+                        ? selectedMemberIds.filter(id => id !== contactId)
+                        : [...selectedMemberIds, contactId];
+                    setSelectedMemberIds(newMemberIds);
+                    setFormData(prev => ({ ...prev, memberIds: newMemberIds }));
+                };
+                return (
+                    <>
+                        <FormField label={t('teams.name')}>
+                            <input 
+                                name="name" 
+                                value={team.name || ''} 
+                                onChange={handleChange} 
+                                className={inputClass} 
+                                required 
+                                placeholder={t('teams.namePlaceholder')} 
+                            />
+                        </FormField>
+                        <FormField label={t('teams.description')}>
+                            <textarea 
+                                name="description" 
+                                value={team.description || ''} 
+                                onChange={handleChange} 
+                                className={inputClass} 
+                                rows={3} 
+                                placeholder={t('teams.descriptionPlaceholder')}
+                            />
+                        </FormField>
+                        <FormField label={t('teams.selectMembers')}>
+                            <div className="max-h-60 overflow-y-auto space-y-2 p-3 bg-white/5 dark:bg-black/10 rounded-xl border border-white/10">
+                                {contacts.length === 0 ? (
+                                    <p className="text-sm text-[var(--drip-muted)] dark:text-neutral-400 text-center py-4">
+                                        {t('teams.noContacts')}
+                                    </p>
+                                ) : (
+                                    contacts.map(contact => {
+                                        const isSelected = selectedMemberIds.includes(contact.id);
+                                        const displayName = `${contact.firstName} ${contact.lastName}`.trim() || contact.email;
+                                        return (
+                                            <label
+                                                key={contact.id}
+                                                className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-all ${
+                                                    isSelected 
+                                                        ? 'bg-[var(--drip-primary)]/20 border border-[var(--drip-primary)]/40' 
+                                                        : 'bg-white/5 hover:bg-white/10 border border-transparent'
+                                                }`}
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    checked={isSelected}
+                                                    onChange={() => handleMemberToggle(contact.id)}
+                                                    className="w-4 h-4 rounded border-white/20 bg-white/10 text-[var(--drip-primary)] focus:ring-[var(--drip-primary)]"
+                                                />
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-medium text-[var(--drip-text)] dark:text-white truncate">
+                                                        {displayName}
+                                                    </p>
+                                                    {contact.role && (
+                                                        <p className="text-xs text-[var(--drip-muted)] dark:text-neutral-400 truncate">
+                                                            {contact.role}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </label>
+                                        );
+                                    })
+                                )}
+                            </div>
+                            {selectedMemberIds.length > 0 && (
+                                <p className="text-xs text-[var(--drip-muted)] dark:text-neutral-400 mt-2">
+                                    {selectedMemberIds.length} {t('teams.membersSelected')}
+                                </p>
+                            )}
                         </FormField>
                     </>
                 );

@@ -7,6 +7,7 @@ import CalendarTab from './components/tabs/WeeklyScheduleTab';
 import FinancialsTab from './components/tabs/FinancialsTab';
 import ChallengesTab from './components/tabs/ChallengesTab';
 import ContactsTab from './components/tabs/ContactsTab';
+import TeamsTab from './components/tabs/TeamsTab';
 import TasksTab from './components/tabs/TasksTab';
 import AdminPanelTab from './components/tabs/AdminPanelTab';
 import Chatbot from './components/Chatbot';
@@ -29,7 +30,7 @@ import { useTheme } from './context/ThemeContext';
 import { finalizeSignup, fetchSignupRequests, resolveSignupRequest, SignupFinalizePayload } from './services/signupService';
 import { useAuth } from './context/AuthContext';
 
-type ModalType = 'schedule' | 'financials' | 'challenges' | 'advantages' | 'contacts' | 'tasks' | 'users';
+type ModalType = 'schedule' | 'financials' | 'challenges' | 'advantages' | 'contacts' | 'teams' | 'tasks' | 'users';
 type SettingsPanelTab = 'profile' | 'settings' | 'privacy';
 
 function App() {
@@ -274,6 +275,7 @@ function App() {
           challenges: { view: true, edit: false },
           advantages: { view: true, edit: false },
           contacts: { view: true, edit: false },
+          teams: { view: true, edit: false },
           tasks: { view: true, edit: false },
         },
       };
@@ -448,9 +450,19 @@ function App() {
           onOpenModal={handleOpenEditModal as any}
           onUpdate={(id, field, value) => handleQuickUpdate(id, 'contacts', field, value)}
         />;
+      case 'Teams':
+        return <TeamsTab
+          data={dashboardData.teams}
+          contacts={dashboardData.contacts}
+          canEdit={canEdit('teams')}
+          onOpenModal={handleOpenEditModal as any}
+          onUpdate={(id, field, value) => handleQuickUpdate(id, 'teams', field, value)}
+          onDelete={(id) => handleDeleteItem(id, 'teams')}
+        />;
       case 'Tasks':
         return <TasksTab
           data={dashboardData.tasks}
+          teams={dashboardData.teams}
           canEdit={canEdit('tasks')}
           onOpenModal={handleOpenDetailModal as any}
           onUpdateStatus={(taskId, newStatus) => handleQuickUpdate(taskId, 'tasks', 'status', newStatus)}
@@ -533,6 +545,7 @@ function App() {
                 onClose={() => setDetailModalItem(null)}
                 onEdit={handleOpenEditModal as any}
                 onDelete={handleDeleteItem}
+                teams={dashboardData.teams}
               />
             )}
             {editModalItem && (
@@ -542,6 +555,8 @@ function App() {
                 isNew={editModalItem.isNew}
                 onClose={() => setEditModalItem(null)}
                 onSave={editModalItem.isNew ? handleCreateItem as any : handleUpdateItem as any}
+                teams={dashboardData.teams}
+                contacts={dashboardData.contacts}
               />
             )}
             <ReleaseNotesModal

@@ -41,7 +41,15 @@ const app = express();
 const port = Number(process.env.API_PORT || 4000);
 
 // Initialize email service
+// Initialize email service
+process.on('exit', (code) => console.log(`Process exiting with code: ${code}`));
+process.on('SIGINT', () => { console.log('Received SIGINT'); process.exit(); });
+process.on('uncaughtException', (err) => { console.error('Uncaught Exception:', err); process.exit(1); });
+
 initEmailService();
+
+// Prevent process from exiting (temporary fix for development)
+setInterval(() => { }, 1 << 30);
 
 ensureDataEnvironment()
   .then(() => {
